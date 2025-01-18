@@ -1,0 +1,2 @@
+This file details the rules for styling of the engine's source code.
+
