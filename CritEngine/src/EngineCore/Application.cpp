@@ -2,10 +2,6 @@
 
 namespace Engine {
 
-	std::unique_ptr<Application> Application::Create() {
-		return std::make_unique<Application>();
-	}
-
 	Application::Application() 
 	{
 

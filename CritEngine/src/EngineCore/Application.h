@@ -9,7 +9,6 @@ namespace Engine {
 	class ENGINE_API Application
 	{
 	public:
-		static std::unique_ptr<Application> Create();
 		Application();
 		virtual ~Application();
 
@@ -18,6 +17,8 @@ namespace Engine {
 	private:
 		
 	};
+
+	std::unique_ptr<Application> CreateApplication();
 }
 
 

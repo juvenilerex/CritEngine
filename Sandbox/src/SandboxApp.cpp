@@ -18,3 +18,7 @@ public:
 
 	}
 };
+
+std::unique_ptr<Engine::Application> Engine::CreateApplication() {
+	return std::make_unique<Engine::Application>(Sandbox());
+};
