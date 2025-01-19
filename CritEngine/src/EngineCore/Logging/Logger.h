@@ -23,7 +23,7 @@ namespace Logger {
 
 		// Functions to call a specific type of log
 		static void Info(const std::string message) { Log(INFO, NONCRITICAL, LabelToString(INFO) + message + SeverityToString(NONCRITICAL) + GetCurrentTimestamp()); }
-		static void Warning(const std::string message) { Log(WARNING, NONCRITICAL, message + SeverityToString(NONCRITICAL) + GetCurrentTimestamp());}
+		static void Warning(const std::string message) { Log(WARNING, NONCRITICAL, LabelToString(WARNING) + message + SeverityToString(NONCRITICAL) + GetCurrentTimestamp());}
 		static void Error(const std::string message) { Log(ERROR, CRITICAL, LabelToString(ERROR) + message + SeverityToString(CRITICAL) + GetCurrentTimestamp());}
 
 	private:

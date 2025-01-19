@@ -13,6 +13,7 @@ public:
 	{
 		Logger::Logger::Info("Thing found..");
 		Logger::Logger::Error("Error found..");
+		Logger::Logger::Warning("Warning found..");
 	}
 
 	~Sandbox()
