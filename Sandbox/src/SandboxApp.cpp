@@ -11,9 +11,9 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		Engine::Logger::Info("Sandbox", "Thing found.");
-		Engine::Logger::Error("Sandbox", "Error found.");
-		Engine::Logger::Warning("Sandbox", "Warning found.");
+		LogInfo("Sandbox", "Thing found.");
+		LogError("Sandbox", "Error found.");
+		LogWarning("Sandbox", "Warning found.");
 	}
 
 	~Sandbox()
