@@ -16,10 +16,27 @@ namespace Engine {
 		// Labels
 		enum Severity { ERROR, WARNING, INFO };
 
-
 		static void Log(std::string timestamp, std::string label, Severity severity, std::string msg) {
-			printf("[%s][%s][%s] %s\n", timestamp.c_str(), label.c_str(), SeverityToString(severity).c_str(), msg.c_str());
-			//std::cout << timestamp << msg << std::endl;
+
+
+			enum Color { RED = 31, YELLOW = 33, WHITE = 37 }; // Enum of relevant ascii codes for readability
+
+			int color = 0; // Our ascii color code
+
+			switch (severity) {
+			case ERROR:
+				color = Color::RED;
+				break;
+			case WARNING:
+				color = Color::YELLOW;
+				break;
+			case INFO:
+				color = Color::WHITE;
+				break;
+			}
+
+			printf("\033[%s;1;1m[%s][%s] %s \033[0m\n", std::to_string(color).c_str(), timestamp.c_str(), label.c_str(), msg.c_str());
+
 		}
 
 		// Functions to call a specific type of log
@@ -52,6 +69,7 @@ namespace Engine {
 			return timestamp.str();
 		}
 
+		/*
 		static std::string SeverityToString(Severity severity) {
 
 			switch (severity) {
@@ -62,6 +80,7 @@ namespace Engine {
 
 			}
 		}
+		*/
 
 	};
 }
