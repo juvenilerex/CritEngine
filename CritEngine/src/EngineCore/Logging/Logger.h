@@ -7,7 +7,7 @@
 #include <chrono>
 #include <sstream>
 
-namespace Logger {
+namespace Engine {
 
 	class Logger {
 
