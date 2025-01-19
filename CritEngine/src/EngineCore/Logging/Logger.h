@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <cstdio>
 #include <iomanip>
 #include <string>
 #include <chrono>
@@ -13,18 +14,18 @@ namespace Logger {
 	public:
 
 		// Labels
-		enum Label { ERROR, WARNING, INFO };
-		enum Severity { CRITICAL, NONCRITICAL };
+		enum Severity { ERROR, WARNING, INFO };
 
 
-		static void Log(Label label, Severity severity, std::string str) {
-			std::cout << str << std::endl;
+		static void Log(std::string timestamp, std::string label, Severity severity, std::string msg) {
+			printf("[%s][%s][%s] %s\n", timestamp.c_str(), label.c_str(), SeverityToString(severity).c_str(), msg.c_str());
+			//std::cout << timestamp << msg << std::endl;
 		}
 
 		// Functions to call a specific type of log
-		static void Info(const std::string message) { Log(INFO, NONCRITICAL, LabelToString(INFO) + message + SeverityToString(NONCRITICAL) + GetCurrentTimestamp()); }
-		static void Warning(const std::string message) { Log(WARNING, NONCRITICAL, LabelToString(WARNING) + message + SeverityToString(NONCRITICAL) + GetCurrentTimestamp());}
-		static void Error(const std::string message) { Log(ERROR, CRITICAL, LabelToString(ERROR) + message + SeverityToString(CRITICAL) + GetCurrentTimestamp());}
+		static void Info(const std::string label, const std::string message) { Log(GetCurrentTimestamp(), label, Severity::INFO, message); }
+		static void Warning(const std::string label, const std::string message) { Log(GetCurrentTimestamp(), label, Severity::WARNING, message); }
+		static void Error(const std::string label, const std::string message) { Log(GetCurrentTimestamp(), label, Severity::ERROR, message); }
 
 	private:
 
@@ -55,21 +56,9 @@ namespace Logger {
 
 			switch (severity) {
 
-				case CRITICAL: return " Severity: CRITICAL ";
-				case NONCRITICAL: return " Severity: NONCRITICAL ";
-
-			}
-		}
-
-		static std::string LabelToString(Label label) {
-
-			switch (label) {
-
-				case INFO: return "INFO: ";
-				case WARNING: return "WARNING: ";
-				case ERROR: return "ERROR: ";
-
-				default: return "UNKNOWN: ";
+				case INFO: return "INFO ";
+				case WARNING: return "WARN ";
+				case ERROR: return "ERROR";
 
 			}
 		}
