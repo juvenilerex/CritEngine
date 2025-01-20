@@ -9,38 +9,21 @@
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event.h>
 
-// Inherits from the Listener and takes on any behavior when notified
-class EventListener : public Listener { 
-	public:
-		void onNotify(const std::string& event) override {
-			LogInfo("Events", std::string(event + " notified"));			
-		}
-};
+using namespace Engine;
 
-// A duplicate to test functionality
-class SecondEventListener : public Listener {
+// Any game object inheriting Events can emit signals
+class TestObject {
 public:
-		void onNotify(const std::string& event) override {
-			if (event != "Juump") {
-				LogWarning("Events", std::string(event + " notified again!"));
-			}
-			else {
-				LogWarning("Events", std::string(event + " notified again with two u's!"));
-			}
-		}
-};
-
-// A test object (i.e, a player) that notifies any attached listeners with an event 
-class TestObject : public Emitter {
-public:
-	void Jump() {
-		notify("Jump");
-		notify("Juump");
+	void TestEmit(){
+		emit("Fun"); // We send out signal to the listeners to perform a function
+		emit("Fun3");
+		emit("Fun2");
 	}
 };
 
 class Sandbox : public Engine::Application
 {
+
 public:
 	Sandbox()
 	{
@@ -48,29 +31,14 @@ public:
 	}
 
 	int main() {
-		EventListener eventListener; // A listener object
-		SecondEventListener secondEventListener;
-		TestObject testObject; // Test object, like a player
 
-		testObject.addListener(&eventListener);
-		testObject.addFunction("Thing", [this]() {this->Fun(); }); // Weird lambda stuff but it all breaks if it's not there
-		testObject.addFunction("Thing2", [this]() {this->Fun2(); }); 
-		testObject.addFunction("Thing3", [this]() {this->Fun3(); }); 
+		TestObject testObject;
 
+		addListener("Fun", [this]() {this->Fun();  }); // This lambda expression is the glue but is ugly
+		addListener("Fun2", [this]() {this->Fun2(); });
+		addListener("Fun3", [this]() {this->Fun3(); });
 
-		testObject.triggerFunction("Thing"); // A small side effect here is if the event name is incorrect, it'll always
-		                                  // default to the first event added
-		testObject.triggerFunction("Thing2");
-		testObject.triggerFunction("Thing3");
-
-
-		testObject.Jump(); // Performing just a function. We can pass event names manually as well
-
-
-		LogInfo("Sandbox", "Thing found.");
-		LogError("Sandbox", "Error found.");
-		LogWarning("Sandbox", "Warning found.");
-
+		testObject.TestEmit(); 
 		return 0;
 	}
 
@@ -83,7 +51,6 @@ public:
 	void Fun3() {
 		LogWarning("Events", "Function 3 ran");
 	}
-
 
 	~Sandbox()
 	{

@@ -3,68 +3,32 @@
 #include <iostream>
 #include <vector>
 #include <functional>
-#include <algorithm>
 #include <unordered_map>
 #include "Logging/Logger.h"
 
-class Listener {
-public:
-	virtual void onNotify(const std::string& event) = 0; // To be overriden with our own behavior when inheriting
-
-};
-
-class Emitter {
+namespace Engine {
 
 	using FunctionPointer = std::function<void(void)>; // Make it so we can type all that less
 
-private:
-	std::vector<Listener*> listeners; // A dynamic list of listeners. 
 	std::vector<FunctionPointer> functions;
-	std::unordered_map<std::string, int> nameMap;
+	std::unordered_map<std::string, int> nameMap; // Names stored for manual triggering of functions
 
-public:
-	void addListener(Listener* listener) {
-		listeners.push_back(listener);
-		
-	}
-	void removeListener(Listener* listener) {
-		//TODO: Ability to remove a listener
-	}
-
-	// Stores functions to be called later
-	void addFunction(std::string funcName, FunctionPointer functionPointer) {
-
+	void addListener(std::string funcName, FunctionPointer functionPointer) {
 		functions.push_back(functionPointer);
 		nameMap[funcName] = functions.size() - 1;
-
 	}
 
-	void notify(const std::string& event) {
+	void emit(std::string funcName) {
 
-		for (Listener* listener : listeners) { 
-			listener->onNotify(event);
+		for (auto& pair : nameMap) {
+			if (pair.first == funcName) {
+				FunctionPointer func = functions[nameMap[funcName]];
+				func();
+				return;
+			}
 		}
-	}
-
-	// Trigger a function by name
-	void triggerFunction(std::string event) {
-
-		FunctionPointer func = functions[nameMap[event]];
-		func();
+		// If there is no matches to the function name
+		LogWarning("Event", funcName + " is not a valid function or could not be found");
 
 	}
-
-	// Trigger all stored functions
-	void triggerAll() {
-
-		for (FunctionPointer func : functions) {
-			func();
-		}
-
-	}
-
-	~Emitter() {
-		// I'm not sure if the vector will linger in memory, but if so, we might can clean it up here
-	}
-};
-
+}

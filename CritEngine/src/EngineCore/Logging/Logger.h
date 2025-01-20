@@ -7,6 +7,7 @@
 #include <chrono>
 #include <sstream>
 
+namespace Engine {
 	// Labels
 	enum Severity { ERROR, WARNING, INFO };
 
@@ -45,7 +46,7 @@
 			color = Color::RED;
 			break;
 		case WARNING:
-		color = Color::YELLOW;
+			color = Color::YELLOW;
 			break;
 		case INFO:
 			color = Color::WHITE;
@@ -61,4 +62,4 @@
 	void LogWarning(const std::string label, const std::string message) { Log(GetCurrentTimestamp(), label, Severity::WARNING, message); }
 	void LogError(const std::string label, const std::string message) { Log(GetCurrentTimestamp(), label, Severity::ERROR, message); }
 
-		
+}
