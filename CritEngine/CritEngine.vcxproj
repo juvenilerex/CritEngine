@@ -149,6 +149,7 @@ copy /B /Y ..\bin\Release-windows-x86_64\CritEngine\CritEngine.dll ..\bin\Releas
     <ClInclude Include="src\EngineCore\Application.h" />
     <ClInclude Include="src\EngineCore\Core.h" />
     <ClInclude Include="src\EngineCore\Entry.h" />
+    <ClInclude Include="src\EngineCore\Event.h" />
     <ClInclude Include="src\EngineCore\Logging\Logger.h" />
   </ItemGroup>
   <ItemGroup>

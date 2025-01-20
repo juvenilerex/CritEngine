@@ -12,6 +12,7 @@
     <ClInclude Include="src\EngineCore\Logging\Logger.h">
       <Filter>logging</Filter>
     </ClInclude>
+    <ClInclude Include="src\EngineCore\Event.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EngineCore\Application.cpp" />
