@@ -13,6 +13,9 @@ namespace Engine {
 	std::vector<FunctionPointer> functions;
 	std::unordered_map<std::string, int> nameMap; // Names stored for manual triggering of functions
 
+	// Nifty preprocessor thing so we don't have to rewrite the lambda function over and over
+	#define AddListener(a,b) addListener(a, [this]() {this->b(); }); 
+
 	void addListener(std::string funcName, FunctionPointer functionPointer) {
 		functions.push_back(functionPointer);
 		nameMap[funcName] = functions.size() - 1;
