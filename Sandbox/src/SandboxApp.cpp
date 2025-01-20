@@ -12,12 +12,12 @@
 
 using namespace Engine;
 
-// Any game object inheriting Events can emit signals
+
 class TestObject {
 public:
 	void TestEmit(){
 		emit("Fun"); // We send out signal to the listeners to perform a function
-		emit("Fun2"); // We send out signal to the listeners to perform a function
+		emit("Fun2");
 	}
 };
 
