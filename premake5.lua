@@ -33,7 +33,7 @@ project "CritEngine"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
+		staticruntime "Off"
 		systemversion "latest"
 
 		defines 
@@ -58,6 +58,7 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	
 
 	targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
 	objdir ("bin-intermediate/" .. outputDirectory .. "/%{prj.name}")
@@ -80,7 +81,7 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
+		staticruntime "Off"
 		systemversion "latest"
 
 		defines 
