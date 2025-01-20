@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdio>
+#include <functional>
+#include <iostream>
 
 #include <EngineCore/Application.h>
 #include <EngineCore/Entry.h>
@@ -50,10 +52,19 @@ public:
 		SecondEventListener secondEventListener;
 		TestObject testObject; // Test object, like a player
 
-		testObject.addListener(&eventListener); // Adding listeners to test object
-		testObject.addListener(&secondEventListener);
+		testObject.addListener(&eventListener);
+		testObject.addFunction("Thing", [this]() {this->Fun(); }); // Weird lambda stuff but it all breaks if it's not there
+		testObject.addFunction("Thing2", [this]() {this->Fun2(); }); 
+		testObject.addFunction("Thing3", [this]() {this->Fun3(); }); 
 
-		testObject.Jump(); // Peforming just a function. We can pass event names manually as well
+
+		testObject.triggerFunction("Thing"); // A small side effect here is if the event name is incorrect, it'll always
+		                                  // default to the first event added
+		testObject.triggerFunction("Thing2");
+		testObject.triggerFunction("Thing3");
+
+
+		testObject.Jump(); // Performing just a function. We can pass event names manually as well
 
 
 		LogInfo("Sandbox", "Thing found.");
@@ -62,6 +73,17 @@ public:
 
 		return 0;
 	}
+
+	void Fun(){
+		LogWarning("Events", "Function ran");
+	}
+	void Fun2() {
+		LogWarning("Events", "Function 2 ran");
+	}
+	void Fun3() {
+		LogWarning("Events", "Function 3 ran");
+	}
+
 
 	~Sandbox()
 	{
