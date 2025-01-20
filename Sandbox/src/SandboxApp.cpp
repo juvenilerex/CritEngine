@@ -7,19 +7,11 @@
 #include <EngineCore/Application.h>
 #include <EngineCore/Entry.h>
 #include <EngineCore/Logging/Logger.h>
-#include "EngineCore/Event.h"
+#include <EngineCore/Event/Event.h>
 
-
-using namespace Engine;
-
-
-class TestObject {
-public:
-	void TestEmit(){
-		emit("Fun"); // We send out signal to the listeners to perform a function
-		emit("Fun2");
-	}
-};
+void SampleRawFunction() {
+	Engine::LogWarning("Events", "Raw Function ran");
+}
 
 class Sandbox : public Engine::Application
 {
@@ -30,25 +22,31 @@ public:
 		main();
 	}
 
+	void SampleMemberFunction() {
+		Engine::LogWarning("Events", "Member Function ran");
+	}
+
 	int main() {
 
-		TestObject testObject;
+		Engine::EventEmitter eventEmitter = Engine::EventEmitter();
 
-		AddListener("Fun", Fun); /* Just a slight abstraction of the original function (can be found in Event.h)
-									Listens for a signal that an object will emit, and runs a function
-								 */
-		AddListener("Fun2", Fun2);
+		eventEmitter.AddListener([]() {
+			Engine::LogWarning("Events", "Lambda ran");
+			}
+		);
 		
-		testObject.TestEmit(); 
+		std::function<void()> raw = &SampleRawFunction;
+		eventEmitter.AddListener(raw);
+
+		std::function<void()> member = std::bind(&Sandbox::SampleMemberFunction, this);
+		eventEmitter.AddListener(member);
+
+		eventEmitter.Emit();
+		
 		return 0;
 	}
 
-	void Fun(){
-		LogWarning("Events", "Function ran");
-	}
-	void Fun2() {
-		LogWarning("Events", "Function 2 ran");
-	}
+
 
 	~Sandbox()
 	{
