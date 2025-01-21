@@ -2,6 +2,7 @@ bin
 bin-intermediate
 
 .vs
+*.vcxproj*
 *.sln
 *.vcxproj
 *.vcxproj.filters
