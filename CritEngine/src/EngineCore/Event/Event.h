@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector>
 #include <functional>
-#include <unordered_map>
 
 #include "../Core.h"
 
