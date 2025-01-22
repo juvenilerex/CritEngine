@@ -18,12 +18,15 @@ project "CritEngine"
 	
 	targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
 	objdir ("bin-intermediate/" .. outputDirectory .. "/%{prj.name}")
+	includedirs { "thirdparty/libs/glad/include/", "thirdparty/libs/glfw/include/", "thirdparty/libs/glm/", "thirdparty/libs/imgui/", "thirdparty/libs/imgui/examples" }
 
 	files
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp"
 	}
+
+	links { "GLFW", "GLM", "GLAD", "ImGui" }
 
 	postbuildcommands 
 	{ 
@@ -53,6 +56,11 @@ project "CritEngine"
 	filter "configurations:Release"
 		defines "CE_RELEASE"
 		optimize "On"
+
+	include "thirdparty/libs/glfw.lua"
+	include "thirdparty/libs/glad.lua"
+	include "thirdparty/libs/glm.lua"
+	include "thirdparty/libs/imgui.lua"
 
 project "Sandbox"
 	location "Sandbox"
