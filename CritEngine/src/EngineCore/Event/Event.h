@@ -10,10 +10,10 @@
 
 namespace Engine {
 
-	class ENGINE_API EventEmitter {
+	class ENGINE_API EventEmitterBase {
 	public:
 
-		EventEmitter();
+		EventEmitterBase();
 
 		void AddListener(std::function<void()> func);
 		void Emit();
