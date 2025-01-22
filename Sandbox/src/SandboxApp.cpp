@@ -28,7 +28,7 @@ public:
 
 	int main() {
 
-		Engine::EventEmitter eventEmitter = Engine::EventEmitter();
+		Engine::EventEmitterBase eventEmitter = Engine::EventEmitterBase();
 
 		eventEmitter.AddListener([]() {
 			Engine::LogWarning("Events", "Lambda ran");
