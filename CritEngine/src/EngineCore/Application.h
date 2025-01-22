@@ -12,7 +12,7 @@ namespace Engine {
 		Application();
 		virtual ~Application();
 
-		void Run();
+		void virtual Tick();
 
 	private:
 		
