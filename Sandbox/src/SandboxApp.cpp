@@ -5,55 +5,39 @@
 #include <iostream>
 
 #include <EngineCore/Application.h>
-#include <EngineCore/Entry.h>
+#include <EngineCore/Core/MainLoop.h>
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
-
-void SampleRawFunction() {
-	Engine::LogWarning("Events", "Raw Function ran");
-}
+#include <EngineCore/Entry.h>
 
 class Sandbox : public Engine::Application
 {
 
 public:
+	int test = 10;
 	Sandbox()
 	{
-		main();
+		printf("Hello");
+		//main();
+		std::ostringstream get_the_address;
+		get_the_address << this;
+		Engine::LogInfo("Sandbox", get_the_address.str());
 	}
 
-	void SampleMemberFunction() {
-		Engine::LogWarning("Events", "Member Function ran");
-	}
+	void Tick() override {
+		Engine::LogInfo("Sandbox", "Tock!");
+	};
 
 	int main() {
-
-		Engine::EventEmitter eventEmitter = Engine::EventEmitter();
-
-		eventEmitter.AddListener([]() {
-			Engine::LogWarning("Events", "Lambda ran");
-			}
-		);
-		
-		std::function<void()> raw = &SampleRawFunction;
-		eventEmitter.AddListener(raw);
-
-		std::function<void()> member = std::bind(&Sandbox::SampleMemberFunction, this);
-		eventEmitter.AddListener(member);
-
-		eventEmitter.Emit();
-		
 		return 0;
 	}
 
-
-
 	~Sandbox()
 	{
-
+		Engine::LogWarning("Sandbox", "Destroyed!");
 	}
 };
 
-std::unique_ptr<Engine::Application> Engine::CreateApplication() {
-	return std::make_unique<Engine::Application>(Sandbox());
+std::unique_ptr<Engine::Application> CreateApplication() {
+	return std::make_unique<Sandbox>(Sandbox());
 };

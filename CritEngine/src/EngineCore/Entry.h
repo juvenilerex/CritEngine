@@ -1,12 +1,11 @@
 #pragma once
 
-#include "Application.h"
+#include "Core/MainLoop.h"
 
-extern std::unique_ptr<Engine::Application> Engine::CreateApplication();
+extern std::unique_ptr<Engine::Application> CreateApplication();
 
 int main(int argc, char** argv)
 {
-	std::unique_ptr<Engine::Application> Application = Engine::CreateApplication();
-	Application->Run();
+	Engine::MainLoop loop = Engine::MainLoop(std::move(CreateApplication()));
+	loop.Run();
 }
-

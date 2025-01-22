@@ -5,15 +5,15 @@
 
 namespace Engine {
 
-	EventEmitter::EventEmitter() {
+	EventEmitterBase::EventEmitterBase() {
 		LogWarning("Event", "Emitter Created!");
 	};
 
-	void EventEmitter::AddListener(std::function<void()> func) {
+	void EventEmitterBase::AddListener(std::function<void()> func) {
 		this->callbacks.push_back(func);
 	}
 
-	void EventEmitter::Emit() {
+	void EventEmitterBase::Emit() {
 
 		for (int32_t i = 0; i < this->callbacks.size(); i++) {
 			this->callbacks[i]();
