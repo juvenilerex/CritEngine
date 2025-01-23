@@ -18,7 +18,7 @@ project "CritEngine"
 	
 	targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
 	objdir ("bin-intermediate/" .. outputDirectory .. "/%{prj.name}")
-	includedirs { "thirdparty/libs/glad/include/", "thirdparty/libs/glfw/include/", "thirdparty/libs/glm/", "thirdparty/libs/imgui/", "thirdparty/libs/imgui/examples" }
+	includedirs { "CritEngine/thirdparty/libs/glfw/include/", "CritEngine/thirdparty/libs/glad/include/", "CritEngine/thirdparty/libs/glm/", "CritEngine/thirdparty/libs/imgui/", "CritEngine/thirdparty/libs/imgui/examples"}
 
 	files
 	{
@@ -57,10 +57,10 @@ project "CritEngine"
 		defines "CE_RELEASE"
 		optimize "On"
 
-	include "thirdparty/libs/glfw.lua"
-	include "thirdparty/libs/glad.lua"
-	include "thirdparty/libs/glm.lua"
-	include "thirdparty/libs/imgui.lua"
+	include "CritEngine/thirdparty/libs/glfw.lua"
+	include "CritEngine/thirdparty/libs/glad.lua"
+	include "CritEngine/thirdparty/libs/glm.lua"
+	include "CritEngine/thirdparty/libs/imgui.lua"
 
 project "Sandbox"
 	location "Sandbox"
