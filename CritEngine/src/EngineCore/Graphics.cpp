@@ -16,6 +16,7 @@ namespace Engine {
 	//
 	void GraphicsRenderer::Draw()
 	{
+		glClearColor(0.6f, 0.3f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		window->SwapBuffers();
 	}

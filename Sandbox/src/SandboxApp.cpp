@@ -9,23 +9,33 @@
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
 #include <EngineCore/Entry.h>
+#include <EngineCore/Graphics.h>
 
 class Sandbox : public Engine::Application
 {
 
 public:
-	int test = 10;
+
+	std::shared_ptr<Engine::Window> window;
+	std::shared_ptr<Engine::GraphicsRenderer> renderer = nullptr;
+
 	Sandbox()
 	{
-		printf("Hello");
-		//main();
+		window = std::make_shared<Engine::Window>(800, 600, "CritEgine");
+		renderer = std::make_shared<Engine::GraphicsRenderer>(*window);
+
 		std::ostringstream get_the_address;
 		get_the_address << this;
 		Engine::LogInfo("Sandbox", get_the_address.str());
+
+		window->windowCloseEvent.AddListener([]() {
+			});
+
 	}
 
 	void Tick() override {
-		Engine::LogInfo("Sandbox", "Tock!");
+		renderer->Draw();
+		renderer->PollEvents();
 	};
 
 	int main() {

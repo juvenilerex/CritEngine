@@ -18,25 +18,9 @@ namespace Engine {
 		std::ostringstream get_the_address;
 		get_the_address << this->application;
 		Engine::LogInfo("MainLoop", get_the_address.str());
-
-		 
-		Window window(800, 600, "CritEngine");
-		GraphicsRenderer graphicsRenderer(window);
-
-
-//		window.windowCloseEvent.AddListener([this]() { MainLoop::Stop(); LogWarning("Event", "Thing."); });
-		window.windowCloseEvent.AddListener([&window](){
-			
-			window.Test();
-			
-			});
 		
 
-		while (is_running && !window.ShouldClose()) { 
-			// Render stuff here (?)
-			graphicsRenderer.Draw();
-			graphicsRenderer.PollEvents();
-
+		while (is_running) { 
 			Tick();
 		}
 
