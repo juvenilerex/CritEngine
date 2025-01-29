@@ -18,9 +18,19 @@ namespace Engine {
 		get_the_address << this->application;
 		Engine::LogInfo("MainLoop", get_the_address.str());
 
+		 
 		Window window(800, 600, "CritEngine");
 
-		while (is_running && !window.shouldClose()) {
+		
+//		window.windowCloseEvent.AddListener([this]() { MainLoop::Stop(); LogWarning("Event", "Thing."); });
+		window.windowCloseEvent.AddListener([&window](){
+			
+			window.Test();
+			
+			});
+		
+
+		while (is_running && !window.shouldClose()) { 
 			// Render stuff here (?)
 			glClear(GL_COLOR_BUFFER_BIT);
 

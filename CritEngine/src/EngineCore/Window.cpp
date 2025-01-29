@@ -15,6 +15,7 @@ namespace Engine {
 
         glfwDestroyWindow(window);
         glfwTerminate();
+        windowCloseEvent.Emit();
 
     }
 
@@ -58,6 +59,14 @@ namespace Engine {
 
     bool Window::shouldClose()  {
         return glfwWindowShouldClose(window);
+    }
+
+    void Window::setShouldClose(int value) {
+        glfwSetWindowShouldClose(window, value);
+    }
+
+    void Window::Test() {
+        LogWarning("Event", "Test");
     }
 
     void Window::swapBuffers() {
