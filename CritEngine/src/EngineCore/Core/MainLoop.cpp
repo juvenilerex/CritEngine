@@ -32,7 +32,7 @@ namespace Engine {
 			});
 		
 
-		while (is_running && !window.shouldClose()) { 
+		while (is_running && !window.ShouldClose()) { 
 			// Render stuff here (?)
 			graphicsRenderer.Draw();
 			graphicsRenderer.PollEvents();

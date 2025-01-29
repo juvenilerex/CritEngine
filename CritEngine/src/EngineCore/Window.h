@@ -17,17 +17,17 @@ namespace Engine {
         Window(int width, int height, std::string title);
         ~Window();
 
-        bool shouldClose();
-        void setShouldClose(int value);
-        void swapBuffers();
+        bool ShouldClose();
+        void SetShouldClose(int value);
+        void SwapBuffers();
         void Test();
-        void pollEvents();
+        void PollEvents();
 
     private:
         GLFWwindow* window;
 
-        void initializeGLFW();
-        void initializeGLAD();
+        void InitializeGLFW();
+        void InitializeGLAD();
         void createWindow(int width, int height, std::string title);
 
     };

@@ -17,12 +17,12 @@ namespace Engine {
 	void GraphicsRenderer::Draw()
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-		window->swapBuffers();
+		window->SwapBuffers();
 	}
 
 	void GraphicsRenderer::PollEvents()
 	{
-		window->pollEvents();
+		window->PollEvents();
 	}
 
 }

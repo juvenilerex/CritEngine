@@ -5,9 +5,9 @@ namespace Engine {
 
     Window::Window(int width, int height, std::string title) {
 
-        initializeGLFW();
+        InitializeGLFW();
         createWindow(width, height, title);
-        initializeGLAD();
+        InitializeGLAD();
 
     }
 
@@ -19,7 +19,7 @@ namespace Engine {
 
     }
 
-    void Window::initializeGLFW() {
+    void Window::InitializeGLFW() {
 
         if (!glfwInit()) {
             LogError("GLFW", "Failed to initialize GLFW!");
@@ -48,7 +48,7 @@ namespace Engine {
 
     }
 
-    void Window::initializeGLAD() {
+    void Window::InitializeGLAD() {
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             LogError("GLAD", "Failed to initialize GLAD!");
@@ -57,11 +57,11 @@ namespace Engine {
 
     }
 
-    bool Window::shouldClose()  {
+    bool Window::ShouldClose()  {
         return glfwWindowShouldClose(window);
     }
 
-    void Window::setShouldClose(int value) {
+    void Window::SetShouldClose(int value) {
         glfwSetWindowShouldClose(window, value);
     }
 
@@ -69,11 +69,11 @@ namespace Engine {
         LogWarning("Event", "Test");
     }
 
-    void Window::swapBuffers() {
+    void Window::SwapBuffers() {
         glfwSwapBuffers(window);
     }
 
-    void Window::pollEvents() {
+    void Window::PollEvents() {
         glfwPollEvents();
     }
 };
