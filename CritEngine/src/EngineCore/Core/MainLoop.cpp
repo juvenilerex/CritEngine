@@ -1,6 +1,7 @@
 
 #include "MainLoop.h"
 #include "../Logging/Logger.h"
+#include "../Window.h"
 
 namespace Engine {
 
@@ -10,18 +11,29 @@ namespace Engine {
 	};
 
 	void MainLoop::Run() {
+
 		this->is_running = true;
 
 		std::ostringstream get_the_address;
 		get_the_address << this->application;
 		Engine::LogInfo("MainLoop", get_the_address.str());
 
-		while (is_running) {
+		Window window(800, 600, "CritEngine");
+
+		while (is_running && !window.shouldClose()) {
+			// Render stuff here (?)
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			window.swapBuffers();
+			window.pollEvents();
+
 			Tick();
 		}
+
 	};
 
 	void MainLoop::Stop() {
+
 		this->is_running = false;
 	};
 
@@ -30,4 +42,3 @@ namespace Engine {
 		this->application->Tick();
 	};
 }
-
