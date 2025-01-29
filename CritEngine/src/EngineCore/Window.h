@@ -24,7 +24,6 @@ namespace Engine {
         void pollEvents();
 
     private:
-
         GLFWwindow* window;
 
         void initializeGLFW();

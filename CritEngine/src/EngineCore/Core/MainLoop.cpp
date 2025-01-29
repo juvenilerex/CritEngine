@@ -2,6 +2,7 @@
 #include "MainLoop.h"
 #include "../Logging/Logger.h"
 #include "../Window.h"
+#include "../Graphics.h"
 
 namespace Engine {
 
@@ -20,8 +21,9 @@ namespace Engine {
 
 		 
 		Window window(800, 600, "CritEngine");
+		GraphicsRenderer graphicsRenderer(window);
 
-		
+
 //		window.windowCloseEvent.AddListener([this]() { MainLoop::Stop(); LogWarning("Event", "Thing."); });
 		window.windowCloseEvent.AddListener([&window](){
 			
@@ -32,10 +34,8 @@ namespace Engine {
 
 		while (is_running && !window.shouldClose()) { 
 			// Render stuff here (?)
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			window.swapBuffers();
-			window.pollEvents();
+			graphicsRenderer.Draw();
+			graphicsRenderer.PollEvents();
 
 			Tick();
 		}
@@ -43,7 +43,6 @@ namespace Engine {
 	};
 
 	void MainLoop::Stop() {
-
 		this->is_running = false;
 	};
 
