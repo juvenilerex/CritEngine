@@ -16,22 +16,16 @@ class Sandbox : public Engine::Application
 
 public:
 
-	std::shared_ptr<Engine::Window> window;
 	std::shared_ptr<Engine::GraphicsRenderer> renderer = nullptr;
 
 	Sandbox()
 	{
-		window = std::make_shared<Engine::Window>(800, 600, "CritEgine");
-		renderer = std::make_shared<Engine::GraphicsRenderer>(*window);
-
+		renderer = std::make_unique<Engine::GraphicsRenderer>();
 		std::ostringstream get_the_address;
 		get_the_address << this;
 		Engine::LogInfo("Sandbox", get_the_address.str());
-
-		window->windowCloseEvent.AddListener([]() {
-			});
-
 	}
+
 
 	void Tick() override {
 		renderer->Draw();

@@ -2,8 +2,6 @@
 
 #include "Event/Event.h"
 #include "Logging/Logger.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <string>
 
 namespace Engine {
@@ -24,7 +22,6 @@ namespace Engine {
         void PollEvents();
 
     private:
-        GLFWwindow* window;
 
         void InitializeGLFW();
         void InitializeGLAD();

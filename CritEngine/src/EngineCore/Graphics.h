@@ -7,13 +7,13 @@ namespace Engine {
 	class ENGINE_API GraphicsRenderer {
 
 	public:
-		GraphicsRenderer(Window& _window);
+		GraphicsRenderer();
 		~GraphicsRenderer();
 
 		void Draw();
 		void PollEvents();
 
 	private:
-		Window* window;
+		std::shared_ptr<Engine::Window> window;
 	};
 }

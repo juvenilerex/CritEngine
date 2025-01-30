@@ -1,10 +1,14 @@
 #include "Graphics.h"
+#include "Core/MainLoop.h" // Need this to reference the window context we created
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace Engine {
 
-	GraphicsRenderer::GraphicsRenderer(Window& _window)
+
+	GraphicsRenderer::GraphicsRenderer()
 	{
-		window = &_window; // We'll pass our main window into the constructor above
+		window = GetEngineWindow();
 	}
 
 	GraphicsRenderer::~GraphicsRenderer()

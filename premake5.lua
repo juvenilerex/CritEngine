@@ -70,8 +70,6 @@ project "Sandbox"
 
 	targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
 	objdir ("bin-intermediate/" .. outputDirectory .. "/%{prj.name}")
-	includedirs { "CritEngine/thirdparty/libs/glfw/include/", "CritEngine/thirdparty/libs/glad/include/", "CritEngine/thirdparty/libs/glm/", "CritEngine/thirdparty/libs/imgui/", "CritEngine/thirdparty/libs/imgui/examples"}
-
 	
 
 	files
@@ -80,7 +78,7 @@ project "Sandbox"
 		"%{prj.name}/src/**.cpp"
 	}
 
-	links { "GLFW", "GLM", "GLAD", "ImGui" }
+
 
 	includedirs 
 	{
@@ -114,8 +112,3 @@ project "Sandbox"
 	filter "configurations:Release"
 		defines "CE_RELEASE"
 		optimize "On"
-
-	include "CritEngine/thirdparty/libs/glfw.lua"
-	include "CritEngine/thirdparty/libs/glad.lua"
-	include "CritEngine/thirdparty/libs/glm.lua"
-	include "CritEngine/thirdparty/libs/imgui.lua"

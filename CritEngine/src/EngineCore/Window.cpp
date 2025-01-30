@@ -1,7 +1,11 @@
 #include "Window.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
 
 namespace Engine {
+
+    GLFWwindow* window;
 
     Window::Window(int width, int height, std::string title) {
 
@@ -76,4 +80,5 @@ namespace Engine {
     void Window::PollEvents() {
         glfwPollEvents();
     }
+
 };

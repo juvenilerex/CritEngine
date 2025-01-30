@@ -1,8 +1,5 @@
 
 #include "MainLoop.h"
-#include "../Logging/Logger.h"
-#include "../Window.h"
-#include "../Graphics.h"
 
 namespace Engine {
 
@@ -11,7 +8,11 @@ namespace Engine {
 		this->application = std::move(applicationInstance);
 	};
 
+	std::shared_ptr<Engine::Window> window;
+
 	void MainLoop::Run() {
+
+		window = std::make_shared<Engine::Window>(800, 600, "CritEgine");
 
 		this->is_running = true;
 
@@ -19,7 +20,6 @@ namespace Engine {
 		get_the_address << this->application;
 		Engine::LogInfo("MainLoop", get_the_address.str());
 		
-
 		while (is_running) { 
 			Tick();
 		}
@@ -34,4 +34,10 @@ namespace Engine {
 		//LogInfo("MainLoop", "Tick!");
 		this->application->Tick();
 	};
+
+	std::shared_ptr<Engine::Window> GetEngineWindow()
+	{
+		return window;
+	}
+
 }
