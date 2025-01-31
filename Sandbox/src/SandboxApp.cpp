@@ -16,20 +16,14 @@ class Sandbox : public Engine::Application
 
 public:
 
-	std::shared_ptr<Engine::GraphicsRenderer> renderer = nullptr;
-
 	Sandbox()
 	{
-		renderer = std::make_unique<Engine::GraphicsRenderer>();
-		std::ostringstream get_the_address;
-		get_the_address << this;
-		Engine::LogInfo("Sandbox", get_the_address.str());
+		//
 	}
 
 
 	void Tick() override {
-		renderer->Draw();
-		renderer->PollEvents();
+		//
 	};
 
 	int main() {

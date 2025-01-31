@@ -6,9 +6,9 @@
 namespace Engine {
 
 
-	GraphicsRenderer::GraphicsRenderer()
+	GraphicsRenderer::GraphicsRenderer(Engine::Window& window_ref) 
+		: window(window_ref)
 	{
-		window = GetEngineWindow();
 	}
 
 	GraphicsRenderer::~GraphicsRenderer()
@@ -22,12 +22,7 @@ namespace Engine {
 	{
 		glClearColor(0.6f, 0.3f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		window->SwapBuffers();
-	}
-
-	void GraphicsRenderer::PollEvents()
-	{
-		window->PollEvents();
+		window.SwapBuffers();
 	}
 
 }

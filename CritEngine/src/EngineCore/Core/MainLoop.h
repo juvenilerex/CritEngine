@@ -12,8 +12,6 @@
 
 namespace Engine {
 
-	std::shared_ptr<Engine::Window> GetEngineWindow();
-
 	class ENGINE_API MainLoop {
 	public:
 		MainLoop(std::unique_ptr<Application> applicationInstance);
@@ -24,6 +22,8 @@ namespace Engine {
 		bool is_running = true;
 
 		std::unique_ptr<Application> application = nullptr;
+		std::unique_ptr<Window> window = nullptr;
+		std::unique_ptr<GraphicsRenderer> renderer = nullptr;
 	};
 }
 

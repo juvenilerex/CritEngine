@@ -5,8 +5,6 @@
 
 namespace Engine {
 
-    GLFWwindow* window;
-
     Window::Window(int width, int height, std::string title) {
 
         InitializeGLFW();

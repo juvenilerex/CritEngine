@@ -4,6 +4,8 @@
 #include "Logging/Logger.h"
 #include <string>
 
+struct GLFWwindow;
+
 namespace Engine {
 
     class ENGINE_API Window {
@@ -23,6 +25,7 @@ namespace Engine {
 
     private:
 
+        GLFWwindow* window;
         void InitializeGLFW();
         void InitializeGLAD();
         void createWindow(int width, int height, std::string title);

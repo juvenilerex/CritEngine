@@ -4,21 +4,16 @@
 namespace Engine {
 
 	MainLoop::MainLoop(std::unique_ptr<Application> applicationInstance) {
-		Engine::LogInfo("MainLoop", "Huh");
+		Engine::LogInfo("MainLoop", "Starting");
 		this->application = std::move(applicationInstance);
 	};
 
-	std::shared_ptr<Engine::Window> window;
-
 	void MainLoop::Run() {
 
-		window = std::make_shared<Engine::Window>(800, 600, "CritEgine");
+		window = std::make_unique<Engine::Window>(800, 600, "CritEngine");
+		renderer = std::make_unique<Engine::GraphicsRenderer>(*window.get());
 
 		this->is_running = true;
-
-		std::ostringstream get_the_address;
-		get_the_address << this->application;
-		Engine::LogInfo("MainLoop", get_the_address.str());
 		
 		while (is_running) { 
 			Tick();
@@ -31,13 +26,9 @@ namespace Engine {
 	};
 
 	void MainLoop::Tick() {
-		//LogInfo("MainLoop", "Tick!");
 		this->application->Tick();
+		this->window->PollEvents();
+		this->renderer->Draw();
 	};
-
-	std::shared_ptr<Engine::Window> GetEngineWindow()
-	{
-		return window;
-	}
 
 }
