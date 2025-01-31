@@ -4,3 +4,5 @@ bin-intermediate
 *.vcxproj*
 *.sln
 !thirdparty/*
+CritEngine/thirdparty/bin/*
+CritEngine/thirdparty/obj/*
