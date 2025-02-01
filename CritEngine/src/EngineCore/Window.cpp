@@ -39,14 +39,6 @@ namespace Engine {
             Window* window_object = static_cast<Window*>(glfwGetWindowUserPointer(window));
             });
 
-        glfwMakeContextCurrent(this->windowHandle);
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-            LogError("GLAD", "Failed to initialize GLAD!");
-            exit(EXIT_FAILURE);
-        }
-
-        glfwSwapInterval(1); // Wait on 1 monitor refresh before swapping buffers / VSync
-
         return true;
     }
 
