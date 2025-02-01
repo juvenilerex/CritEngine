@@ -5,74 +5,66 @@
 
 namespace Engine {
 
-    Window::Window(int width, int height, std::string title) {
-
-        InitializeGLFW();
-        createWindow(width, height, title);
-        InitializeGLAD();
-
-    }
-
-    Window::~Window() {
-
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        windowCloseEvent.Emit();
-
-    }
-
-    void Window::InitializeGLFW() {
+    Window::Window() {
 
         if (!glfwInit()) {
             LogError("GLFW", "Failed to initialize GLFW!");
             exit(EXIT_FAILURE);
         }
+    }
+
+    Window::~Window() {
+
+        glfwDestroyWindow(windowHandle);
+        glfwTerminate();
+
+    }
+
+    bool Window::CreateWindowHandle(int width, int height, std::string title) {
 
         // We can use whatever version we want, I just set it to the latest
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    }
+        this->windowHandle = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
-    void Window::createWindow(int width, int height, std::string title) {
-
-        window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-
-        if (!window) {
+        if (!this->windowHandle) {
             LogError("GLFW", "Failed to create GLFW window!");
-            glfwTerminate();
-            exit(EXIT_FAILURE);
+            return false;
         }
 
-        glfwMakeContextCurrent(window);
-        glfwSwapInterval(1); // Wait on 1 monitor refresh before swapping buffers / VSync
+        glfwSetWindowUserPointer(this->windowHandle, this);
+        glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* window) {
+            Window* window_object = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            });
 
-    }
-
-    void Window::InitializeGLAD() {
-
+        glfwMakeContextCurrent(this->windowHandle);
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
             LogError("GLAD", "Failed to initialize GLAD!");
             exit(EXIT_FAILURE);
         }
 
+        glfwSwapInterval(1); // Wait on 1 monitor refresh before swapping buffers / VSync
+
+        return true;
     }
 
-    bool Window::ShouldClose()  {
-        return glfwWindowShouldClose(window);
+    void Window::DestroyWindowHandle() {
+        glfwDestroyWindow(this->windowHandle);
+        this->windowHandle = nullptr;
     }
 
-    void Window::SetShouldClose(int value) {
-        glfwSetWindowShouldClose(window, value);
+    bool Window::IsHandleValid() {
+        return this->windowHandle != nullptr;
     }
 
-    void Window::Test() {
-        LogWarning("Event", "Test");
+    GLFWwindow* Window::GetHandle() {
+        return this->windowHandle;
     }
 
     void Window::SwapBuffers() {
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(this->windowHandle);
     }
 
     void Window::PollEvents() {

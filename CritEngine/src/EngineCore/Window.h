@@ -12,23 +12,23 @@ namespace Engine {
 
     public:
 
-        EventEmitterBase windowCloseEvent;
-
-        Window(int width, int height, std::string title);
+        Window();
         ~Window();
+        
+        
+        bool CreateWindowHandle(int width, int height, std::string title);
+        void DestroyWindowHandle();
 
-        bool ShouldClose();
-        void SetShouldClose(int value);
-        void SwapBuffers();
-        void Test();
+        bool IsHandleValid();
+        GLFWwindow* GetHandle();
+
         void PollEvents();
+        void SwapBuffers();
 
     private:
-
-        GLFWwindow* window;
-        void InitializeGLFW();
-        void InitializeGLAD();
-        void createWindow(int width, int height, std::string title);
+        GLFWwindow* windowHandle = nullptr;
+        
+        
 
     };
 

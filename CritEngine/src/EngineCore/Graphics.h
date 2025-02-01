@@ -13,6 +13,6 @@ namespace Engine {
 		void Draw();
 
 	private:
-		Engine::Window& window;
+		GLFWwindow* windowHandle;
 	};
 }

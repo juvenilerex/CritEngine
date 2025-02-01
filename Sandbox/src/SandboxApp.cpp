@@ -9,21 +9,15 @@
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
 #include <EngineCore/Entry.h>
-#include <EngineCore/Graphics.h>
 
 class Sandbox : public Engine::Application
 {
 
 public:
 
-	Sandbox()
-	{
-		//
-	}
-
 
 	void Tick() override {
-		//
+		Engine::LogInfo("Sandbox", "Tick!");
 	};
 
 	int main() {
@@ -37,5 +31,6 @@ public:
 };
 
 std::unique_ptr<Engine::Application> CreateApplication() {
-	return std::make_unique<Sandbox>(Sandbox());
+	std::unique_ptr<Sandbox>(new Sandbox());
+	return std::make_unique<Sandbox>();
 };

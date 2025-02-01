@@ -10,9 +10,6 @@ namespace Engine {
 
 	void MainLoop::Run() {
 
-		window = std::make_unique<Engine::Window>(800, 600, "CritEngine");
-		renderer = std::make_unique<Engine::GraphicsRenderer>(*window.get());
-
 		this->is_running = true;
 		
 		while (is_running) { 
@@ -26,9 +23,8 @@ namespace Engine {
 	};
 
 	void MainLoop::Tick() {
+		this->application->TickInternal();
 		this->application->Tick();
-		this->window->PollEvents();
-		this->renderer->Draw();
 	};
 
 }
