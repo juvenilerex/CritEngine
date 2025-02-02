@@ -9,6 +9,7 @@ namespace Engine {
 		this->window = std::make_unique<Engine::Window>();
 		this->window->CreateWindowHandle(800, 600, "Sandbox");
 
+		this->input = std::make_unique<Engine::InputListener>(*window.get());
 		this->renderer = std::make_unique<Engine::GraphicsRenderer>(*window.get());
 
 		
@@ -28,6 +29,14 @@ namespace Engine {
 			this->window->PollEvents();
 			this->renderer->Draw();
 		}	
+	}
+
+	bool Application::GetKeyDown(int key) {
+		return this->input->GetKeyDown(key);
+	}
+
+	bool Application::GetKeyReleased(int key) {
+		return this->input->GetKeyUp(key);
 	}
 
 	void Application::Tick()

@@ -1,5 +1,4 @@
 #include "Window.h"
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 
@@ -17,7 +16,6 @@ namespace Engine {
 
         glfwDestroyWindow(windowHandle);
         glfwTerminate();
-
     }
 
     bool Window::CreateWindowHandle(int width, int height, std::string title) {

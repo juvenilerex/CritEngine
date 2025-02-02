@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "Graphics.h"
 #include "Window.h"
+#include "Input.h"
 
 namespace Engine {
 
@@ -16,10 +17,13 @@ namespace Engine {
 
 		void TickInternal();
 		void virtual Tick();
+		bool GetKeyDown(int key);
+		bool GetKeyReleased(int key);
 
 	private:
 		std::unique_ptr<Window> window = nullptr;
 		std::unique_ptr<GraphicsRenderer> renderer = nullptr;
+		std::unique_ptr<InputListener> input = nullptr;
 	};
 
 	std::unique_ptr<Application> CreateApplication();
