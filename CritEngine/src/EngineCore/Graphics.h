@@ -13,6 +13,9 @@ namespace Engine {
 		void Draw();
 
 	private:
+
+		unsigned int vertexArrayObject;
+		unsigned int shaderProgram;
 		GLFWwindow* windowHandle;
 	};
 }
