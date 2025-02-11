@@ -39,6 +39,10 @@ namespace Engine {
 		return this->input->GetKeyUp(key);
 	}
 
+	bool Application::GetKeyJustPressed(int key) {
+		return this->input->GetKeyJustPressed(key);
+	}
+
 	void Application::Tick()
 	{
 		LogInfo("App", "Tick!");

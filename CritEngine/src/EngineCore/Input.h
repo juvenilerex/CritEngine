@@ -10,6 +10,7 @@ namespace Engine {
 	public:
 		InputListener(Engine::Window& window);
 
+		bool GetKeyJustPressed(int key) const;
 		bool GetKeyDown(int key) const;
 		bool GetKeyUp(int key) const;
 

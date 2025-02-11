@@ -17,6 +17,7 @@ namespace Engine {
 
 		void TickInternal();
 		void virtual Tick();
+		bool GetKeyJustPressed(int key);
 		bool GetKeyDown(int key);
 		bool GetKeyReleased(int key);
 

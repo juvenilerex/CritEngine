@@ -26,6 +26,9 @@ public:
 		if (GetKeyReleased(66)) { // If B is released
 			Engine::LogError("Input", "B released!");
 		}
+		if (GetKeyJustPressed(67)) {
+			Engine::LogError("Input", "C was just pressed!");
+		}
 
 		Engine::LogInfo("Sandbox", "Tick!");
 	};

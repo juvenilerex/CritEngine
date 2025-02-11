@@ -51,4 +51,17 @@ namespace Engine {
 
 	}
 
+	// If the key was just pressed down, only true for one frame
+	bool InputListener::GetKeyJustPressed(int key) const {
+
+		auto i = KeyStates.find(key);
+		if (i != KeyStates.end() && i->second) {
+			KeyStates[key] = false;
+			return true;
+		}
+		return false;
+
+	}
+
+
 }
