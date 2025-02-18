@@ -29,7 +29,7 @@ namespace Engine {
 			this->window->PollEvents();
 			this->renderer->Draw();
 		}	
-		for (Layer* layer : layerStack) {
+		for (Layer* layer : this->layerStack) {
 			layer->OnUpdate();
 		}
 	}
@@ -44,12 +44,12 @@ namespace Engine {
 
 	void Application::PushLayer(Layer* layer)
 	{
-		layerStack.PushLayer(layer);
+		this->layerStack.PushLayer(layer);
 	}
 
 	void Application::PushOverlay(Layer* overlay)
 	{
-		layerStack.PushLayer(overlay);
+		this->layerStack.PushLayer(overlay);
 	}
 
 	bool Application::GetKeyJustPressed(int key) {
