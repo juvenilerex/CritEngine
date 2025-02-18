@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 
+#include <EngineCore/Layer.h>
 #include <EngineCore/Application.h>
 #include <EngineCore/Core/MainLoop.h>
 #include <EngineCore/Logging/Logger.h>
@@ -11,10 +12,28 @@
 #include <EngineCore/Entry.h>
 #include <EngineCore/Input.h>
 
+class LayerTest : public Engine::Layer {
+
+public:
+
+	LayerTest() : Layer("ExampleLayer") {
+
+	}
+
+	void OnUpdate() override {
+		Engine::LogInfo("ExampleLayer", "Update");
+	}
+
+};
+
 class Sandbox : public Engine::Application
 {
 
 public:
+
+	Sandbox() {
+		PushLayer(new LayerTest());
+	}
 
 
 	void Tick() override {

@@ -29,6 +29,9 @@ namespace Engine {
 			this->window->PollEvents();
 			this->renderer->Draw();
 		}	
+		for (Layer* layer : layerStack) {
+			layer->OnUpdate();
+		}
 	}
 
 	bool Application::GetKeyDown(int key) {
@@ -37,6 +40,16 @@ namespace Engine {
 
 	bool Application::GetKeyReleased(int key) {
 		return this->input->GetKeyUp(key);
+	}
+
+	void Application::PushLayer(Layer* layer)
+	{
+		layerStack.PushLayer(layer);
+	}
+
+	void Application::PushOverlay(Layer* overlay)
+	{
+		layerStack.PushLayer(overlay);
 	}
 
 	bool Application::GetKeyJustPressed(int key) {
