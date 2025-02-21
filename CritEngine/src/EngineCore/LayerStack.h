@@ -1,21 +1,21 @@
 #pragma once
 
-#include "Core.h"
+#include "Core/Base.h"
 #include "Layer.h"
 #include <vector>
 
 namespace Engine {
 
-	class ENGINE_API LayerStack {
+	class LayerStack {
 
 	public:
-		LayerStack();
-		~LayerStack();
+		ENGINE_API LayerStack();
+		ENGINE_API ~LayerStack();
 
-		void PushLayer(Layer* layer);
-		void PopLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
-		void PopOverlay(Layer* overlay);
+		ENGINE_API void PushLayer(Layer* layer);
+		ENGINE_API void PopLayer(Layer* layer);
+		ENGINE_API void PushOverlay(Layer* overlay);
+		ENGINE_API void PopOverlay(Layer* overlay);
 
 		std::vector<Layer*>::iterator begin() { return layers.begin(); }
 		std::vector<Layer*>::iterator end() { return layers.end(); }

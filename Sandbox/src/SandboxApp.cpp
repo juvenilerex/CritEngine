@@ -21,7 +21,7 @@ public:
 	}
 
 	void OnUpdate() override {
-		Engine::LogInfo("ExampleLayer", "Update");
+		LogInfo("ExampleLayer", "Update");
 	}
 
 };
