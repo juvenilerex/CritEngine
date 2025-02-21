@@ -2,34 +2,31 @@
 
 #include <memory>
 
-#include "Core.h"
-#include "Graphics.h"
-#include "Window.h"
-#include "Input.h"
+
+#include "Core/Base.h"
+#include "Window/Window.h"
 #include "LayerStack.h"
 
 namespace Engine {
 
-	class ENGINE_API Application
+	class Application
 	{
 	public:
-		Application();
-		~Application();
 
-		void TickInternal();
-		void virtual Tick();
-		bool GetKeyJustPressed(int key);
-		bool GetKeyDown(int key);
-		bool GetKeyReleased(int key);
+		ENGINE_API Application();
+		ENGINE_API ~Application();
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
+		ENGINE_API void TickInternal();
+		ENGINE_API void virtual Tick();
+
+		ENGINE_API void PushLayer(Layer* layer);
+		ENGINE_API void PushOverlay(Layer* overlay);
+
+		ENGINE_API Window& GetWindow();
 
 	private:
 		std::unique_ptr<Window> window = nullptr;
-		std::unique_ptr<GraphicsRenderer> renderer = nullptr;
-		std::unique_ptr<InputListener> input = nullptr;
-		LayerStack layerStack;
+
 	};
 
 	std::unique_ptr<Application> CreateApplication();

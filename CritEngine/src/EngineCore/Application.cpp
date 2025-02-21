@@ -6,40 +6,22 @@ namespace Engine {
 
 	Application::Application()
 	{
-		this->window = std::make_unique<Engine::Window>();
-		this->window->CreateWindowHandle(800, 600, "Sandbox");
-
-		this->input = std::make_unique<Engine::InputListener>(*window.get());
-		this->renderer = std::make_unique<Engine::GraphicsRenderer>(*window.get());
-
-		
+		this->window = std::make_unique<Window>(800, 600, "Sandbox");
 	};
 
-	Application::~Application() 
+	Application::~Application()
 	{
-		this->renderer.reset();
-
-		this->window->DestroyWindowHandle();
 		this->window.reset();
 	};
 
-	void Application::TickInternal() 
+	void Application::TickInternal()
 	{
-		if (this->window->IsHandleValid()) {
+		if (this->window != nullptr)
+		{
 			this->window->PollEvents();
-			this->renderer->Draw();
-		}	
-		for (Layer* layer : this->layerStack) {
-			layer->OnUpdate();
+			this->window->GetRenderer().Draw();
+			this->window->SwapBuffers();
 		}
-	}
-
-	bool Application::GetKeyDown(int key) {
-		return this->input->GetKeyDown(key);
-	}
-
-	bool Application::GetKeyReleased(int key) {
-		return this->input->GetKeyUp(key);
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -52,8 +34,10 @@ namespace Engine {
 		this->layerStack.PushLayer(overlay);
 	}
 
-	bool Application::GetKeyJustPressed(int key) {
-		return this->input->GetKeyJustPressed(key);
+	Window& Application::GetWindow()
+	{
+		ASSERT(this->window)
+		return *this->window.get();
 	}
 
 	void Application::Tick()
