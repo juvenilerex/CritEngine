@@ -6,7 +6,7 @@
 namespace Engine {
 
 	EventEmitterBase::EventEmitterBase() {
-		LogWarning("Event", "Emitter Created!");
+		LogInfo("Event", "Emitter Created!");
 	};
 
 	void EventEmitterBase::AddListener(std::function<void()> func) {

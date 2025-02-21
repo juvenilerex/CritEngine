@@ -1,6 +1,8 @@
 bin
 bin-intermediate
+obj
 .vs
 *.vcxproj*
 *.sln
 !thirdparty/*
+

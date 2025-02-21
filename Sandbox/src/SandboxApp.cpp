@@ -8,40 +8,47 @@
 #include <EngineCore/Core/MainLoop.h>
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
+#include <EngineCore/Window/Input.h>
 #include <EngineCore/Entry.h>
-#include <EngineCore/Graphics.h>
+
 
 class Sandbox : public Engine::Application
 {
 
 public:
 
-	std::shared_ptr<Engine::GraphicsRenderer> renderer = nullptr;
-
 	Sandbox()
 	{
-		renderer = std::make_unique<Engine::GraphicsRenderer>();
-		std::ostringstream get_the_address;
-		get_the_address << this;
-		Engine::LogInfo("Sandbox", get_the_address.str());
+
 	}
 
+	void Tick() override
+	{
+		// We don't have access to GLFW's key enums, so we may need to import them (?)
+		if (this->GetWindow().GetInput().GetKeyDown(66))
+		{ // If B is pressed
+			 LogWarning("Input", "B pressed!");
+		}
+		if (this->GetWindow().GetInput().GetKeyUp(66))
+		{ // If B is released
+			LogWarning("Input", "B released!");
+		}
+		if (this->GetWindow().GetInput().GetKeyJustPressed(67))
+		{
+			LogWarning("Input", "C just pressed!");
+		}
 
-	void Tick() override {
-		renderer->Draw();
-		renderer->PollEvents();
-	};
-
-	int main() {
-		return 0;
+		LogInfo("Sandbox", "Tick!");
 	}
 
 	~Sandbox()
 	{
-		Engine::LogWarning("Sandbox", "Destroyed!");
+		LogWarning("Sandbox", "Destroyed!");
 	}
 };
 
-std::unique_ptr<Engine::Application> CreateApplication() {
-	return std::make_unique<Sandbox>(Sandbox());
+
+std::unique_ptr<Engine::Application> CreateApplication()
+{
+	return std::make_unique<Sandbox>();
 };
