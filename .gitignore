@@ -4,4 +4,7 @@ obj
 .vs
 *.vcxproj*
 *.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 !thirdparty/*
