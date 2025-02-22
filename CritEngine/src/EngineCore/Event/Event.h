@@ -4,20 +4,18 @@
 #include <vector>
 #include <functional>
 
-#include "../Core.h"
-
+#include "../Core/Base.h"
 
 namespace Engine {
 
-	class ENGINE_API EventEmitterBase {
+	class EventEmitterBase {
 	public:
 
-		EventEmitterBase();
+		ENGINE_API EventEmitterBase();
+		ENGINE_API void AddListener(std::function<void()> func);
+		ENGINE_API void Emit();
 
-		void AddListener(std::function<void()> func);
-		void Emit();
-
-	protected:
+	private:
 		std::vector<std::function<void()>> callbacks;
 	};
 };

@@ -4,40 +4,63 @@
 #include <functional>
 #include <iostream>
 
+#include <EngineCore/Layer.h>
 #include <EngineCore/Application.h>
 #include <EngineCore/Core/MainLoop.h>
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
+#include <EngineCore/Window/Input.h>
 #include <EngineCore/Entry.h>
+
+class LayerTest : public Engine::Layer {
+
+public:
+
+	LayerTest() : Layer("ExampleLayer") {
+
+	}
+
+	void OnUpdate() override {
+		LogInfo("ExampleLayer", "Update");
+	}
+
+};
 
 class Sandbox : public Engine::Application
 {
 
 public:
-	int test = 10;
-	Sandbox()
-	{
-		printf("Hello");
-		//main();
-		std::ostringstream get_the_address;
-		get_the_address << this;
-		Engine::LogInfo("Sandbox", get_the_address.str());
+
+	Sandbox() {
+		PushLayer(new LayerTest());
 	}
 
-	void Tick() override {
-		Engine::LogInfo("Sandbox", "Tock!");
-	};
+	void Tick() override
+	{
+		// We don't have access to GLFW's key enums, so we may need to import them (?)
+		if (this->GetWindow().GetInput().GetKeyDown(66))
+		{ // If B is pressed
+			 LogWarning("Input", "B pressed!");
+		}
+		if (this->GetWindow().GetInput().GetKeyUp(66))
+		{ // If B is released
+			LogWarning("Input", "B released!");
+		}
+		if (this->GetWindow().GetInput().GetKeyJustPressed(67))
+		{
+			LogWarning("Input", "C just pressed!");
+		}
 
-	int main() {
-		return 0;
+		LogInfo("Sandbox", "Tick!");
 	}
 
 	~Sandbox()
 	{
-		Engine::LogWarning("Sandbox", "Destroyed!");
+		LogWarning("Sandbox", "Destroyed!");
 	}
 };
 
-std::unique_ptr<Engine::Application> CreateApplication() {
-	return std::make_unique<Sandbox>(Sandbox());
+std::unique_ptr<Engine::Application> CreateApplication()
+{
+	return std::make_unique<Sandbox>();
 };

@@ -2,20 +2,32 @@
 
 #include <memory>
 
-#include "Core.h"
+
+#include "Core/Base.h"
+#include "Window/Window.h"
+#include "LayerStack.h"
 
 namespace Engine {
 
-	class ENGINE_API Application
+	class Application
 	{
 	public:
-		Application();
-		virtual ~Application();
 
-		void virtual Tick();
+		ENGINE_API Application();
+		ENGINE_API ~Application();
+
+		ENGINE_API void TickInternal();
+		ENGINE_API void virtual Tick();
+
+		ENGINE_API void PushLayer(Layer* layer);
+		ENGINE_API void PushOverlay(Layer* overlay);
+
+		ENGINE_API Window& GetWindow();
 
 	private:
-		
+		std::unique_ptr<Window> window = nullptr;
+		LayerStack layerStack;
+
 	};
 
 	std::unique_ptr<Application> CreateApplication();

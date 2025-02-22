@@ -1,33 +1,37 @@
 
 #include "MainLoop.h"
-#include "../Logging/Logger.h"
 
 namespace Engine {
 
-	MainLoop::MainLoop(std::unique_ptr<Application> applicationInstance) {
-		Engine::LogInfo("MainLoop", "Huh");
+
+	MainLoop::MainLoop(std::unique_ptr<Application> applicationInstance)
+	{
+		LogInfo("MainLoop", "Starting");
 		this->application = std::move(applicationInstance);
 	};
 
-	void MainLoop::Run() {
+	void MainLoop::Run()
+	{
 		this->is_running = true;
 
-		std::ostringstream get_the_address;
-		get_the_address << this->application;
-		Engine::LogInfo("MainLoop", get_the_address.str());
 
-		while (is_running) {
+		while (is_running)
+		{
 			Tick();
 		}
+
 	};
 
-	void MainLoop::Stop() {
+	void MainLoop::Stop()
+	{
 		this->is_running = false;
 	};
 
-	void MainLoop::Tick() {
-		//LogInfo("MainLoop", "Tick!");
+
+	void MainLoop::Tick()
+	{
+		this->application->TickInternal();
 		this->application->Tick();
 	};
-}
 
+}
