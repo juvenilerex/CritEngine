@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <functional>
 #include <iostream>
+#include <sstream>
 
 #include <EngineCore/Layer.h>
 #include <EngineCore/Application.h>
@@ -33,6 +34,35 @@ public:
 
 	Sandbox() {
 		PushLayer(new LayerTest());
+
+		Engine::EventEmitterBase emitterVoid = Engine::EventEmitterBase();
+		Engine::EventEmitterBase<int> emitterInt = Engine::EventEmitterBase<int>();
+
+		emitterVoid.AddListener([]()
+		{
+			std::stringstream oss;
+			oss << "Hello Void";
+			LogInfo("Event", oss.str());
+			return;
+		});
+
+		emitterInt.AddListener([](int e)
+		{
+			std::stringstream oss;
+			oss << "Hello " << e;
+			LogInfo("Event", oss.str());
+			return;
+		});
+
+		emitterInt.AddListener([](int e)
+		{
+			std::stringstream oss;
+			oss << "Hello Other Event " << e;
+			LogInfo("Event", oss.str());
+			return;
+		});
+
+		emitterInt.Emit(10);
 	}
 
 	void Tick() override

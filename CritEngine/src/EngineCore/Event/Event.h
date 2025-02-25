@@ -8,14 +8,52 @@
 
 namespace Engine {
 
-	class EventEmitterBase {
+	// Variadic Templates only accept 1 .. n arguments, so we have an identical template for 0 arguments.
+	template<typename... Ts>
+	class EventEmitterBase
+	{
 	public:
 
-		ENGINE_API EventEmitterBase();
-		ENGINE_API void AddListener(std::function<void()> func);
-		ENGINE_API void Emit();
+		EventEmitterBase() {}
+
+		void AddListener(std::function<void(Ts...)> func);
+
+		void Emit(Ts... args);
 
 	private:
-		std::vector<std::function<void()>> callbacks;
+		std::vector<std::function<void(Ts...)>> callbacks;
 	};
+
+	// Impl
+
+	template <typename... Ts>
+	void EventEmitterBase<Ts...>::AddListener(std::function<void(Ts...)> func)
+	{
+		this->callbacks.push_back(func);
+	}
+
+	template<>
+	inline void EventEmitterBase<>::AddListener(std::function<void(void)> func)
+	{
+		this->callbacks.push_back(func);
+	}
+
+	template <typename... Ts>
+	void EventEmitterBase<Ts...>::Emit(Ts... args)
+	{
+		for (int32_t i = 0; i < this->callbacks.size(); i++)
+		{
+			this->callbacks[i](std::forward<Ts>(args)...);
+		}
+	}
+
+	template<>
+	inline void EventEmitterBase<>::Emit()
+	{
+		for (int32_t i = 0; i < this->callbacks.size(); i++)
+		{
+			this->callbacks[i]();
+		}
+	}
+
 };
