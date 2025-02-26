@@ -62,7 +62,8 @@ public:
 			return;
 		});
 
-		emitterInt.Emit(10);
+		emitterVoid.Emit();
+		emitterInt.Emit(4000000);
 	}
 
 	void Tick() override
