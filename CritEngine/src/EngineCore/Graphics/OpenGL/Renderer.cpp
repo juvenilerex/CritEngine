@@ -46,25 +46,25 @@ namespace Engine {
 		this->shader.reset(new Shader(vertexShaderSource, fragmentShaderSource));
 
 		//triangle
-		
-		this->vertexArray = VertexArray::Create();
 
-		float vertices[3 * 7] = {
-		    -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-		     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-		     0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+		this->triangleVA = VertexArray::Create();
+
+		float triangleVertices[3 * 7] = {
+			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
 		};
-		this->vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
-		BufferLayout layout = {
+
+		std::shared_ptr<VertexBuffer> triangleVB = VertexBuffer::Create(triangleVertices, sizeof(triangleVertices));
+		triangleVB->SetLayout({
 			{ ShaderDataType::Float3, "aPos" },
 			{ ShaderDataType::Float4, "aColor" }
-		};
-		this->vertexBuffer->SetLayout(layout);
-		this->vertexArray->AddVertexBuffer(this->vertexBuffer);
+							});
+		this->triangleVA->AddVertexBuffer(triangleVB);
 
-		unsigned int indices[3] = { 0, 1, 2 };
-		this->indexBuffer = IndexBuffer::Create(indices, sizeof(indices));
-		this->vertexArray->SetIndexBuffer(this->indexBuffer);
+		unsigned int triangleIndices[6] = { 0, 1, 2 };
+		std::shared_ptr<IndexBuffer> triangleIB = IndexBuffer::Create(triangleIndices, sizeof(triangleIndices) / sizeof(uint32_t));
+		this->triangleVA->SetIndexBuffer(triangleIB);
 
 		// Square
 
@@ -103,8 +103,8 @@ namespace Engine {
 		this->squareVA->Bind();
 		glDrawElements(GL_TRIANGLES, this->squareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
-		this->vertexArray->Bind();
-		glDrawElements(GL_TRIANGLES, this->indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+		this->triangleVA->Bind();
+		glDrawElements(GL_TRIANGLES, this->triangleVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 }

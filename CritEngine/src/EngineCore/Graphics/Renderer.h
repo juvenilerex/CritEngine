@@ -27,9 +27,7 @@ namespace Engine {
 	private:
 		static RendererAPI renderAPI;
 
-		std::shared_ptr<VertexArray> vertexArray;
-		std::shared_ptr<VertexBuffer> vertexBuffer;
-		std::shared_ptr<IndexBuffer> indexBuffer;
+		std::shared_ptr<VertexArray> triangleVA;
 
 		std::shared_ptr<VertexArray> squareVA;
 		
