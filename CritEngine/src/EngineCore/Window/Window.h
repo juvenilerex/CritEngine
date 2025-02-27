@@ -3,7 +3,7 @@
 #include "../Event/Event.h"
 #include "../Logging/Logger.h"
 #include "../Graphics/RenderContext.h"
-#include "../Graphics/Graphics.h"
+#include "../Graphics/Renderer.h"
 #include "Input.h"
 #include <string>
 

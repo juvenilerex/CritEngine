@@ -12,7 +12,7 @@ namespace Engine {
 		void Bind() const;
 		void Unbind() const;
 	private:
-		uint32_t rendererID;
+		uint32_t shaderID;
 	};
 
 }

@@ -54,24 +54,25 @@ namespace Engine {
 			return;
 		}
 
-		this->rendererID = glCreateProgram();
+		uint32_t program = glCreateProgram();
+		this->shaderID = program;
 
-		glAttachShader(this->rendererID, vertexShader);
-		glAttachShader(this->rendererID, fragmentShader);
+		glAttachShader(program, vertexShader);
+		glAttachShader(program, fragmentShader);
 
-		glLinkProgram(this->rendererID);
+		glLinkProgram(program);
 
 		int32_t isLinked = 0;
-		glGetProgramiv(this->rendererID, GL_LINK_STATUS, &isLinked);
+		glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
 		if (isLinked == false)
 		{
 			int32_t maxMessageLength = 0;
-			glGetProgramiv(this->rendererID, GL_INFO_LOG_LENGTH, &maxMessageLength);
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxMessageLength);
 
 			std::vector<char> infoLog(maxMessageLength);
-			glGetProgramInfoLog(this->rendererID, maxMessageLength, &maxMessageLength, &infoLog[0]);
+			glGetProgramInfoLog(program, maxMessageLength, &maxMessageLength, &infoLog[0]);
 
-			glDeleteProgram(this->rendererID);
+			glDeleteProgram(program);
 
 			glDeleteShader(fragmentShader);
 			glDeleteShader(vertexShader);
@@ -81,17 +82,17 @@ namespace Engine {
 			return;
 		}
 
-		glDetachShader(this->rendererID, vertexShader);
-		glDetachShader(this->rendererID, fragmentShader);
+		glDetachShader(program, vertexShader);
+		glDetachShader(program, fragmentShader);
 
 	}
 	Shader::~Shader()
 	{
-		glDeleteProgram(this->rendererID);
+		glDeleteProgram(this->shaderID);
 	}
 	void Shader::Bind() const
 	{
-		glUseProgram(this->rendererID);
+		glUseProgram(this->shaderID);
 	}
 
 	void Shader::Unbind() const
