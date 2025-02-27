@@ -62,7 +62,7 @@ namespace Engine {
 							});
 		this->triangleVA->AddVertexBuffer(triangleVB);
 
-		unsigned int triangleIndices[6] = { 0, 1, 2 };
+		unsigned int triangleIndices[3] = { 0, 1, 2 };
 		std::shared_ptr<IndexBuffer> triangleIB = IndexBuffer::Create(triangleIndices, sizeof(triangleIndices) / sizeof(uint32_t));
 		this->triangleVA->SetIndexBuffer(triangleIB);
 
