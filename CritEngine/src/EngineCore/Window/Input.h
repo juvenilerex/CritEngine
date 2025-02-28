@@ -20,7 +20,8 @@ namespace Engine {
 
 	private:
 		GLFWwindow* windowHandle;
-		static std::unordered_map<int, bool> KeyStates, KeyReleased;
+		static std::unordered_map<int, bool> KeyStates;
+		static std::unordered_map<int, bool> KeyReleased;
 
 	};
 

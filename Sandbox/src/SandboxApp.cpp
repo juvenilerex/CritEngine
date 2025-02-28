@@ -10,7 +10,6 @@
 #include <EngineCore/Core/MainLoop.h>
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
-#include <EngineCore/Window/InputMouse.h>
 #include <EngineCore/Window/Input.h>
 #include <EngineCore/Entry.h>
 
@@ -19,7 +18,7 @@ class LayerTest : public Engine::Layer {
 public:
 
 	LayerTest() : Layer("ExampleLayer") {
-		
+
 	}
 
 	void OnUpdate() override {
@@ -82,25 +81,8 @@ public:
 		{
 			LogWarning("Input", "C just pressed!");
 		}
-		if (this->GetWindow().GetMouseButtonInput().GetMouseDown(1))
-		{ // If mouse1 is pressed
-			LogWarning("Input", "Mouse 1 pressed!");
-		}
-		if (this->GetWindow().GetMouseButtonInput().GetMouseJustPressed(0))
-		{ // If mouse1 is pressed
-			LogWarning("Input", "Mouse 0 just pressed!");
-		}
-		if (this->GetWindow().GetMouseButtonInput().GetMouseUp(1))
-		{ // If mouse1 is pressed
-			LogWarning("Input", "Mouse 1 just released!");
-		}
 
-		std::string mousePosX = std::to_string(this->GetWindow().GetMousePosition().X());
-		std::string MousePosY = std::to_string(this->GetWindow().GetMousePosition().Y());
-		std::stringstream ms;
-		ms << mousePosX << ", " << MousePosY;
-
-		LogInfo("MousePosition:", ms.str());
+		LogInfo("Sandbox", "Tick!");
 	}
 
 	~Sandbox()
