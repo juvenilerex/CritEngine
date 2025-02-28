@@ -77,10 +77,11 @@ public:
 			Vector2 b(1.63f, 6.3f);
 			LogWarning("Input 2", b.ToString());
 			Vector2 c = a + b;
-			LogError("Input 3", c.ToString());
 		}
 		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(GLFW::MOUSE_BUTTON_1)) {
 			LogWarning("Mouse", "Mouse 1 pressed!");
+			Vector3 vec3(0.0f, 3.3f, 0.2f);
+			LogError("Input 3", vec3.ToString());
 		}
 
 //		std::string mousePosX = std::to_string(this->GetWindow().GetMousePosition().X());
@@ -88,7 +89,7 @@ public:
 //		std::stringstream ms;
 //		ms << mousePosX << ", " << MousePosY;
 
-		LogInfo("MousePosition:", this->GetWindow().GetMouseInput().GetPosition().ToString());
+//		LogInfo("MousePosition:", this->GetWindow().GetMouseInput().GetPosition().ToString());
 	}
 
 	~Sandbox()
