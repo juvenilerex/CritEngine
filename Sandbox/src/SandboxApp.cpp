@@ -13,6 +13,7 @@
 #include <EngineCore/Window/InputMouse.h>
 #include <EngineCore/Window/Input.h>
 #include <EngineCore/Entry.h>
+#include <EngineCore/Math/Vector.h>
 
 class LayerTest : public Engine::Layer {
 
@@ -70,37 +71,25 @@ public:
 	void Tick() override
 	{
 		// We don't have access to GLFW's key enums, so we may need to import them (?)
-		if (this->GetWindow().GetInput().GetKeyDown(66))
+		if (this->GetWindow().GetInput().GetKeyJustPressed(66))
 		{ // If B is pressed
-			 LogWarning("Input", "B pressed!");
+			Vector2 a(1.1f, 10.3f);
+			LogWarning("Input", a.ToString());
+			Vector2 b(1.63f, 6.3f);
+			LogWarning("Input 2", b.ToString());
+			Vector2 c = a + b;
+			LogError("Input 3", c.ToString());
 		}
-		if (this->GetWindow().GetInput().GetKeyUp(66))
-		{ // If B is released
-			LogWarning("Input", "B released!");
-		}
-		if (this->GetWindow().GetInput().GetKeyJustPressed(67))
-		{
-			LogWarning("Input", "C just pressed!");
-		}
-		if (this->GetWindow().GetMouseButtonInput().GetMouseDown(1))
-		{ // If mouse1 is pressed
-			LogWarning("Input", "Mouse 1 pressed!");
-		}
-		if (this->GetWindow().GetMouseButtonInput().GetMouseJustPressed(0))
-		{ // If mouse1 is pressed
-			LogWarning("Input", "Mouse 0 just pressed!");
-		}
-		if (this->GetWindow().GetMouseButtonInput().GetMouseUp(1))
-		{ // If mouse1 is pressed
-			LogWarning("Input", "Mouse 1 just released!");
+		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(0)) {
+			LogWarning("Mouse", "Mouse 0 pressed!");
 		}
 
-		std::string mousePosX = std::to_string(this->GetWindow().GetMousePosition().X());
-		std::string MousePosY = std::to_string(this->GetWindow().GetMousePosition().Y());
-		std::stringstream ms;
-		ms << mousePosX << ", " << MousePosY;
+//		std::string mousePosX = std::to_string(this->GetWindow().GetMousePosition().X());
+//		std::string MousePosY = std::to_string(this->GetWindow().GetMousePosition().Y());
+//		std::stringstream ms;
+//		ms << mousePosX << ", " << MousePosY;
 
-		LogInfo("MousePosition:", ms.str());
+		LogInfo("MousePosition:", this->GetWindow().GetMouseInput().GetPosition().ToString());
 	}
 
 	~Sandbox()

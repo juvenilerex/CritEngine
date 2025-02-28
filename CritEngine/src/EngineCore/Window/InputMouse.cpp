@@ -11,6 +11,7 @@ namespace Engine {
 	MouseInputListener::MouseInputListener(GLFWwindow* windowHandle) : windowHandle(windowHandle)
 	{
 		glfwSetMouseButtonCallback(windowHandle, MouseButtonCallback);
+		glfwSetCursorPosCallback(windowHandle, CursorPosCallback);
 	}
 
 	void MouseInputListener::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) 
@@ -68,26 +69,16 @@ namespace Engine {
 	}
 
 	// Defining static mouse position coordinates
-	double MousePositionListener::posX, MousePositionListener::posY;
+	double MouseInputListener::posX, MouseInputListener::posY;
 
-	double MousePositionListener::X() const 
-	{
-		return posX;
+	Vector2 MouseInputListener::GetPosition() const {
+		return Vector2(posX, posY);
 	}
-
-	double MousePositionListener::Y() const
-	{
-		return posY;
-	}
-
-	void MousePositionListener::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+	
+	void MouseInputListener::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 	{
 		posX = xpos; posY = ypos;
 	}
 
-	MousePositionListener::MousePositionListener(GLFWwindow* windowHandle) : windowHandle(windowHandle)
-	{
-		glfwSetCursorPosCallback(windowHandle, CursorPosCallback);
-	}
 
 }
