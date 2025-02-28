@@ -20,7 +20,6 @@ class LayerTest : public Engine::Layer {
 public:
 
 	LayerTest() : Layer("ExampleLayer") {
-		
 	}
 
 	void OnUpdate() override {
@@ -71,7 +70,7 @@ public:
 	void Tick() override
 	{
 		// We don't have access to GLFW's key enums, so we may need to import them (?)
-		if (this->GetWindow().GetInput().GetKeyJustPressed(66))
+		if (this->GetWindow().GetInput().GetKeyJustPressed(GLFW::KEY_SPACE))
 		{ // If B is pressed
 			Vector2 a(1.1f, 10.3f);
 			LogWarning("Input", a.ToString());
@@ -80,8 +79,8 @@ public:
 			Vector2 c = a + b;
 			LogError("Input 3", c.ToString());
 		}
-		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(0)) {
-			LogWarning("Mouse", "Mouse 0 pressed!");
+		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(GLFW::MOUSE_BUTTON_1)) {
+			LogWarning("Mouse", "Mouse 1 pressed!");
 		}
 
 //		std::string mousePosX = std::to_string(this->GetWindow().GetMousePosition().X());
