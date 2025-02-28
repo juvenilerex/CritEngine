@@ -6,7 +6,8 @@
 namespace Engine {
 
 	// Defining static key states
-	std::unordered_map<int, bool> InputListener::KeyStates, InputListener::KeyReleased;
+	std::unordered_map<int, bool> InputListener::KeyStates;
+	std::unordered_map<int, bool> InputListener::KeyReleased;
 
 	InputListener::InputListener(GLFWwindow* windowHandle) : windowHandle(windowHandle)
 	{
