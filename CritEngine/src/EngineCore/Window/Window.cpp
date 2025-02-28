@@ -26,7 +26,6 @@ namespace Engine {
 			Window* window_object = static_cast<Window*>(glfwGetWindowUserPointer(window));
 		});
 		
-		this->mousePos = std::make_unique<MousePositionListener>(this->GetHandle());
 		this->mouseInput = std::make_unique<MouseInputListener>(this->GetHandle());
 		this->input = std::make_unique<InputListener>(this->GetHandle());
 		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
@@ -63,12 +62,7 @@ namespace Engine {
 		return *this->input.get();
 	}
 
-	MousePositionListener& Window::GetMousePosition() {
-		ASSERT(this->mousePos);
-		return *this->mousePos.get();
-	}
-
-	MouseInputListener& Window::GetMouseButtonInput()
+	MouseInputListener& Window::GetMouseInput()
 	{
 		ASSERT(this->mouseInput);
 		return *this->mouseInput.get();

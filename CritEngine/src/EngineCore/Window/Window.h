@@ -24,14 +24,12 @@ namespace Engine {
 		ENGINE_API void PollEvents();
 		ENGINE_API void SwapBuffers();
 
-		ENGINE_API MousePositionListener& GetMousePosition();
-		ENGINE_API MouseInputListener& GetMouseButtonInput();
+		ENGINE_API MouseInputListener& GetMouseInput();
 		ENGINE_API InputListener& GetInput();
 		ENGINE_API GraphicsRenderer& GetRenderer();
 
 	private:
 		GLFWwindow* windowHandle = nullptr;
-		std::unique_ptr<MousePositionListener> mousePos = nullptr;
 		std::unique_ptr<MouseInputListener> mouseInput = nullptr;
 		std::unique_ptr<InputListener> input = nullptr;
 		std::unique_ptr<RenderContext> renderContext = nullptr;
