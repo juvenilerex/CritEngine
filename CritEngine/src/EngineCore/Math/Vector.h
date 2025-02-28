@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <sstream>
 
 struct Vector2 {
 	float x, y;
