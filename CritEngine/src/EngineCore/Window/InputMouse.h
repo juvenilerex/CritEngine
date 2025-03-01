@@ -2,6 +2,7 @@
 
 #include "../Core/Base.h"
 #include <unordered_map>
+#include <array>
 #include "../Math/Vector.h"
 
 struct GLFWwindow;
@@ -31,16 +32,22 @@ namespace Engine {
 
 }
 
-// GLFW keycode wrapper here so we can use it in the sandbox
-namespace GLFW {
+namespace Mouse {
 
-	constexpr auto MOUSE_BUTTON_1 = 0;
-	constexpr auto MOUSE_BUTTON_2 = 1;
-	constexpr auto MOUSE_BUTTON_3 = 2;
-	constexpr auto MOUSE_BUTTON_4 = 3;
-	constexpr auto MOUSE_BUTTON_5 = 4;
-	constexpr auto MOUSE_BUTTON_6 = 5;
-	constexpr auto MOUSE_BUTTON_7 = 6;
-	constexpr auto MOUSE_BUTTON_8 = 7;
+	enum Button : uint8_t {
+		BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4, BUTTON_5, BUTTON_6, BUTTON_7, BUTTON_8
+	};
+
+	constexpr std::array<uint8_t, BUTTON_8 + 1> ButtonMap = {
+		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+	};
+
+}
+
+namespace Engine {
+
+	constexpr uint8_t GetMouseButton(Mouse::Button button) {
+		return Mouse::ButtonMap[button];
+	}
 
 }

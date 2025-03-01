@@ -70,7 +70,7 @@ public:
 	void Tick() override
 	{
 		// We don't have access to GLFW's key enums, so we may need to import them (?)
-		if (this->GetWindow().GetInput().GetKeyJustPressed(GLFW::KEY_SPACE))
+		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::A)))
 		{ // If B is pressed
 			Vector2 a(1.1f, 10.3f);
 			LogWarning("Input", a.ToString());
@@ -78,7 +78,7 @@ public:
 			LogWarning("Input 2", b.ToString());
 			Vector2 c = a + b;
 		}
-		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(GLFW::MOUSE_BUTTON_1)) {
+		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(Engine::GetMouseButton(Mouse::BUTTON_1))) {
 			LogWarning("Mouse", "Mouse 1 pressed!");
 			Vector3 vec3(0.0f, 3.3f, 0.2f);
 			LogError("Input 3", vec3.ToString());

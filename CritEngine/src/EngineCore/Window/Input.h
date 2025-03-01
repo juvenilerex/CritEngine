@@ -2,6 +2,7 @@
 
 #include "../Core/Base.h"
 #include <unordered_map>
+#include <array>
 
 struct GLFWwindow;
 
@@ -27,137 +28,50 @@ namespace Engine {
 }
 
 // GLFW keycode wrapper here so we can use it in the sandbox
-namespace GLFW {
+// Using an array approach instead for memory optimization 
+namespace Keys {
 
-    constexpr auto KEY_SPACE = 32;
-    constexpr auto KEY_APOSTROPHE = 39; // '
-    constexpr auto KEY_COMMA = 44; // ,
-    constexpr auto KEY_MINUS = 45; // -
-    constexpr auto KEY_PERIOD = 46; // .
-    constexpr auto KEY_SLASH = 47; // /
+    enum Key : uint8_t {
+        SPACE, APOSTROPHE, COMMA, MINUS, PERIOD, SLASH,
+        DIGIT_0, DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, DIGIT_5, DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9,
+        SEMICOLON, EQUAL,
+        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+        LEFT_BRACKET, BACKSLASH, RIGHT_BRACKET, GRAVE_ACCENT,
+        WORLD_1, WORLD_2, ESCAPE, ENTER, TAB, BACKSPACE,
+        INSERT, DELETE_KEY, RIGHT, LEFT, DOWN, UP,
+        PAGE_UP, PAGE_DOWN, HOME, END,
+        CAPS_LOCK, SCROLL_LOCK, NUM_LOCK, PRINT_SCREEN, PAUSE,
+        F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25,
+        KP_0, KP_1, KP_2, KP_3, KP_4, KP_5, KP_6, KP_7, KP_8, KP_9,
+        KP_DECIMAL, KP_DIVIDE, KP_MULTIPLY, KP_SUBTRACT, KP_ADD, KP_ENTER, KP_EQUAL,
+        LEFT_SHIFT, LEFT_CONTROL, LEFT_ALT, LEFT_SUPER,
+        RIGHT_SHIFT, RIGHT_CONTROL, RIGHT_ALT, RIGHT_SUPER, MENU,
+        LAST
+    };
 
-    constexpr auto KEY_0 = 48;
-    constexpr auto KEY_1 = 49;
-    constexpr auto KEY_2 = 50;
-    constexpr auto KEY_3 = 51;
-    constexpr auto KEY_4 = 52;
-    constexpr auto KEY_5 = 53;
-    constexpr auto KEY_6 = 54;
-    constexpr auto KEY_7 = 55;
-    constexpr auto KEY_8 = 56;
-    constexpr auto KEY_9 = 57;
+    constexpr std::array<uint16_t, LAST + 1> KeyMap = {
+        32, 39, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, 54, 55, 56, 57,
+        59, 61,
+        65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
+        91, 92, 93, 96,
+        161, 162, 256, 257, 258, 259,
+        260, 261, 262, 263, 264, 265,
+        266, 267, 268, 269,
+        280, 281, 282, 283, 284,
+        290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314,
+        320, 321, 322, 323, 324, 325, 326, 327, 328, 329,
+        330, 331, 332, 333, 334, 335, 336,
+        340, 341, 342, 343,
+        344, 345, 346, 347, 348
+    };
 
-    constexpr auto KEY_SEMICOLON = 59; // ;
-    constexpr auto KEY_EQUAL = 61; // =
+}
 
-    constexpr auto KEY_A = 65;
-    constexpr auto KEY_B = 66;
-    constexpr auto KEY_C = 67;
-    constexpr auto KEY_D = 68;
-    constexpr auto KEY_E = 69;
-    constexpr auto KEY_F = 70;
-    constexpr auto KEY_G = 71;
-    constexpr auto KEY_H = 72;
-    constexpr auto KEY_I = 73;
-    constexpr auto KEY_J = 74;
-    constexpr auto KEY_K = 75;
-    constexpr auto KEY_L = 76;
-    constexpr auto KEY_M = 77;
-    constexpr auto KEY_N = 78;
-    constexpr auto KEY_O = 79;
-    constexpr auto KEY_P = 80;
-    constexpr auto KEY_Q = 81;
-    constexpr auto KEY_R = 82;
-    constexpr auto KEY_S = 83;
-    constexpr auto KEY_T = 84;
-    constexpr auto KEY_U = 85;
-    constexpr auto KEY_V = 86;
-    constexpr auto KEY_W = 87;
-    constexpr auto KEY_X = 88;
-    constexpr auto KEY_Y = 89;
-    constexpr auto KEY_Z = 90;
+namespace Engine {
 
-    constexpr auto KEY_LEFT_BRACKET = 91; // [
-    constexpr auto KEY_BACKSLASH = 92; //
-    constexpr auto KEY_RIGHT_BRACKET = 93; // ]
-    constexpr auto KEY_GRAVE_ACCENT = 96; // `
+    constexpr uint16_t GetKeyCode(Keys::Key key) {
+        return Keys::KeyMap[key];
+    }
 
-    constexpr auto KEY_WORLD_1 = 161; // non-US #1
-    constexpr auto KEY_WORLD_2 = 162; // non-US #2
-
-    constexpr auto KEY_ESCAPE = 256;
-    constexpr auto KEY_ENTER = 257;
-    constexpr auto KEY_TAB = 258;
-    constexpr auto KEY_BACKSPACE = 259;
-    constexpr auto KEY_INSERT = 260;
-    constexpr auto KEY_DELETE = 261;
-    constexpr auto KEY_RIGHT = 262;
-    constexpr auto KEY_LEFT = 263;
-    constexpr auto KEY_DOWN = 264;
-    constexpr auto KEY_UP = 265;
-    constexpr auto KEY_PAGE_UP = 266;
-    constexpr auto KEY_PAGE_DOWN = 267;
-    constexpr auto KEY_HOME = 268;
-    constexpr auto KEY_END = 269;
-    constexpr auto KEY_CAPS_LOCK = 280;
-    constexpr auto KEY_SCROLL_LOCK = 281;
-    constexpr auto KEY_NUM_LOCK = 282;
-    constexpr auto KEY_PRINT_SCREEN = 283;
-    constexpr auto KEY_PAUSE = 284;
-
-    constexpr auto KEY_F1 = 290;
-    constexpr auto KEY_F2 = 291;
-    constexpr auto KEY_F3 = 292;
-    constexpr auto KEY_F4 = 293;
-    constexpr auto KEY_F5 = 294;
-    constexpr auto KEY_F6 = 295;
-    constexpr auto KEY_F7 = 296;
-    constexpr auto KEY_F8 = 297;
-    constexpr auto KEY_F9 = 298;
-    constexpr auto KEY_F10 = 299;
-    constexpr auto KEY_F11 = 300;
-    constexpr auto KEY_F12 = 301;
-    constexpr auto KEY_F13 = 302;
-    constexpr auto KEY_F14 = 303;
-    constexpr auto KEY_F15 = 304;
-    constexpr auto KEY_F16 = 305;
-    constexpr auto KEY_F17 = 306;
-    constexpr auto KEY_F18 = 307;
-    constexpr auto KEY_F19 = 308;
-    constexpr auto KEY_F20 = 309;
-    constexpr auto KEY_F21 = 310;
-    constexpr auto KEY_F22 = 311;
-    constexpr auto KEY_F23 = 312;
-    constexpr auto KEY_F24 = 313;
-    constexpr auto KEY_F25 = 314;
-
-    constexpr auto KEY_KP_0 = 320;
-    constexpr auto KEY_KP_1 = 321;
-    constexpr auto KEY_KP_2 = 322;
-    constexpr auto KEY_KP_3 = 323;
-    constexpr auto KEY_KP_4 = 324;
-    constexpr auto KEY_KP_5 = 325;
-    constexpr auto KEY_KP_6 = 326;
-    constexpr auto KEY_KP_7 = 327;
-    constexpr auto KEY_KP_8 = 328;
-    constexpr auto KEY_KP_9 = 329;
-    constexpr auto KEY_KP_DECIMAL = 330;
-    constexpr auto KEY_KP_DIVIDE = 331;
-    constexpr auto KEY_KP_MULTIPLY = 332;
-    constexpr auto KEY_KP_SUBTRACT = 333;
-    constexpr auto KEY_KP_ADD = 334;
-    constexpr auto KEY_KP_ENTER = 335;
-    constexpr auto KEY_KP_EQUAL = 336;
-
-    constexpr auto KEY_LEFT_SHIFT = 340;
-    constexpr auto KEY_LEFT_CONTROL = 341;
-    constexpr auto KEY_LEFT_ALT = 342;
-    constexpr auto KEY_LEFT_SUPER = 343;
-    constexpr auto KEY_RIGHT_SHIFT = 344;
-    constexpr auto KEY_RIGHT_CONTROL = 345;
-    constexpr auto KEY_RIGHT_ALT = 346;
-    constexpr auto KEY_RIGHT_SUPER = 347;
-    constexpr auto KEY_MENU = 348;
-
-    constexpr auto KEY_LAST = KEY_MENU;
 }
