@@ -24,13 +24,12 @@ namespace Engine {
 		ENGINE_API void SwapBuffers();
 
 		ENGINE_API InputListener& GetInput();
-		ENGINE_API GraphicsRenderer& GetRenderer();
+		ENGINE_API Renderer& GetRenderer();
 
 	private:
 		GLFWwindow* windowHandle = nullptr;
 		std::unique_ptr<InputListener> input = nullptr;
 		std::unique_ptr<RenderContext> renderContext = nullptr;
-		std::unique_ptr<GraphicsRenderer> renderer = nullptr;
 
 	};
 

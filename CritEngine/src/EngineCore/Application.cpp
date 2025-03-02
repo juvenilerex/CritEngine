@@ -1,7 +1,6 @@
 #include "Application.h"
 #include "Logging/Logger.h"
 
-
 namespace Engine {
 
 	Application::Application()
@@ -19,7 +18,6 @@ namespace Engine {
 		if (this->window != nullptr)
 		{
 			this->window->PollEvents();
-			this->window->GetRenderer().Draw();
 			this->window->SwapBuffers();
 		}
 	}

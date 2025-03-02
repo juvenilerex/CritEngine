@@ -6,25 +6,27 @@
 namespace Engine {
 	std::shared_ptr <VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
 	{
-		switch (GraphicsRenderer::GetAPI())
+		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::None: ASSERT(false, "None RenderAPI is currently not supported"); return nullptr;
+			case RendererAPI::API::None: ASSERT(false, "None RenderAPI is currently not supported"); return nullptr;
 
-			case RendererAPI::OpenGL: return std::make_shared<OpenGLVertexBuffer>(vertices, size);
+			case RendererAPI::API::OpenGL: return std::make_shared<OpenGLVertexBuffer>(vertices, size);
 		}
 
-		ASSERT(false, "Invalid Render API!"); return nullptr;
+		ASSERT(false, "Invalid Render API!"); 
+		return nullptr;
 	}
 
-	std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
+	std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
 	{
-		switch (GraphicsRenderer::GetAPI())
+		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::None: ASSERT(false, "None RenderAPI is currently not supported"); return nullptr;
+			case RendererAPI::API::None: ASSERT(false, "None RenderAPI is currently not supported"); return nullptr;
 
-			case RendererAPI::OpenGL: return std::make_shared<OpenGLIndexBuffer>(indices, size);
+			case RendererAPI::API::OpenGL: return std::make_shared<OpenGLIndexBuffer>(indices, count);
 		}
 
-		ASSERT(false, "Invalid Render API!"); return nullptr;
+		ASSERT(false, "Invalid Render API!"); 
+		return nullptr;
 	}
 }

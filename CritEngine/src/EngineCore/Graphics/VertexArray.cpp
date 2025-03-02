@@ -7,14 +7,15 @@ namespace Engine {
 
 	std::shared_ptr<VertexArray> VertexArray::Create()
 	{
-		switch (GraphicsRenderer::GetAPI())
+		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::None: ASSERT(false, "None RenderAPI is currently not supported"); return nullptr;
+			case RendererAPI::API::None: ASSERT(false, "None RenderAPI is currently not supported"); return nullptr;
 
-			case RendererAPI::OpenGL: return std::make_shared<OpenGLVertexArray>();
+			case RendererAPI::API::OpenGL: return std::make_shared<OpenGLVertexArray>();
 		}
 
-		ASSERT(false, "Invalid Render API!"); return nullptr;
+		ASSERT(false, "Invalid Render API!"); 
+		return nullptr;
 	}
 
 }
