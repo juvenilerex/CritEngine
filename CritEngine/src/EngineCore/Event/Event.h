@@ -56,7 +56,8 @@ namespace Engine {
 				LogError("EventBus", "RemoveListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
 				return;
 			}
-			// TODO: Add listener removal logic to EventEmitterBase
+			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
+			typedEmitter->RemoveListener(func);
 		}
 
 		template <typename... Ts>
@@ -83,14 +84,13 @@ namespace Engine {
 		EventEmitterBase() {}
 
 		void AddListener(std::function<void(Ts...)> func);
+		void RemoveListener(std::function<void(Ts...)> func);
 
 		void Emit(Ts... args);
 
 	private:
 		std::vector<std::function<void(Ts...)>> callbacks;
 	};
-
-	// Impl
 
 	template <typename... Ts>
 	void EventEmitterBase<Ts...>::AddListener(std::function<void(Ts...)> func)
@@ -102,6 +102,40 @@ namespace Engine {
 	inline void EventEmitterBase<>::AddListener(std::function<void(void)> func)
 	{
 		this->callbacks.push_back(func);
+	}
+
+	template <typename... Ts>
+	void EventEmitterBase<Ts...>::RemoveListener(std::function<void(Ts...)> func)
+	{
+		auto it = std::remove_if(callbacks.begin(), callbacks.end(), [&func](const std::function<void(Ts...)>& callback) {
+
+			// Comparing the addresses of the underlying callable objects. target(), a method from std::function
+			// returns a pointer to the underlying callable object
+			// This is the only way I've found to reliably identify the function we wanna delete
+			// .template tells the compiler that what follows callback is a function template, otherwise it will misinterpet the code
+			// as a member function.. What a doozy 
+			return callback.template target<void(Ts...)>() == func.template target<void(Ts...)>();
+
+			});
+
+		if (it != callbacks.end()) {
+			callbacks.erase(it, callbacks.end());
+		}
+
+	}
+
+	template<>
+	inline void EventEmitterBase<>::RemoveListener(std::function<void(void)> func)
+	{
+		auto it = std::remove_if(callbacks.begin(), callbacks.end(), [&func](const std::function<void(void)>& callback) {
+
+			return callback.template target<void()>() == func.template target<void()>();
+
+			});
+
+		if (it != callbacks.end()) {
+			callbacks.erase(it, callbacks.end());
+		}
 	}
 
 	template <typename... Ts>

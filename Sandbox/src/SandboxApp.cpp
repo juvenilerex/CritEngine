@@ -54,6 +54,10 @@ public:
 		bus->Emit("emit2", 1000);
 		bus->Emit("emit1");
 		bus->Emit("emit2", 1);
+		bus->RemoveListener<int>("emit2", { [](int i) {
+			LogInfo("intEmitter", std::to_string(i));
+			}});
+		bus->Emit("emit2", 6);
 	}
 
 	void Tick() override
@@ -71,9 +75,7 @@ public:
 		{
 			LogWarning("Input", "C just pressed!");
 		}
-
-		bus->Emit("emit2", 600);
-		bus->Emit("emit2", 1000);
+		bus->Emit("emit1");
 	}
 
 	~Sandbox()
