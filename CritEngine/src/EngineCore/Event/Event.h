@@ -2,15 +2,52 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include <functional>
+#include <any>
 
 #include "../Core/Base.h"
 
 namespace Engine {
 
+	// Forward declaration that somehow is the glue of this
+	template<typename... Ts>
+	class EventEmitterBase;
+
+	// Non-templated wrapper class that EventEmitterBase will use as its base class,
+	// allowing any specialization to be stored in our bus
+	class EventEmitterWrapper {
+	public:
+		virtual ~EventEmitterWrapper() = default;
+	};
+
+	class EventBus {
+
+	public:
+		template <typename... Ts>
+		void AddEmitter(const std::string& emitterName, EventEmitterBase<Ts...>* emitter) {
+			emitters[emitterName].push_back(emitter);
+		}
+
+		template <typename... Ts>
+		void AddListener(const std::string& emitterName, std::function<void(Ts...)> func) {
+			auto it = emitters.find(emitterName);
+			if (it != emitters.end()) {
+				for (auto& _emitter : it->second) {
+					auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(_emitter);
+					ASSERT(typedEmitter, "Can't add listener to an invalid EventEmitterBase");
+					typedEmitter->AddListener(func);
+				}
+			}
+		}
+
+	private:
+		std::unordered_map<std::string, std::vector<EventEmitterWrapper*>> emitters;
+	};
+
 	// Variadic Templates only accept 1 .. n arguments, so we have an identical template for 0 arguments.
 	template<typename... Ts>
-	class EventEmitterBase
+	class EventEmitterBase : public EventEmitterWrapper
 	{
 	public:
 
