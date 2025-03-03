@@ -3,7 +3,7 @@
 #include "../Event/Event.h"
 #include "../Logging/Logger.h"
 #include "../Graphics/RenderContext.h"
-#include "../Graphics/Graphics.h"
+#include "../Graphics/Renderer.h"
 #include "Input.h"
 #include <string>
 
@@ -24,13 +24,12 @@ namespace Engine {
 		ENGINE_API void SwapBuffers();
 
 		ENGINE_API InputListener& GetInput();
-		ENGINE_API GraphicsRenderer& GetRenderer();
+		ENGINE_API Renderer& GetRenderer();
 
 	private:
 		GLFWwindow* windowHandle = nullptr;
 		std::unique_ptr<InputListener> input = nullptr;
 		std::unique_ptr<RenderContext> renderContext = nullptr;
-		std::unique_ptr<GraphicsRenderer> renderer = nullptr;
 
 	};
 

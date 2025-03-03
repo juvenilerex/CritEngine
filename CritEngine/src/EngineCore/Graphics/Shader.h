@@ -6,13 +6,13 @@ namespace Engine {
 	class Shader
 	{
 	public:
-		Shader(const std::string& vertexSource, std::string& fragmentSource);
-		~Shader();
+		ENGINE_API Shader(const std::string& vertexSource, std::string& fragmentSource);
+		ENGINE_API ~Shader();
 
-		void Bind() const;
-		void Unbind() const;
+		ENGINE_API void Bind() const;
+		ENGINE_API void Unbind() const;
 	private:
-		uint32_t rendererID;
+		uint32_t shaderID;
 	};
 
 }

@@ -82,12 +82,13 @@ project "Sandbox"
 
 	includedirs 
 	{
-		"%{wks.location}/CritEngine/src"
+		"%{wks.location}/CritEngine/src",
+		"CritEngine/thirdparty/libs/glm/"
 	}
 	
 	links 
 	{
-		"CritEngine"
+		"CritEngine", "GLM"
 	}
 
 	filter "system:windows"
