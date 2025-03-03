@@ -32,28 +32,28 @@ class Sandbox : public Engine::Application
 
 public:
 
+	std::unique_ptr<Engine::EventBus> bus;
+	Engine::EventEmitterBase<int> intEmitter;
+	Engine::EventEmitterBase<> voidEmitter;
+
 	Sandbox() {
 		PushLayer(new LayerTest());
-		Engine::EventEmitterBase<> voidEmitter;
-		Engine::EventEmitterBase<int> intEmitter;
-		Engine::EventBus bus;
-		bus.AddEmitter("emit1", &voidEmitter);
-		bus.AddEmitter("emit2", &intEmitter);
+		bus = std::make_unique<Engine::EventBus>();
+		bus->AddEmitter("emit1", &voidEmitter);
+		bus->AddEmitter("emit2", &intEmitter);
 
-		bus.AddListener("emit1", { []() { 
+		bus->AddListener("emit1", { []() {
 			LogInfo("voidEmitter", "Void emitter emitted"); 
 			}});
 
-		bus.AddListener<int>("emit2", { [](int i) {
+		bus->AddListener<int>("emit2", { [](int i) {
 			LogInfo("intEmitter", std::to_string(i));
 			}});
 
-		bus.Emit("emit2", 600);
-		bus.Emit("emit2", 1000);
-		bus.Emit("emit1");
-		bus.Emit("emit2", 1);
-
-		bus.RemoveEmitter("emit2");
+		bus->Emit("emit2", 600);
+		bus->Emit("emit2", 1000);
+		bus->Emit("emit1");
+		bus->Emit("emit2", 1);
 	}
 
 	void Tick() override
@@ -71,12 +71,16 @@ public:
 		{
 			LogWarning("Input", "C just pressed!");
 		}
+
+		bus->Emit("emit2", 600);
+		bus->Emit("emit2", 1000);
 	}
 
 	~Sandbox()
 	{
 		LogWarning("Sandbox", "Destroyed!");
 	}
+
 };
 
 std::unique_ptr<Engine::Application> CreateApplication()
