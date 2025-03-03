@@ -26,25 +26,24 @@ namespace Engine {
 
 		template <typename... Ts>
 		void AddEmitter(const std::string& emitterName, EventEmitterBase<Ts...>* emitter) {
-			this->emitters.emplace(emitterName, emitter);
+			auto it = this->emitters.find(emitterName);
+			ASSERT(it == this->emitters.end(), 
+				"AddEmitter: " + emitterName + " can not overwrite an existing emitter. Try RemoveEmitter() first."); // Assert when the user attempts to overwrite
+			this->emitters.insert({emitterName, emitter});
 		}
 
 		template <typename... Ts>
 		void RemoveEmitter(const std::string& emitterName) {
-			if (this->emitters.find(emitterName) == this->emitters.end()) {
-				LogError("EventBus", "RemoveEmitter: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-				return;
-			}
+			ASSERT(this->emitters.find(emitterName) != this->emitters.end(), 
+				"RemoveEmitter: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
 			this->emitters.erase(emitterName);
 		}
 
 		template <typename... Ts>
 		void AddListener(const std::string& emitterName, std::function<void(Ts...)> func) {
 			auto it = this->emitters.find(emitterName);
-			if (it == this->emitters.end()) {
-				LogError("EventBus", "AddListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-				return;
-			}
+			ASSERT(it != this->emitters.end(),
+				"AddListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
 			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
 			typedEmitter->AddListener(func);
 		}
@@ -52,10 +51,8 @@ namespace Engine {
 		template <typename... Ts>
 		void RemoveListener(const std::string& emitterName, std::function<void(Ts...)> func) {
 			auto it = this->emitters.find(emitterName);
-			if (it == this->emitters.end()) {
-				LogError("EventBus", "RemoveListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-				return;
-			}
+			ASSERT(it != this->emitters.end(),
+				"RemoveListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
 			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
 			typedEmitter->RemoveListener(func);
 		}
@@ -63,10 +60,8 @@ namespace Engine {
 		template <typename... Ts>
 		void Emit(const std::string& emitterName, Ts... args) {
 			auto it = this->emitters.find(emitterName);
-			if (it == this->emitters.end()) {
-				LogError("EventBus", "Emit: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-				return;
-			}
+			ASSERT(it != this->emitters.end(),
+				"Emit: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
 			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
 			typedEmitter->Emit(args...);
 		}
