@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <iostream>
 #include <filesystem>
 
@@ -31,9 +32,9 @@
 #endif
 
 #ifdef CE_ENABLE_ASSERTS
-    #define CE_INTERNAL_ASSERT_IMPL(check, msg, ...) { if(!(check)) { printf(msg); CE_DEBUGBREAK(); } }
-    #define CE_INTERNAL_ASSERT_WITH_MSG(check, ...) CE_INTERNAL_ASSERT_IMPL(check, "Assertion failed: {0}", __VA_ARGS__)
-    #define CE_INTERNAL_ASSERT_NO_MSG(check) CE_INTERNAL_ASSERT_IMPL(check, "Assertion '{0}' failed at {1}:{2}", CE_STRINGIFY_MACRO(check), std::filesystem::path(__FILE__).filename().string(), __LINE__)
+    #define CE_INTERNAL_ASSERT_IMPL(check, msg, ...) { if(!(check)) { printf(msg, __VA_ARGS__); CE_DEBUGBREAK(); } }
+    #define CE_INTERNAL_ASSERT_WITH_MSG(check, ...) CE_INTERNAL_ASSERT_IMPL(check, "Assertion failed: %s", __VA_ARGS__)
+    #define CE_INTERNAL_ASSERT_NO_MSG(check) CE_INTERNAL_ASSERT_IMPL(check, "Assertion '%s' failed at %s:%s", CE_STRINGIFY_MACRO(check), std::filesystem::path(__FILE__).filename().string().c_str(), std::to_string(__LINE__).c_str())
 
     #define CE_INTERNAL_ASSERT_PICK_MACRO(arg1, arg2, macro, ...) macro
     #define CE_INTERNAL_ASSERT_GET_MACRO(...) CE_EXPAND_MACRO( CE_INTERNAL_ASSERT_PICK_MACRO(__VA_ARGS__, CE_INTERNAL_ASSERT_WITH_MSG, CE_INTERNAL_ASSERT_NO_MSG) )
