@@ -48,8 +48,12 @@ public:
 			LogInfo("intEmitter", std::to_string(i));
 			}});
 
-		intEmitter.Emit(400);
-		voidEmitter.Emit();
+		bus.Emit("emit2", 600);
+		bus.Emit("emit2", 1000);
+		bus.Emit("emit1");
+		bus.Emit("emit2", 1);
+
+		bus.RemoveEmitter("emit2");
 	}
 
 	void Tick() override
