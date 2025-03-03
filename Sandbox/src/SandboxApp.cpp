@@ -52,9 +52,6 @@ public:
 		voidEmitter.Emit();
 	}
 
-	void du(){
-	}
-
 	void Tick() override
 	{
 		// We don't have access to GLFW's key enums, so we may need to import them (?)
