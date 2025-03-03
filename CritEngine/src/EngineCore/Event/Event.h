@@ -23,55 +23,25 @@ namespace Engine {
 	class EventBus {
 
 	public:
-
 		template <typename... Ts>
 		void AddEmitter(const std::string& emitterName, EventEmitterBase<Ts...>* emitter) {
-			this->emitters.emplace(emitterName, emitter);
-		}
-
-		template <typename... Ts>
-		void RemoveEmitter(const std::string& emitterName) {
-			if (this->emitters.find(emitterName) == this->emitters.end()) {
-				LogError("EventBus", "RemoveEmitter: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-				return;
-			}
-			this->emitters.erase(emitterName);
+			emitters[emitterName].push_back(emitter);
 		}
 
 		template <typename... Ts>
 		void AddListener(const std::string& emitterName, std::function<void(Ts...)> func) {
-			auto it = this->emitters.find(emitterName);
-			if (it == this->emitters.end()) {
-				LogError("EventBus", "AddListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-				return;
+			auto it = emitters.find(emitterName);
+			if (it != emitters.end()) {
+				for (auto& _emitter : it->second) {
+					auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(_emitter);
+					ASSERT(typedEmitter, "Can't add listener to an invalid EventEmitterBase");
+					typedEmitter->AddListener(func);
+				}
 			}
-			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
-			typedEmitter->AddListener(func);
-		}
-
-		template <typename... Ts>
-		void RemoveListener(const std::string& emitterName, std::function<void(Ts...)> func) {
-			auto it = this->emitters.find(emitterName);
-			if (it == this->emitters.end()) {
-				LogError("EventBus", "RemoveListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-				return;
-			}
-			// TODO: Add listener removal logic to EventEmitterBase
-		}
-
-		template <typename... Ts>
-		void Emit(const std::string& emitterName, Ts... args) {
-			auto it = this->emitters.find(emitterName);
-			if (it == this->emitters.end()) {
-				LogError("EventBus", "Emit: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-				return;
-			}
-			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
-			typedEmitter->Emit(args...);
 		}
 
 	private:
-		std::unordered_map<std::string, EventEmitterWrapper*> emitters;
+		std::unordered_map<std::string, std::vector<EventEmitterWrapper*>> emitters;
 	};
 
 	// Variadic Templates only accept 1 .. n arguments, so we have an identical template for 0 arguments.
