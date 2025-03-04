@@ -130,6 +130,8 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
+//		bus->AddEmitter("emit2", &intEmitter);
+
 	}
 
 
@@ -148,9 +150,6 @@ public:
 		{
 			LogWarning("Input", "C just pressed!");
 		}
-		bus->Emit("emit1");
-
-		LogInfo("Sandbox", "Tick!");
 
 		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
 		Engine::RenderCommand::Clear();
