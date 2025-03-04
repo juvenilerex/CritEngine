@@ -30,8 +30,8 @@ namespace Engine {
 	// If the key is being held down
 	bool InputListener::GetKeyDown(int key) const {
 
-		auto i = KeyStates.find(key);
-		if (i != KeyStates.end()) {
+		auto i = this->KeyStates.find(key);
+		if (i != this->KeyStates.end()) {
 			return i->second;
 		}
 		else {
@@ -43,9 +43,9 @@ namespace Engine {
 	// If the key was just released
 	bool InputListener::GetKeyUp(int key) const {
 
-		auto i = KeyReleased.find(key);
-		if (i != KeyReleased.end() && i->second) {
-			KeyReleased[key] = false;
+		auto i = this->KeyReleased.find(key);
+		if (i != this->KeyReleased.end() && i->second) {
+			this->KeyReleased[key] = false;
 			return true;
 		}
 		return false;
@@ -55,14 +55,13 @@ namespace Engine {
 	// If the key was just pressed down, only true for one frame
 	bool InputListener::GetKeyJustPressed(int key) const {
 
-		auto i = KeyStates.find(key);
-		if (i != KeyStates.end() && i->second) {
-			KeyStates[key] = false;
+		auto i = this->KeyStates.find(key);
+		if (i != this->KeyStates.end() && i->second) {
+			this->KeyStates[key] = false;
 			return true;
 		}
 		return false;
 
 	}
-
 
 }

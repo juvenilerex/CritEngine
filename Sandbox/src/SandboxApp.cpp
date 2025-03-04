@@ -11,7 +11,9 @@
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
 #include <EngineCore/Window/Input.h>
+#include <EngineCore/Window/InputMouse.h>
 #include <EngineCore/Entry.h>
+#include <EngineCore/Math/Vector.h>
 #include <EngineCore/Graphics/Renderer.h>
 
 std::string vertexShaderSource = R"(
@@ -129,27 +131,19 @@ public:
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
-
-//		bus->AddEmitter("emit2", &intEmitter);
-
 	}
 
 
 	void Tick() override
 	{
-		// We don't have access to GLFW's key enums, so we may need to import them (?)
-		if (this->GetWindow().GetInput().GetKeyDown(66))
-		{ // If B is pressed
-			 LogWarning("Input", "B pressed!");
+		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::A)))
+		{ // If A is pressed
+			LogWarning("Input: ", "A was just pressed");
 		}
-		if (this->GetWindow().GetInput().GetKeyUp(66))
-		{ // If B is released
-			LogWarning("Input", "B released!");
+		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(Engine::GetMouseButton(Mouse::BUTTON_1))) {
+			LogWarning("Mouse: ", "Mouse 1 pressed!");
 		}
-		if (this->GetWindow().GetInput().GetKeyJustPressed(67))
-		{
-			LogWarning("Input", "C just pressed!");
-		}
+//		LogInfo("MousePos: ", this->GetWindow().GetMouseInput().GetPosition().ToString());
 
 		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
 		Engine::RenderCommand::Clear();
