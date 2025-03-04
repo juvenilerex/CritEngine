@@ -58,11 +58,11 @@ namespace Engine {
 
 		void RemoveAllListeners(const std::string& emitterName) {
 			ASSERT(IsRegistered(emitterName), "Can not access unregistered emitter");
-			emitters[emitterName] = 0;
+			this->emitters[emitterName] = 0;
 		}
 
 		inline void RemoveAllEmitters() {
-			emitters.clear();
+			this->emitters.clear();
 		}
 
 
@@ -110,7 +110,7 @@ namespace Engine {
 	template <typename... Ts>
 	void EventEmitterBase<Ts...>::RemoveListener(std::function<void(Ts...)> func)
 	{
-		auto it = std::remove_if(callbacks.begin(), callbacks.end(), [&func](const std::function<void(Ts...)>& callback) {
+		auto it = std::remove_if(this->callbacks.begin(), this->callbacks.end(), [&func](const std::function<void(Ts...)>& callback) {
 
 			// Comparing the addresses of the underlying callable objects. target(), a method from std::function
 			// returns a pointer to the underlying callable object
@@ -121,8 +121,8 @@ namespace Engine {
 
 			});
 
-		if (it != callbacks.end()) {
-			callbacks.erase(it, callbacks.end());
+		if (it != this->callbacks.end()) {
+			this->callbacks.erase(it, this->callbacks.end());
 		}
 
 	}
@@ -130,14 +130,14 @@ namespace Engine {
 	template<>
 	inline void EventEmitterBase<>::RemoveListener(std::function<void(void)> func)
 	{
-		auto it = std::remove_if(callbacks.begin(), callbacks.end(), [&func](const std::function<void(void)>& callback) {
+		auto it = std::remove_if(this->callbacks.begin(), this->callbacks.end(), [&func](const std::function<void(void)>& callback) {
 
 			return callback.template target<void()>() == func.template target<void()>();
 
 			});
 
-		if (it != callbacks.end()) {
-			callbacks.erase(it, callbacks.end());
+		if (it != this->callbacks.end()) {
+			this->callbacks.erase(it, this->callbacks.end());
 		}
 	}
 
