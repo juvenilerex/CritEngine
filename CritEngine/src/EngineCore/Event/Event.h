@@ -26,7 +26,7 @@ namespace Engine {
 
 		template <typename... Ts>
 		void AddEmitter(const std::string& emitterName, EventEmitterBase<Ts...>* emitter) {
-			ASSERT(!IsRegistered(emitterName), "Can not overwrite registerted emitter");
+			ASSERT(!IsRegistered(emitterName), "Can not overwrite registered emitter");
 			this->emitters.insert({emitterName, emitter});
 		}
 
