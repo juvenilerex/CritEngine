@@ -27,7 +27,6 @@ namespace Engine {
 	private:
 		std::unique_ptr<Window> window = nullptr;
 		LayerStack layerStack;
-
 	};
 
 	std::unique_ptr<Application> CreateApplication();

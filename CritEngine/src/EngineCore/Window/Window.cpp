@@ -30,8 +30,6 @@ namespace Engine {
 		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
 		this->renderContext->Init();
 
-		this->renderer = std::make_unique<GraphicsRenderer>(this->GetHandle());
-
 	}
 
 	Window::~Window()
@@ -59,12 +57,6 @@ namespace Engine {
 	{
 		ASSERT(this->input);
 		return *this->input.get();
-	}
-
-	GraphicsRenderer& Window::GetRenderer()
-	{
-		ASSERT(this->renderer);
-		return *this->renderer.get();
 	}
 
 };

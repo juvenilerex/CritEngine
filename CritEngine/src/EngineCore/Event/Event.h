@@ -26,47 +26,55 @@ namespace Engine {
 
 		template <typename... Ts>
 		void AddEmitter(const std::string& emitterName, EventEmitterBase<Ts...>* emitter) {
-			auto it = this->emitters.find(emitterName);
-			ASSERT(it == this->emitters.end(), 
-				"AddEmitter: " + emitterName + " can not overwrite an existing emitter. Try RemoveEmitter() first."); // Assert when the user attempts to overwrite
+			ASSERT(!IsRegistered(emitterName), "Can not overwrite registered emitter");
 			this->emitters.insert({emitterName, emitter});
 		}
 
-		template <typename... Ts>
 		void RemoveEmitter(const std::string& emitterName) {
-			ASSERT(this->emitters.find(emitterName) != this->emitters.end(), 
-				"RemoveEmitter: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
+			ASSERT(IsRegistered(emitterName), "Can not access unregistered emitter");
 			this->emitters.erase(emitterName);
 		}
 
 		template <typename... Ts>
 		void AddListener(const std::string& emitterName, std::function<void(Ts...)> func) {
-			auto it = this->emitters.find(emitterName);
-			ASSERT(it != this->emitters.end(),
-				"AddListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
-			typedEmitter->AddListener(func);
+			ASSERT(IsRegistered(emitterName), "Can not access unregistered emitter");
+			auto tEmitter = static_cast<EventEmitterBase<Ts...>*>(GetEmitter(emitterName)->second);
+			tEmitter->AddListener(func);
 		}
 
 		template <typename... Ts>
 		void RemoveListener(const std::string& emitterName, std::function<void(Ts...)> func) {
-			auto it = this->emitters.find(emitterName);
-			ASSERT(it != this->emitters.end(),
-				"RemoveListener: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
-			typedEmitter->RemoveListener(func);
+			ASSERT(IsRegistered(emitterName), "Can not access unregistered emitter");
+			auto tEmitter = static_cast<EventEmitterBase<Ts...>*>(GetEmitter(emitterName)->second);
+			tEmitter->RemoveListener(func);
 		}
 
 		template <typename... Ts>
 		void Emit(const std::string& emitterName, Ts... args) {
-			auto it = this->emitters.find(emitterName);
-			ASSERT(it != this->emitters.end(),
-				"Emit: " + emitterName + " was not found. Check spelling and ensure the emitter exists!");
-			auto typedEmitter = static_cast<EventEmitterBase<Ts...>*>(it->second);
-			typedEmitter->Emit(args...);
+			ASSERT(IsRegistered(emitterName), "Can not access unregistered emitter");
+			auto tEmitter = static_cast<EventEmitterBase<Ts...>*>(GetEmitter(emitterName)->second);
+			tEmitter->Emit(args...);
 		}
 
+		void RemoveAllListeners(const std::string& emitterName) {
+			ASSERT(IsRegistered(emitterName), "Can not access unregistered emitter");
+			emitters[emitterName] = 0;
+		}
+
+		inline void RemoveAllEmitters() {
+			emitters.clear();
+		}
+
+
 	private:
+
+		inline auto GetEmitter(const std::string& emitterName) { return this->emitters.find(emitterName); }
+		inline bool IsRegistered(const std::string& emitterName) { 
+			if (this->emitters.find(emitterName) != this->emitters.end()) return true; else {
+				return false;
+			}
+		}
+
 		std::unordered_map<std::string, EventEmitterWrapper*> emitters;
 	};
 
