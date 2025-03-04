@@ -91,6 +91,13 @@ public:
 			}});
 		bus->Emit("emit2", 6);
 
+
+		this->GetWindow().GetWindowEventBus().AddListener("WindowCloseEvent", { []() {
+
+			LogInfo("WindowCloseEvent: ", "Window close called!");
+
+			} } );
+
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 
 		this->triangleVA = Engine::VertexArray::Create();
