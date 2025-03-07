@@ -21,15 +21,15 @@ namespace Engine {
 		ASSERT(this->windowHandle, "Failed to create GLFW window!");
 
 		glfwSetWindowUserPointer(this->windowHandle, this);
-		glfwSetWindowCloseCallback(this->windowHandle, Window::WindowCloseCallback);
+		glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* window)
+		{
+			Window* window_object = static_cast<Window*>(glfwGetWindowUserPointer(window));
+		});
 		
-		this->eventBus = std::make_unique<EventBus>();
 		this->mouseInput = std::make_unique<MouseInputListener>(this->GetHandle());
 		this->input = std::make_unique<InputListener>(this->GetHandle());
 		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
 		this->renderContext->Init();
-
-		eventBus->AddEmitter("WindowCloseEvent", &WindowCloseEvent);
 
 	}
 
@@ -58,17 +58,6 @@ namespace Engine {
 	{
 		ASSERT(this->input);
 		return *this->input.get();
-	}
-
-	EventBus& Window::GetWindowEventBus()
-	{
-		return *this->eventBus;
-	}
-
-	void Window::WindowCloseCallback(GLFWwindow* window)
-	{
-        Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-        win->eventBus->Emit("WindowCloseEvent");
 	}
 
 	MouseInputListener& Window::GetMouseInput()

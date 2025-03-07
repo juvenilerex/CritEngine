@@ -27,14 +27,9 @@ namespace Engine {
 		ENGINE_API MouseInputListener& GetMouseInput();
 		ENGINE_API InputListener& GetInput();
 		ENGINE_API Renderer& GetRenderer();
-		ENGINE_API EventBus& GetWindowEventBus();
-
-		static void WindowCloseCallback(GLFWwindow* window); 
 
 	private:
 		GLFWwindow* windowHandle = nullptr;
-		EventEmitterBase<> WindowCloseEvent;
-		std::unique_ptr<Engine::EventBus> eventBus = nullptr;
 		std::unique_ptr<MouseInputListener> mouseInput = nullptr;
 		std::unique_ptr<InputListener> input = nullptr;
 		std::unique_ptr<RenderContext> renderContext = nullptr;
