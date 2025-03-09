@@ -13,6 +13,8 @@
 #include <EngineCore/Entry.h>
 #include <EngineCore/Graphics/Renderer.h>
 
+#include <EngineCore/Math/Common.h>
+
 std::string vertexShaderSource = R"(
 	#version 460 core
 
@@ -136,6 +138,23 @@ public:
 
 
 		Engine::Renderer::EndScene();
+
+		Engine::Matrix n = Engine::Matrix(4, 4);
+		n.Mul(Engine::Matrix(4, 4));
+
+		Engine::Quaternion quat0 = Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, 0, 0));
+		Engine::Quaternion quat1 = Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, 0, 3.14152 / 2));
+		
+		for (int i = 0; i < 1; i++)
+		{
+			float alpha = 0.66666f;
+
+			Engine::Quaternion slerp = Engine::Quaternion::SlerpShort(quat0, quat1, alpha);
+			Engine::Vector3 result = slerp.RotateVector(Engine::Vector3(0, 1, 0));
+			Engine::Quaternion slerp1 = Engine::Quaternion::SlerpLong(quat0, quat1, alpha);
+			Engine::Vector3 result1 = slerp1.RotateVector(Engine::Vector3(0, 1, 0));
+		}
+
 	}
 
 	~Sandbox()
