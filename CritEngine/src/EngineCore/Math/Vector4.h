@@ -56,6 +56,23 @@ namespace Engine {
 
 		bool IsEqual(const Vector4& other) { return Vector4::IsEqual(*this, other); }
 		bool IsNearlyEqual(const Vector4& other, const float threshold) { return Vector4::IsNearlyEqual(*this, other, threshold); }
+
+		// Operators
+
+		Vector4 operator+(const Vector4& other) const { return Vector4::Add(*this, other); }
+		Vector4 operator-(const Vector4& other) const { return Vector4::Sub(*this, other); }
+		Vector4 operator*(const Vector4& other) const { return Vector4::Mul(*this, other); }
+		Vector4 operator/(const Vector4& other) const { return Vector4::Div(*this, other); }
+
+		Vector4 operator+(const float rhs) const { return Vector4::Add(*this, rhs); }
+		Vector4 operator-(const float rhs) const { return Vector4::Sub(*this, rhs); }
+		Vector4 operator*(const float rhs) const { return Vector4::Mul(*this, rhs); }
+		Vector4 operator/(const float rhs) const { return Vector4::Div(*this, rhs); }
+
+		friend Vector4 operator+(const float& lhs, const Vector4& rhs) { return Vector4::Add(rhs, lhs); }
+		friend Vector4 operator-(const float& lhs, const Vector4& rhs) { return Vector4::Sub(rhs, lhs); }
+		friend Vector4 operator*(const float& lhs, const Vector4& rhs) { return Vector4::Mul(rhs, lhs); }
+		friend Vector4 operator/(const float& lhs, const Vector4& rhs) { return Vector4::Div(rhs, lhs); }
 	};
 
 }
