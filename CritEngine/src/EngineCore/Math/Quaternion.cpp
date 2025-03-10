@@ -42,6 +42,40 @@ namespace Engine {
 		);
 	}
 
+	Quaternion Quaternion::Log(const Quaternion& base)
+	{
+		float magnitude = sqrt(base.x * base.x + base.y * base.y + base.z * base.z + base.w * base.w);
+
+		float theta = acos(base.w / magnitude);
+
+		float vectorMagnitude = sqrt(base.x * base.x + base.y * base.y + base.z * base.z);
+		float unit_x = base.x / vectorMagnitude;
+		float unit_y = base.y / vectorMagnitude;
+		float unit_z = base.z / vectorMagnitude;
+
+
+		return Quaternion(unit_x * theta, unit_y * theta, unit_z * theta, log(magnitude));
+	}
+
+	Quaternion Quaternion::Exp(const Quaternion& base)
+	{
+		float vectorMagnitude = sqrt(base.x * base.x + base.y * base.y + base.z * base.z);
+		float unit_x = base.x / vectorMagnitude;
+		float unit_y = base.y / vectorMagnitude;
+		float unit_z = base.z / vectorMagnitude;
+
+		float exp_w = exp(base.w);
+
+		float sinMagnitude = sin(vectorMagnitude);
+
+		return Quaternion(
+			exp_w * sinMagnitude * unit_x, 
+			exp_w * sinMagnitude * unit_y, 
+			exp_w * sinMagnitude * unit_z, 
+			exp_w * cos(vectorMagnitude)
+		);
+	}
+
 	Quaternion Quaternion::Conjugate(const Quaternion& base)
 	{
 		return Quaternion(-base.x, -base.y, -base.z, base.w);
@@ -147,6 +181,51 @@ namespace Engine {
 				s0 * start.w + s1 * end.w * flippedMult
 			);
 		}
+	}
+
+	// Implementation based off https://www.3dgep.com/understanding-quaternions/#squad
+	// This function is not tested, once a renderer has been built, test this function for its correctness.
+	Quaternion Quaternion::SquadSpline(const std::vector<Quaternion>& spline, float alpha)
+	{
+		int startIndex = (spline.size() - 1) * alpha;
+		if (startIndex == spline.size()) startIndex--;
+		int endIndex = startIndex + 1;
+
+		auto splineHelper = [](Quaternion qn1, Quaternion q0, Quaternion q1)
+		{
+			Quaternion minus1 = Quaternion::Log(qn1 * q0.Conjugate());
+			Quaternion plus1 = Quaternion::Log(q1 * q0.Conjugate());
+			Quaternion log_diff_scaled = Quaternion((minus1.x - plus1.x) / 4, (minus1.y - plus1.y) / 4, (minus1.z - plus1.z) / 4, (minus1.w - plus1.w) / 4);
+
+			return log_diff_scaled.Exp().Mul(q0);
+		};
+
+		Quaternion s0;
+		if (startIndex > 0)
+		{
+			s0 = splineHelper(spline[startIndex - 1], spline[startIndex], spline[startIndex + 1]);
+		}
+		else
+		{
+			s0 = spline[startIndex + 1];
+		}
+
+		Quaternion s1;
+		if (startIndex + 1 <= spline.size())
+		{
+			s1 = splineHelper(spline[startIndex], spline[startIndex + 1], spline[startIndex + 2]);
+		}
+		else
+		{
+			s1 = spline[startIndex - 2];
+		}
+
+
+		return Quaternion::SlerpShort(
+			Quaternion::SlerpShort(spline[startIndex], spline[startIndex + 1], alpha),
+			Quaternion::SlerpShort(s0, s1, alpha),
+			2 * alpha * (1 - alpha)
+		);
 	}
 
 	Vector3 Quaternion::RotateVector(const Quaternion& base, const Vector3& vector)
