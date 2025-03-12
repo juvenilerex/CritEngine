@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Math/Common.h"
+#include "Scene.h"
 
 
 namespace Engine {

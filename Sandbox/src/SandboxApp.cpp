@@ -13,7 +13,7 @@
 #include <EngineCore/Window/Input.h>
 #include <EngineCore/Entry.h>
 #include <EngineCore/Graphics/Renderer.h>
-
+#include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
 
 std::string vertexShaderSource = R"(
@@ -70,6 +70,8 @@ public:
 
 	Sandbox() {
 		PushLayer(new LayerTest());
+
+		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
 
@@ -142,19 +144,18 @@ public:
 		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
 		Engine::RenderCommand::Clear();
 
-		Engine::Renderer::BeginScene();
+		Engine::Renderer::BeginScene(this->camera);
 
+		// TODO: Abstract this behind some generalized object class?
 		this->shader->Bind();
-		this->shader->UploadUniformMat4("uViewProjection", this->camera->GetViewMatrix());
-		this->shader->UploadUniformMat4("uPerspectiveProjection", this->camera->GetPerspectiveMatrix());
 		this->shader->UploadUniformMat4("uModelProjection", Engine::Matrix4f({
-			cosf(time.count()), 0, sinf(time.count()), 0,
+			cosf(time.count() * 8), 0, sinf(time.count() * 8), 0,
 			0, 1, 0, 0,
-			-sinf(time.count()), 0, cosf(time.count()), 0,
-			0, sinf(time.count()), 0, 1
+			-sinf(time.count() * 8), 0, cosf(time.count() * 8), 0,
+			0, sinf(time.count() * 4), 0, 1
 		}));
-		Engine::Renderer::Submit(this->squareVA);
-		Engine::Renderer::Submit(this->triangleVA);
+		Engine::Renderer::Submit(this->shader, this->squareVA);
+		Engine::Renderer::Submit(this->shader, this->triangleVA);
 
 		Engine::Renderer::EndScene();
 	}
