@@ -8,12 +8,9 @@ namespace Engine {
 	{
 		float x, y;
 
-		float& r = x;
-		float& g = y;
-
-		Vector2();
-		Vector2(float scalar);
-		Vector2(float x, float y);
+		Vector2() : x(0), y(0) {};
+		Vector2(float scalar) : x(scalar), y(scalar) {};
+		Vector2(float x, float y) : x(x), y(y) {};
 
 		//Static Math Operations
 		static Vector2 Add(const Vector2& first, const Vector2& second);

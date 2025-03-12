@@ -8,13 +8,9 @@ namespace Engine {
 	{
 		float x, y, z;
 
-		float& r = x;
-		float& g = y;
-		float& b = z;
-
-		Vector3();
-		Vector3(float scalar);
-		Vector3(float x, float y, float z);
+		Vector3() : x(0), y(0), z(0) {}
+		Vector3(float scalar) : x(scalar), y(scalar), z(scalar) {}
+		Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
 
 		//Static Math Operations
 		static Vector3 Add(const Vector3& first, const Vector3& second);

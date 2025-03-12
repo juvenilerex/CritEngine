@@ -5,10 +5,6 @@
 
 namespace Engine {
 
-	Vector3::Vector3() : x(0), y(0), z(0) {}
-	Vector3::Vector3(float scalar) : x(scalar), y(scalar), z(scalar) {}
-	Vector3::Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
-
 	Vector3 Vector3::Add(const Vector3& first, const Vector3& second)
 	{
 		return Vector3(first.x + second.x, first.y + second.y, first.z + second.z);

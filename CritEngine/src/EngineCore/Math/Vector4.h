@@ -8,15 +8,10 @@ namespace Engine {
 	{
 		float x, y, z, w;
 
-		float& r = x;
-		float& g = y;
-		float& b = z;
-		float& a = w;
-
-		Vector4();
-		Vector4(float scalar);
-		Vector4(float x, float y, float z, float w);
-
+		Vector4() : x(0), y(0), z(0), w(0) {}
+		Vector4(float scalar) : x(scalar), y(scalar), z(scalar), w(scalar) {}
+		Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+		
 		//Static Math Operations
 		static Vector4 Add(const Vector4& first, const Vector4& second);
 		static Vector4 Sub(const Vector4& first, const Vector4& second);

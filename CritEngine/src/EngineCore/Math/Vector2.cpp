@@ -5,10 +5,6 @@
 
 namespace Engine {
 
-	Vector2::Vector2() : x(0), y(0) {}
-	Vector2::Vector2(float scalar) : x(scalar), y(scalar) {}
-	Vector2::Vector2(float x, float y) : x(x), y(y) {}
-
 	Vector2 Vector2::Add(const Vector2& first, const Vector2& second)
 	{
 		return Vector2(first.x + second.x, first.y + second.y);
