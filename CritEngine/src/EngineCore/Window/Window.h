@@ -24,12 +24,16 @@ namespace Engine {
 		ENGINE_API void SwapBuffers();
 
 		ENGINE_API InputListener& GetInput();
-		ENGINE_API Renderer& GetRenderer();
+
+		ENGINE_API int GetWidth() { return this->width; }
+		ENGINE_API int GetHeight() { return this->height; }
+		ENGINE_API float GetAspectRatio() { return (float)this->width / (float)this->height; }
 
 	private:
 		GLFWwindow* windowHandle = nullptr;
 		std::unique_ptr<InputListener> input = nullptr;
 		std::unique_ptr<RenderContext> renderContext = nullptr;
+		int width, height;
 
 	};
 
