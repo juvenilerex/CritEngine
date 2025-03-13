@@ -99,4 +99,10 @@ namespace Engine {
 	{
 		glUseProgram(0);
 	}
+	
+	void Shader::UploadUniformMat4(const std::string name, const Matrix4f& mat4)
+	{
+		int location = glGetUniformLocation(this->shaderID, name.c_str());
+		glUniformMatrix4fv(location, 1, GL_FALSE, &mat4.data[0]);
+	}
 }
