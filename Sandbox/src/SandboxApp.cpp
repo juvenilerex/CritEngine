@@ -11,7 +11,9 @@
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
 #include <EngineCore/Window/Input.h>
+#include <EngineCore/Window/InputMouse.h>
 #include <EngineCore/Entry.h>
+#include <EngineCore/Math/Vector2.h>
 #include <EngineCore/Graphics/Renderer.h>
 #include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
@@ -123,18 +125,12 @@ public:
 
 	void Tick() override
 	{
-		// We don't have access to GLFW's key enums, so we may need to import them (?)
-		if (this->GetWindow().GetInput().GetKeyDown(66))
-		{ // If B is pressed
-			 LogWarning("Input", "B pressed!");
+		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::A)))
+		{ // If A is pressed
+			LogWarning("Input: ", "A was just pressed");
 		}
-		if (this->GetWindow().GetInput().GetKeyUp(66))
-		{ // If B is released
-			LogWarning("Input", "B released!");
-		}
-		if (this->GetWindow().GetInput().GetKeyJustPressed(67))
-		{
-			LogWarning("Input", "C just pressed!");
+		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(Engine::GetMouseButton(Mouse::BUTTON_1))) {
+			LogWarning("Mouse: ", "Mouse 1 pressed!");
 		}
 
 		LogInfo("Sandbox", "Tick!");
