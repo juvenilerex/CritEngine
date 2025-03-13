@@ -62,7 +62,7 @@ public:
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
 
-		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -2), camera_rot));
+		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 0.25, -7), camera_rot));
 
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 
@@ -109,17 +109,24 @@ public:
 	}
 
 	std::unique_ptr<Player> player;
+	const float FIXED_TIME_STEP = 1.0f / 60.0f; 
 
 	void Tick() override
 	{
-		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A)))
-		{ // If A is pressed
-			LogWarning("Input: ", "A was just pressed");
-			player->transform.position = player->transform.position + Engine::Vector2(0, 0.1f);
-			LogWarning("Input: ", std::to_string(player->transform.position.x) + " " + std::to_string(player->transform.position.y));
-		}
+		Time::Update();
+		float deltaTime = Time::deltaTime();
 
-//		LogInfo("Sandbox", "Tick!");
+
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::W))) { // If A is pressed
+			LogWarning("Input: ", "W was just pressed");
+			this->player->transform.position = this->player->transform.position + Engine::Vector2(0, 1.0f) * deltaTime;
+		}
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A))) { // If A is pressed
+			LogWarning("Input: ", "a was just pressed");
+			this->player->transform.position = this->player->transform.position + Engine::Vector2(-1.0f, 0.0f) * deltaTime;
+			
+		}
+		LogWarning("Input: ", std::to_string(player->transform.position.x) + " " + std::to_string(player->transform.position.y));
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
@@ -128,19 +135,32 @@ public:
 
 		Engine::Renderer::BeginScene(this->camera);
 
-		// TODO: Abstract this behind some generalized object class?
+		// Bind the shader
 		this->shader->Bind();
+
+		Engine::Matrix4f modelMatrix = {
+			3.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 3.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 3.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1
+		};
+
+		this->shader->UploadUniformMat4("uModelProjection", modelMatrix);
+
+		Engine::Renderer::Submit(this->shader, this->squareVA);
+
+		// Draw the triangle (if needed)
 		this->shader->UploadUniformMat4("uModelProjection", Engine::Matrix4f({
 			cosf(time.count() * 8), 0, sinf(time.count() * 8), 0,
 			0, 1, 0, 0,
 			-sinf(time.count() * 8), 0, cosf(time.count() * 8), 0,
 			0, sinf(time.count() * 4), 0, 1
 			}));
-		Engine::Renderer::Submit(this->shader, this->squareVA);
 		Engine::Renderer::Submit(this->shader, this->triangleVA);
 
 		Engine::Renderer::EndScene();
 	}
+
 
 	~Game()
 	{
