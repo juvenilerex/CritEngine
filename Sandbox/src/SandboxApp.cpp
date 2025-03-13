@@ -125,7 +125,7 @@ public:
 
 	void Tick() override
 	{
-		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::A)))
+		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::A))) 
 		{ // If A is pressed
 			LogWarning("Input: ", "A was just pressed");
 		}
