@@ -13,7 +13,7 @@
 #include <EngineCore/Window/Input.h>
 #include <EngineCore/Window/InputMouse.h>
 #include <EngineCore/Entry.h>
-#include <EngineCore/Math/Vector.h>
+#include <EngineCore/Math/Vector2.h>
 #include <EngineCore/Graphics/Renderer.h>
 #include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
@@ -157,7 +157,6 @@ public:
 		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(Engine::GetMouseButton(Mouse::BUTTON_1))) {
 			LogWarning("Mouse: ", "Mouse 1 pressed!");
 		}
-//		LogInfo("MousePos: ", this->GetWindow().GetMouseInput().GetPosition().ToString());
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
