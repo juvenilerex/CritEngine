@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../Core/Base.h"
+#include "../Math/Vector2.h"
 #include <unordered_map>
 #include <array>
-#include "../Math/Vector.h"
 
 struct GLFWwindow;
 
