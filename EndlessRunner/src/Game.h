@@ -34,15 +34,15 @@ class GameObject {
 
 public:
 	Transform transform;
-    Engine::Vector3 velocity;
 
-	GameObject() : transform(), velocity(Engine::Vector3()) {}
+	GameObject() : transform() {}
     virtual ~GameObject() {}
 };
 
 class Player : public GameObject {
 
 public:
+    Engine::Vector3 velocity;
     bool isGrounded = false;
 };
 
