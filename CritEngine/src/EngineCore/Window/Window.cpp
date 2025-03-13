@@ -7,7 +7,8 @@
 
 namespace Engine {
 
-	Window::Window(int width, int height, std::string title)
+	Window::Window(int width, int height, std::string title) 
+		: width(width), height(height)
 	{
 		bool success = glfwInit();
 		ASSERT(success, "Failed to initialize GLFW!");
