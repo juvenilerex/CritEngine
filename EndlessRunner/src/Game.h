@@ -19,28 +19,45 @@
 #include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
 #include <EngineCore/Math/Vector3.h>
+#include <thread>
 
-struct Transform2D {
 
-	Engine::Vector2 position;
+struct Transform {
+	Engine::Vector3 position;
 	Engine::Quaternion rotation;
 	float scale;
 
-	Transform2D() : position(Engine::Vector2()), rotation(Engine::Quaternion()), scale(1.0f) {}
+	Transform() : position(Engine::Vector3()), rotation(Engine::Quaternion()), scale(1.0f) {}
 };
 
-class GameObject2D {
+class GameObject {
 
 public:
-	Transform2D transform;
+	Transform transform;
     Engine::Vector3 velocity;
 
+	GameObject() : transform(), velocity(Engine::Vector3()) {}
+    virtual ~GameObject() {}
 };
 
-class Player : public GameObject2D {
+class Player : public GameObject {
 
+public:
+    bool isGrounded = false;
 };
 
+
+class ObjectSpawner {
+
+public:
+
+    void SpawnGameObjects() {
+
+    }
+
+private:
+
+};
 
 class Time {
 public:

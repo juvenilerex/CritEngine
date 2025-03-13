@@ -57,12 +57,14 @@ public:
 	Game() {
 		PushLayer(new LayerTest());
 
+
 		player = std::make_unique<Player>();
+		spawner = std::make_unique<ObjectSpawner>();
+
 		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
 
-		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
-
-		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 0.25, -7), camera_rot));
+		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.2, 0, 0));
+		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1, -9), camera_rot));
 
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 
@@ -109,23 +111,49 @@ public:
 	}
 
 	std::unique_ptr<Player> player;
-	const float FIXED_TIME_STEP = 1.0f / 60.0f; 
+	std::unique_ptr<ObjectSpawner> spawner;
+	const float SPEED = 100.0f;
+	const float JUMP_VELOCITY = 8.0f;
+	const float GRAVITY = 16.0f;
+	const float FLOOR_LEVEL = 0.0f;
 
-	void Tick() override
-	{
+	void Jump() const {
+		if (this->player->isGrounded) 
+			this->player->velocity.y = JUMP_VELOCITY;
+			this->player->isGrounded = false;
+	}
+
+	void ApplyGravity() const {
+		if (!this->player->isGrounded) 
+			this->player->velocity.y -= GRAVITY * Time::deltaTime();		
+	}
+
+	void Tick() override {
 		Time::Update();
 		float deltaTime = Time::deltaTime();
 
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::D))) 
+			this->player->velocity.x = SPEED * deltaTime;
+		else if (this->GetWindow().GetInput().GetKeyUp(Engine::GetKeyCode(Keys::D))) 
+			this->player->velocity.x = 0;
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A))) 
+			this->player->velocity.x = -SPEED * deltaTime;		
+		else if (this->GetWindow().GetInput().GetKeyUp(Engine::GetKeyCode(Keys::A))) 
+			this->player->velocity.x = 0;
 
-		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::W))) { // If A is pressed
-			LogWarning("Input: ", "W was just pressed");
-			this->player->transform.position = this->player->transform.position + Engine::Vector2(0, 1.0f) * deltaTime;
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::SPACE)))
+			Jump();
+
+		ApplyGravity();
+
+		this->player->transform.position = this->player->transform.position + this->player->velocity * deltaTime;
+
+		if (this->player->transform.position.y <= FLOOR_LEVEL) {
+			this->player->transform.position.y = 0;
+			this->player->velocity.y = 0;
+			this->player->isGrounded = true;
 		}
-		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A))) { // If A is pressed
-			LogWarning("Input: ", "a was just pressed");
-			this->player->transform.position = this->player->transform.position + Engine::Vector2(-1.0f, 0.0f) * deltaTime;
-			
-		}
+
 		LogWarning("Input: ", std::to_string(player->transform.position.x) + " " + std::to_string(player->transform.position.y));
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
@@ -135,14 +163,14 @@ public:
 
 		Engine::Renderer::BeginScene(this->camera);
 
-		// Bind the shader
 		this->shader->Bind();
 
+		// Updating the matrix with the player's position
 		Engine::Matrix4f modelMatrix = {
-			3.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 3.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 3.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1
+			1.0f, 0.0f, 0.0f, 0,
+			0.0f, 3.0f, 0.0f, 0,
+			0.0f, 0.0f, 0.0f, 0.0f,
+			this->player->transform.position.x, this->player->transform.position.y, 0.0f, 1
 		};
 
 		this->shader->UploadUniformMat4("uModelProjection", modelMatrix);
@@ -166,6 +194,7 @@ public:
 	{
 		LogWarning("Sandbox", "Destroyed!");
 	}
+
 private:
 	std::shared_ptr<Engine::Shader> shader;
 	std::shared_ptr<Engine::VertexArray> triangleVA;
