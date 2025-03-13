@@ -1,22 +1,6 @@
 #pragma once
 
-#include <cstdio>
-#include <functional>
-#include <iostream>
-#include <chrono>
-
-#include <EngineCore/Layer.h>
-#include <EngineCore/Application.h>
-#include <EngineCore/Core/MainLoop.h>
-#include <EngineCore/Logging/Logger.h>
-#include <EngineCore/Event/Event.h>
-#include <EngineCore/Window/Input.h>
-#include <EngineCore/Window/InputMouse.h>
-#include <EngineCore/Entry.h>
-#include <EngineCore/Math/Vector2.h>
-#include <EngineCore/Graphics/Renderer.h>
-#include <EngineCore/Graphics/Scene.h>
-#include <EngineCore/Graphics/Camera.h>
+#include "Game.h"
 
 std::string vertexShaderSource = R"(
 	#version 460 core
@@ -60,7 +44,7 @@ public:
 	}
 
 	void OnUpdate() override {
-		LogInfo("ExampleLayer", "Update");
+//		LogInfo("ExampleLayer", "Update");
 	}
 
 };
@@ -73,6 +57,7 @@ public:
 	Game() {
 		PushLayer(new LayerTest());
 
+		player = std::make_unique<Player>();
 		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
@@ -123,17 +108,18 @@ public:
 		this->start = std::chrono::high_resolution_clock::now();
 	}
 
+	std::unique_ptr<Player> player;
+
 	void Tick() override
 	{
-		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::A)))
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A)))
 		{ // If A is pressed
 			LogWarning("Input: ", "A was just pressed");
-		}
-		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(Engine::GetMouseButton(Mouse::BUTTON_1))) {
-			LogWarning("Mouse: ", "Mouse 1 pressed!");
+			player->transform.position = player->transform.position + Engine::Vector2(0, 0.1f);
+			LogWarning("Input: ", std::to_string(player->transform.position.x) + " " + std::to_string(player->transform.position.y));
 		}
 
-		LogInfo("Sandbox", "Tick!");
+//		LogInfo("Sandbox", "Tick!");
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
