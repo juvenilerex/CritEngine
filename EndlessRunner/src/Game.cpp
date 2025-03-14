@@ -72,22 +72,29 @@ public:
 	Game() {
 		PushLayer(new LayerTest());
 
+		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
 
+		// Scene initialization logic
+		playerBox = std::make_unique<AABB>(Engine::Vector2(0, 0), PLAYER_SIZE);
 		player = std::make_unique<Player>();
 		spawner = std::make_unique<ObjectSpawner>();
+		testBox = std::make_unique<AABB>(Engine::Vector2(-2, 0), Engine::Vector2(0.5f,2.0f));
+		rng = std::make_unique<RNG>();
 
-        this->spawner->Instantiate(obstacles);
+		this->playerBox->size = PLAYER_SIZE;
+
+		this->spawner->Instantiate(obstacles);
 		this->spawner->Instantiate(obstacles);
 
 
-		for (auto &ob : *this->spawner->GetObjects()) {
+		for (auto& ob : *this->spawner->GetObjects()) {
 			LogInfo("Spawner", "Obstacle found! " + std::to_string(ob->transform.position.x));
 		}
 
-		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
+		/////
 
-		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.2, 0, 0));
-		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1, -9), camera_rot));
+		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4f, 0, 0));
+		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 3, -9), camera_rot));
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 		this->obstacleShader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSourceRed));
 
@@ -136,12 +143,23 @@ public:
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjectSpawner> spawner;
 	std::shared_ptr<Obstacle> obstacles;
-	const float SPEED = 100.0f;
-	const float JUMP_VELOCITY = 8.0f;
-	const float GRAVITY = 16.0f;
+	std::unique_ptr<RNG> rng;
+
+	const float SPEED = 200.0f;
+	const float JUMP_VELOCITY = 23.0f;
+	const float GRAVITY = 35.0f;
 	const float FLOOR_LEVEL = 0.0f;
 	const float OBSTACLE_END_POINT = -10.0f;
 	const float OBSTACLE_SPEED = 15.0F;
+	const float MIN_OBSTACLE_SPAWN_TIME = 1.0f;
+	const float MAX_OBSTACLE_SPAWN_TIME = 2.0f;
+	const float MIN_OBSTACLE_HEIGHT = 1.0f;
+	const float MAX_OBSTACLE_HEIGHT = 3.0f;
+
+	const Engine::Vector2 PLAYER_SIZE = Engine::Vector2(1.0f, 4.0f);
+
+	std::unique_ptr<AABB> playerBox;
+	std::unique_ptr<AABB> testBox;
 
 	void Jump() const {
 		if (this->player->isGrounded) 
@@ -154,9 +172,30 @@ public:
 			this->player->velocity.y -= GRAVITY * Time::deltaTime();		
 	}
 
+	float obTimer = 0.0f;
+	float timeSinceSpawn = 0.0f;
+
+	void RandomObstacleSpawn() {
+		timeSinceSpawn += Time::deltaTime();
+
+		if (timeSinceSpawn >= obTimer) {
+			obTimer = this->rng->GetRandFloat(MIN_OBSTACLE_SPAWN_TIME, MAX_OBSTACLE_SPAWN_TIME);
+			timeSinceSpawn = 0.0f;
+			this->spawner->Instantiate(obstacles);
+
+			// Initializing the object that was just created in the spawner
+			auto& ob = std::dynamic_pointer_cast<Obstacle>(this->spawner->GetLastObject());
+			ob->box->position = Engine::Vector2(10.0f,0.0f);
+			ob->box->size = Engine::Vector2(1.0f, this->rng->GetRandFloat(MIN_OBSTACLE_HEIGHT, MAX_OBSTACLE_HEIGHT));
+			
+		}
+	}
+
 	void Tick() override {
 		Time::Update();
 		float deltaTime = Time::deltaTime();
+
+		RandomObstacleSpawn();
 
 		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::D))) 
 			this->player->velocity.x = SPEED * deltaTime;
@@ -170,10 +209,6 @@ public:
 		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::SPACE)))
 			Jump();
 
-		// Testing instantiation
-		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::X)))
-			this->spawner->Instantiate(obstacles);
-
 		ApplyGravity();
 
 		this->player->transform.position = this->player->transform.position + this->player->velocity * deltaTime;
@@ -184,9 +219,30 @@ public:
 			this->player->isGrounded = true;
 		}
 
+		// Bounding boxes for collision. Could definitely be a component in the future
+		this->playerBox->position = Engine::Vector2(this->player->transform.position.x, this->player->transform.position.y);
+
+		//////////////////
+
 		for (auto& ob : *this->spawner->GetObjects()) {
-			ob->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
+			auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
+			typedObject->box->position.x -= OBSTACLE_SPEED * Time::deltaTime();
 		}
+
+		// Collision checking
+
+		if (this->playerBox->isColliding(*this->testBox)) {
+			LogInfo("AABB", "Colliding!");
+		}
+		for (auto& ob : *this->spawner->GetObjects()) {
+			auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
+			if (this->playerBox->isColliding(*typedObject->box)) {
+				LogError("AABB", "Player hit!");
+			}
+		}
+
+
+		//////////////////////////
 
 		Draw();
 	}
@@ -205,13 +261,23 @@ public:
 
 		// Resembling the player with a square
 		Engine::Matrix4f modelMatrix = {
-			1.0f, 0.0f, 0.0f, 0,
-			0.0f, 3.0f, 0.0f, 0,
+			this->playerBox->size.x / 2, 0.0f, 0.0f, 0,
+			0.0f, this->playerBox->size.y / 2, 0.0f, 0,
 			0.0f, 0.0f, 0.0f, 0.0f,
-			this->player->transform.position.x, this->player->transform.position.y, 0.0f, 1
+			this->playerBox->position.x, this->playerBox->position.y, 0.0f, 1
 		};
 
 		this->shader->UploadUniformMat4("uModelProjection", modelMatrix);
+		Engine::Renderer::Submit(this->shader, this->squareVA);
+
+		Engine::Matrix4f testmodelMatrix = {
+			this->testBox->size.x / 2, 0.0f, 0.0f, 0,
+			0.0f, this->testBox->size.y / 2, 0.0f, 0,
+			0.0f, 0.0f, 0.0f, 0.0f,
+			this->testBox->position.x, this->testBox->position.y, 0.0f, 1
+		};
+
+		this->shader->UploadUniformMat4("uModelProjection", testmodelMatrix);
 		Engine::Renderer::Submit(this->shader, this->squareVA);
 
 		this->shader->Unbind();
@@ -219,15 +285,18 @@ public:
 
 		// Resembling obstacles with squares
 		for (auto& ob : *this->spawner->GetObjects()) {
+			auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
 			Engine::Matrix4f m = {
-				0.5f, 0.0f, 0.0f, 0,
-				0.0f, 1.25f, 0.0f, 0,
-				0.0f, 0.0f, 0.0f, 0.0f,
-				ob->transform.position.x, ob->transform.position.y, 0.0f, 1
+				typedObject->box->size.x / 2, 0.0f, 0.0f, 0,
+				0.0f, typedObject->box->size.y / 2, 0.0f, 0,
+				0.0f, 0.0f, 1.0f, 0.0f,
+				typedObject->box->position.x, typedObject->box->position.y, 0.0f, 1
 			};
 			this->obstacleShader->UploadUniformMat4("uModelProjection", m);
 			Engine::Renderer::Submit(this->obstacleShader, this->squareVA);
 		}
+
+		/*
 
 		this->obstacleShader->Unbind();
 		this->shader->Bind();
@@ -240,6 +309,8 @@ public:
 			0, sinf(time.count() * 4), 0, 1
 			}));
 		Engine::Renderer::Submit(this->shader, this->triangleVA);
+
+		*/
 
 		Engine::Renderer::EndScene();
 
