@@ -184,9 +184,13 @@ public:
 			this->spawner->Instantiate(obstacles);
 
 			// Initializing the object that was just created in the spawner
+			// This sucks but I don't have time to fix it right now
 			const auto& ob = std::dynamic_pointer_cast<Obstacle>(this->spawner->GetLastObject());
 			ob->box->position = Engine::Vector2(10.0f,0.0f);
 			ob->box->size = Engine::Vector2(1.0f, this->rng->GetRandFloat(MIN_OBSTACLE_HEIGHT, MAX_OBSTACLE_HEIGHT));
+			ob->transform.position.x = ob->box->position.x;
+			ob->transform.position.y = ob->box->position.y;
+			ob->transform.scale = Engine::Vector3(ob->box->size.x, ob->box->size.y, 1.0f);
 		}
 	}
 
@@ -224,8 +228,16 @@ public:
 		//////////////////
 
 		for (auto& ob : *this->spawner->GetObjects()) {
+			ob->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
+
+			// Bounding box, for now, will just be directly copying the transform's position to itself
 			const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
-			typedObject->box->position.x -= OBSTACLE_SPEED * Time::deltaTime();
+			typedObject->box->position.x = ob->transform.position.x;
+			typedObject->box->position.y = ob->transform.position.y;
+
+			if (this->playerBox->isColliding(*typedObject->box)) {
+				LogError("AABB", "Player hit!");
+			}
 		}
 
 		// Collision checking
@@ -233,12 +245,7 @@ public:
 		if (this->playerBox->isColliding(*this->testBox)) {
 			LogInfo("AABB", "Colliding!");
 		}
-		for (auto& ob : *this->spawner->GetObjects()) {
-			const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
-			if (this->playerBox->isColliding(*typedObject->box)) {
-				LogError("AABB", "Player hit!");
-			}
-		}
+
 
 
 		//////////////////////////
@@ -284,12 +291,11 @@ public:
 
 		// Resembling obstacles with squares
 		for (auto& ob : *this->spawner->GetObjects()) {
-			const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
 			Engine::Matrix4f m = {
-				typedObject->box->size.x / 2, 0.0f, 0.0f, 0,
-				0.0f, typedObject->box->size.y / 2, 0.0f, 0,
+				ob->transform.scale.x / 2, 0.0f, 0.0f, 0,
+				0.0f, ob->transform.scale.y / 2, 0.0f, 0,
 				0.0f, 0.0f, 1.0f, 0.0f,
-				typedObject->box->position.x, typedObject->box->position.y, 0.0f, 1
+				ob->transform.position.x, ob->transform.position.y, 0.0f, 1
 			};
 			this->obstacleShader->UploadUniformMat4("uModelProjection", m);
 			Engine::Renderer::Submit(this->obstacleShader, this->squareVA);
