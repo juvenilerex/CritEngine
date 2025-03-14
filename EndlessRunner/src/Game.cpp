@@ -61,6 +61,14 @@ public:
 		player = std::make_unique<Player>();
 		spawner = std::make_unique<ObjectSpawner>();
 
+        this->spawner->Instantiate(obstacles);
+		this->spawner->Instantiate(obstacles);
+
+
+		for (auto &ob : *this->spawner->GetObjects()) {
+			LogInfo("Spawner", "Obstacle found! " + std::to_string(ob->transform.position.x));
+		}
+
 		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.2, 0, 0));
@@ -112,10 +120,13 @@ public:
 
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjectSpawner> spawner;
+	std::shared_ptr<Obstacle> obstacles;
 	const float SPEED = 100.0f;
 	const float JUMP_VELOCITY = 8.0f;
 	const float GRAVITY = 16.0f;
 	const float FLOOR_LEVEL = 0.0f;
+	const float OBSTACLE_END_POINT = -10.0f;
+	const float OBSTACLE_SPEED = 15.0F;
 
 	void Jump() const {
 		if (this->player->isGrounded) 
@@ -144,6 +155,10 @@ public:
 		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::SPACE)))
 			Jump();
 
+		// Testing instantiation
+		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::X)))
+			this->spawner->Instantiate(obstacles);
+
 		ApplyGravity();
 
 		this->player->transform.position = this->player->transform.position + this->player->velocity * deltaTime;
@@ -154,7 +169,11 @@ public:
 			this->player->isGrounded = true;
 		}
 
-		LogWarning("Input: ", std::to_string(player->transform.position.x) + " " + std::to_string(player->transform.position.y));
+		for (auto& ob : *this->spawner->GetObjects()) {
+			ob->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
+		}
+
+//		LogWarning("Input: ", std::to_string(player->transform.position.x) + " " + std::to_string(player->transform.position.y));
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
@@ -165,7 +184,7 @@ public:
 
 		this->shader->Bind();
 
-		// Updating the matrix with the player's position
+		// Resembling the player with a square
 		Engine::Matrix4f modelMatrix = {
 			1.0f, 0.0f, 0.0f, 0,
 			0.0f, 3.0f, 0.0f, 0,
@@ -174,8 +193,19 @@ public:
 		};
 
 		this->shader->UploadUniformMat4("uModelProjection", modelMatrix);
-
 		Engine::Renderer::Submit(this->shader, this->squareVA);
+
+		// Resembling obstacles with squares
+		for (auto& ob : *this->spawner->GetObjects()) {
+			Engine::Matrix4f m = {
+				0.5f, 0.0f, 0.0f, 0,
+				0.0f, 1.25f, 0.0f, 0,
+				0.0f, 0.0f, 0.0f, 0.0f,
+				ob->transform.position.x, ob->transform.position.y, 0.0f, 1
+			};
+			this->shader->UploadUniformMat4("uModelProjection", m);
+			Engine::Renderer::Submit(this->shader, this->squareVA);
+		}
 
 		// Draw the triangle (if needed)
 		this->shader->UploadUniformMat4("uModelProjection", Engine::Matrix4f({
@@ -187,6 +217,15 @@ public:
 		Engine::Renderer::Submit(this->shader, this->triangleVA);
 
 		Engine::Renderer::EndScene();
+
+		// Cleaning up obstacles once they enter a certain range
+		for (auto& ob : *this->spawner->GetObjects()) {
+			if (!ob) {
+				break;
+			}
+			if (ob->transform.position.x <= OBSTACLE_END_POINT)
+				this->spawner->DeleteObject(ob);
+		}
 	}
 
 

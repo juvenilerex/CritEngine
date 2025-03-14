@@ -46,16 +46,39 @@ public:
     bool isGrounded = false;
 };
 
+class Obstacle : public GameObject {
+
+public:
+    Obstacle() {
+        LogInfo("Obstacle", "I exist!");
+    }
+};
 
 class ObjectSpawner {
 
 public:
 
-    void SpawnGameObjects() {
+    // This could definitely be expanded upon
+    template<typename T>
+    void Instantiate(std::shared_ptr<T> obj) {
+        obj = std::make_shared<T>();
+        objects.push_back(obj);
+        LogInfo("ObjectSpawner", "Object spawned");
+    }
 
+    inline const std::vector<std::shared_ptr<GameObject>>* GetObjects() {
+        return &this->objects;
+    }
+
+    void DeleteObject(const std::shared_ptr<GameObject>& obj) {
+        auto it = std::find(objects.begin(), objects.end(), obj);
+        if (it != objects.end()) {
+            objects.erase(it);
+        }
     }
 
 private:
+    std::vector<std::shared_ptr<GameObject>> objects;
 
 };
 
