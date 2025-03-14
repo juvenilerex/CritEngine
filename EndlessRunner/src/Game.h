@@ -50,7 +50,7 @@ class Obstacle : public GameObject {
 
 public:
     Obstacle() {
-        LogInfo("Obstacle", "I exist!");
+       
     }
 };
 
