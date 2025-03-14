@@ -184,10 +184,9 @@ public:
 			this->spawner->Instantiate(obstacles);
 
 			// Initializing the object that was just created in the spawner
-			auto& ob = std::dynamic_pointer_cast<Obstacle>(this->spawner->GetLastObject());
+			const auto& ob = std::dynamic_pointer_cast<Obstacle>(this->spawner->GetLastObject());
 			ob->box->position = Engine::Vector2(10.0f,0.0f);
 			ob->box->size = Engine::Vector2(1.0f, this->rng->GetRandFloat(MIN_OBSTACLE_HEIGHT, MAX_OBSTACLE_HEIGHT));
-			
 		}
 	}
 
@@ -225,7 +224,7 @@ public:
 		//////////////////
 
 		for (auto& ob : *this->spawner->GetObjects()) {
-			auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
+			const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
 			typedObject->box->position.x -= OBSTACLE_SPEED * Time::deltaTime();
 		}
 
@@ -235,7 +234,7 @@ public:
 			LogInfo("AABB", "Colliding!");
 		}
 		for (auto& ob : *this->spawner->GetObjects()) {
-			auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
+			const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
 			if (this->playerBox->isColliding(*typedObject->box)) {
 				LogError("AABB", "Player hit!");
 			}
@@ -285,7 +284,7 @@ public:
 
 		// Resembling obstacles with squares
 		for (auto& ob : *this->spawner->GetObjects()) {
-			auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
+			const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
 			Engine::Matrix4f m = {
 				typedObject->box->size.x / 2, 0.0f, 0.0f, 0,
 				0.0f, typedObject->box->size.y / 2, 0.0f, 0,
