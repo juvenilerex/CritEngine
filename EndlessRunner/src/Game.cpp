@@ -69,17 +69,25 @@ class Game : public Engine::Application
 
 public:
 
+	std::unique_ptr<Engine::Matrix4f> playerMatrix = std::make_unique<Engine::Matrix4f>();
+	std::unique_ptr<Engine::Matrix4f> obstacleMatrix = std::make_unique<Engine::Matrix4f>();
+
 	Game() {
 		PushLayer(new LayerTest());
 
 		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
-
+		
 		// Scene initialization logic
 		playerBox = std::make_unique<AABB>(Engine::Vector2(0, 0), PLAYER_SIZE);
 		player = std::make_unique<Player>();
 		spawner = std::make_unique<ObjectSpawner>();
-		testBox = std::make_unique<AABB>(Engine::Vector2(-2, 0), Engine::Vector2(0.5f,2.0f));
 		rng = std::make_unique<RNG>();
+
+		SetMatrixPosition(*playerMatrix, Engine::Vector3(0.0f, 0.0f, 0.0f));
+		SetMatrixSize(*playerMatrix, Engine::Vector3(1.0f, 3.0f, 0.0f));
+
+		SetMatrixPosition(*obstacleMatrix, Engine::Vector3(0.0f, 0.0f, 0.0f));
+		SetMatrixSize(*obstacleMatrix, Engine::Vector3(1.0f, 3.0f, 0.0f));
 
 		this->playerBox->size = PLAYER_SIZE;
 
@@ -94,7 +102,7 @@ public:
 		/////
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4f, 0, 0));
-		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 3, -9), camera_rot));
+		this->camera.reset(new Engine::PerspectiveCamera(20, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 20, -60), camera_rot));
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 		this->obstacleShader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSourceRed));
 
@@ -147,19 +155,20 @@ public:
 
 	const float SPEED = 200.0f;
 	const float JUMP_VELOCITY = 23.0f;
-	const float GRAVITY = 35.0f;
+	const float GRAVITY = 49.0f;
 	const float FLOOR_LEVEL = 0.0f;
-	const float OBSTACLE_END_POINT = -10.0f;
-	const float OBSTACLE_SPEED = 15.0F;
-	const float MIN_OBSTACLE_SPAWN_TIME = 1.0f;
-	const float MAX_OBSTACLE_SPAWN_TIME = 2.0f;
-	const float MIN_OBSTACLE_HEIGHT = 1.0f;
-	const float MAX_OBSTACLE_HEIGHT = 3.0f;
+	const float OBSTACLE_END_POINT = -12.0f;
+	const float OBSTACLE_SPEED = 17.0F;
+	const float MIN_OBSTACLE_SPAWN_TIME = 0.9f;
+	const float MAX_OBSTACLE_SPAWN_TIME = 2.6f;
+	const float MIN_OBSTACLE_HEIGHT = 3.0f;
+	const float MAX_OBSTACLE_HEIGHT = 8.5f;
+
+	int successfulJumps = 0;
 
 	const Engine::Vector2 PLAYER_SIZE = Engine::Vector2(1.0f, 4.0f);
 
 	std::unique_ptr<AABB> playerBox;
-	std::unique_ptr<AABB> testBox;
 
 	void Jump() const {
 		if (this->player->isGrounded) 
@@ -184,14 +193,25 @@ public:
 			this->spawner->Instantiate(obstacles);
 
 			// Initializing the object that was just created in the spawner
-			// This sucks but I don't have time to fix it right now
+			float randHeight = this->rng->GetRandFloat(MIN_OBSTACLE_HEIGHT, MAX_OBSTACLE_HEIGHT);
 			const auto& ob = std::dynamic_pointer_cast<Obstacle>(this->spawner->GetLastObject());
-			ob->box->position = Engine::Vector2(10.0f,0.0f);
-			ob->box->size = Engine::Vector2(1.0f, this->rng->GetRandFloat(MIN_OBSTACLE_HEIGHT, MAX_OBSTACLE_HEIGHT));
+			ob->box->size = Engine::Vector2(1.0f, randHeight / 2);
+			ob->box->position = Engine::Vector2(15.0f, -1.33f + randHeight / 4);
 			ob->transform.position.x = ob->box->position.x;
 			ob->transform.position.y = ob->box->position.y;
 			ob->transform.scale = Engine::Vector3(ob->box->size.x, ob->box->size.y, 1.0f);
 		}
+	}
+	
+	void MovePlayer() {
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::D)))
+			this->player->velocity.x = SPEED * Time::deltaTime();
+		else if (this->GetWindow().GetInput().GetKeyUp(Engine::GetKeyCode(Keys::D)))
+			this->player->velocity.x = 0;
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A)))
+			this->player->velocity.x = -SPEED * Time::deltaTime();
+		else if (this->GetWindow().GetInput().GetKeyUp(Engine::GetKeyCode(Keys::A)))
+			this->player->velocity.x = 0;
 	}
 
 	void Tick() override {
@@ -199,15 +219,7 @@ public:
 		float deltaTime = Time::deltaTime();
 
 		RandomObstacleSpawn();
-
-		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::D))) 
-			this->player->velocity.x = SPEED * deltaTime;
-		else if (this->GetWindow().GetInput().GetKeyUp(Engine::GetKeyCode(Keys::D))) 
-			this->player->velocity.x = 0;
-		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A))) 
-			this->player->velocity.x = -SPEED * deltaTime;		
-		else if (this->GetWindow().GetInput().GetKeyUp(Engine::GetKeyCode(Keys::A))) 
-			this->player->velocity.x = 0;
+		MovePlayer();
 
 		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::SPACE)))
 			Jump();
@@ -240,16 +252,6 @@ public:
 			}
 		}
 
-		// Collision checking
-
-		if (this->playerBox->isColliding(*this->testBox)) {
-			LogInfo("AABB", "Colliding!");
-		}
-
-
-
-		//////////////////////////
-
 		Draw();
 	}
 
@@ -264,58 +266,26 @@ public:
 
 		this->shader->Bind();
 
-
-		// Resembling the player with a square
-		Engine::Matrix4f modelMatrix = {
-			this->playerBox->size.x / 2, 0.0f, 0.0f, 0,
-			0.0f, this->playerBox->size.y / 2, 0.0f, 0,
-			0.0f, 0.0f, 0.0f, 0.0f,
-			this->playerBox->position.x, this->playerBox->position.y, 0.0f, 1
-		};
-
-		this->shader->UploadUniformMat4("uModelProjection", modelMatrix);
-		Engine::Renderer::Submit(this->shader, this->squareVA);
-
-		Engine::Matrix4f testmodelMatrix = {
-			this->testBox->size.x / 2, 0.0f, 0.0f, 0,
-			0.0f, this->testBox->size.y / 2, 0.0f, 0,
-			0.0f, 0.0f, 0.0f, 0.0f,
-			this->testBox->position.x, this->testBox->position.y, 0.0f, 1
-		};
-
-		this->shader->UploadUniformMat4("uModelProjection", testmodelMatrix);
+		SetMatrixPosition(*playerMatrix, Engine::Vector3(this->playerBox->position.x, this->playerBox->position.y, 0.0f));
+		this->shader->UploadUniformMat4("uModelProjection", *playerMatrix);
 		Engine::Renderer::Submit(this->shader, this->squareVA);
 
 		this->shader->Unbind();
 		this->obstacleShader->Bind();
 
-		// Resembling obstacles with squares
+		// Resembling obstacles
 		for (auto& ob : *this->spawner->GetObjects()) {
 			Engine::Matrix4f m = {
-				ob->transform.scale.x / 2, 0.0f, 0.0f, 0,
-				0.0f, ob->transform.scale.y / 2, 0.0f, 0,
+				0.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 0.0f, 0.0f,
 				0.0f, 0.0f, 1.0f, 0.0f,
-				ob->transform.position.x, ob->transform.position.y, 0.0f, 1
+				0.0f, 0.0f, 0.0f, 1.0f
 			};
+			SetMatrixPosition(m, ob->transform.position);
+			SetMatrixSize(m, ob->transform.scale);
 			this->obstacleShader->UploadUniformMat4("uModelProjection", m);
 			Engine::Renderer::Submit(this->obstacleShader, this->squareVA);
 		}
-
-		/*
-
-		this->obstacleShader->Unbind();
-		this->shader->Bind();
-
-		// Draw the triangle (if needed)
-		this->shader->UploadUniformMat4("uModelProjection", Engine::Matrix4f({
-			cosf(time.count() * 8), 0, sinf(time.count() * 8), 0,
-			0, 1, 0, 0,
-			-sinf(time.count() * 8), 0, cosf(time.count() * 8), 0,
-			0, sinf(time.count() * 4), 0, 1
-			}));
-		Engine::Renderer::Submit(this->shader, this->triangleVA);
-
-		*/
 
 		Engine::Renderer::EndScene();
 
@@ -332,6 +302,18 @@ public:
 
 	}
 
+	void SetMatrixPosition(Engine::Matrix4f& mat, const Engine::Vector3& to) {
+		mat.data[12] = to.x;
+		mat.data[13] = to.y;
+		mat.data[14] = to.z;
+		mat.data[15] = 1.0f;
+	}
+
+	void SetMatrixSize(Engine::Matrix4f& mat, const Engine::Vector3& to) {
+		mat.data[0] = to.x / 2;
+		mat.data[5] = to.y / 2;
+		mat.data[10] = to.z / 2;
+	}
 
 	~Game()
 	{
