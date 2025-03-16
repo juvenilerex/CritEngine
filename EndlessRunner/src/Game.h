@@ -26,8 +26,9 @@ template<typename T>
 class Transform {
 
 public:
+    Engine::Quaternion rotation;
 	T position, scale;
-	Engine::Quaternion rotation;
+	
 
     Transform() : position(T()), rotation(Engine::Quaternion()), scale(T()) {}
 
@@ -228,5 +229,30 @@ public:
 
 private:
     PrimitiveDraw();
+};
 
+class OrthographicCamera
+{
+public:
+
+    OrthographicCamera(float verticalFOV, float aspectRatio, float nearPlane, float farPlane, Engine::Vector3 position = Engine::Vector3(0, 0, 0), Engine::Quaternion rotation = Engine::Quaternion());
+
+    Engine::Matrix4f GetViewPerspectiveMatrix();
+    Engine::Matrix4f GetPerspectiveMatrix();
+    Engine::Matrix4f GetViewMatrix();
+
+    void CalculateViewMatrix();
+    void CalculatePerspectiveMatrix();
+
+private:
+    Engine::Matrix4f viewMatrix = Engine::Matrix4f::Identity();
+    Engine::Matrix4f perspectiveMatrix = Engine::Matrix4f::Identity();
+    Engine::Matrix4f viewPerspectiveMatrix = Engine::Matrix4f::Identity();
+
+    Engine::Quaternion rotation;
+    Engine::Vector3 position;
+    float height;
+    float aspectRatio;
+    float nearPlane;
+    float farPlane;
 };

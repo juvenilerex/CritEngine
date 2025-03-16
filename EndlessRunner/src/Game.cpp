@@ -47,6 +47,71 @@ std::string fragmentShaderSourceRed = R"(
 	}
 )";
 
+OrthographicCamera::OrthographicCamera(
+		float height,
+		float aspectRatio,
+		float nearPlane,
+		float farPlane,
+		Engine::Vector3 position,
+	    Engine::Quaternion rotation
+	) 
+	    : height(height), aspectRatio(aspectRatio), nearPlane(nearPlane), farPlane(farPlane), position(position), rotation(rotation)
+	{
+		this->CalculatePerspectiveMatrix();
+		this->CalculateViewMatrix();
+	}
+
+    Engine::Matrix4f OrthographicCamera::GetViewPerspectiveMatrix() { return this->viewPerspectiveMatrix; }
+	Engine::Matrix4f OrthographicCamera::GetPerspectiveMatrix() { return this->perspectiveMatrix; }
+	Engine::Matrix4f OrthographicCamera::GetViewMatrix() { return this->viewMatrix; }
+
+	void OrthographicCamera::CalculateViewMatrix()
+	{
+		Engine::Quaternion q = this->rotation;
+		Engine::Vector3 p = this->position;
+
+		// In the future the view matrix should be created in place to save on some cycles for every recalculation.
+
+		Engine::Matrix4f rotation = Engine::Matrix4f({
+			1 - 2 * q.y * q.y - 2 * q.z * q.z, 2 * q.x * q.y + 2 * q.w * q.z, 2 * q.x * q.z - 2 * q.w * q.y, 0,
+			2 * q.x * q.y - 2 * q.w * q.z, 1 - 2 * q.x * q.x - 2 * q.z * q.z, 2 * q.y * q.z + 2 * q.w * q.x, 0,
+			2 * q.x * q.z + 2 * q.w * q.y, 2 * q.y * q.z - 2 * q.w * q.x, 1 - 2 * q.x * q.x - 2 * q.y * q.y, 0,
+			0, 0, 0, 1
+		});
+
+		Engine::Matrix4f position = Engine::Matrix4f({
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			-p.x, -p.y, -p.z, 1
+		});
+
+		this->viewMatrix = rotation * position;
+
+		this->viewPerspectiveMatrix = this->perspectiveMatrix * this->viewMatrix;
+	}
+
+	void OrthographicCamera::CalculatePerspectiveMatrix()
+	{
+		
+		float far = this->farPlane;
+		float near = this->nearPlane;
+		float top = this->height / 2;
+		float bottom = -this->height / 2;
+		float left = this->height * this->aspectRatio / 2;
+		float right = -this->height * this->aspectRatio / 2;
+
+		this->perspectiveMatrix = Engine::Matrix4f({
+			-2 / (right - left), 0, 0, 0,
+			0, 2 / (top - bottom), 0, 0,
+			0, 0, 2 / (far - near), 0,
+			-(right + left) / (right - left), -(top + bottom) / (top - bottom), -(far + near) / (far - near), 1,
+		});
+
+		this->viewPerspectiveMatrix = this->perspectiveMatrix * this->viewMatrix;
+		
+	}
+
 class LayerTest : public Engine::Layer {
 
 public:
@@ -74,16 +139,15 @@ public:
 		// Game initialization
 
 		testCol = std::make_unique<Player2D>(Engine::Vector2(-1.5f, 1.0f), Engine::Vector2(2.0f, 5.0f));
-		debugBoxDrawQueue.push_back(Engine::Matrix4f());
+		debugBoxDrawQueue.push_back(Engine::Matrix4f::Identity());
 
 		player = std::make_unique<Player2D>(Engine::Vector2(1.0f, 1.0f), Engine::Vector2(3.0f, 7.0f));
-		playerDrawQueue.push_back(Engine::Matrix4f());
-		debugBoxDrawQueue.push_back(Engine::Matrix4f());
+		playerDrawQueue.push_back(Engine::Matrix4f::Identity());
 
 
-		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0.2));
+		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, 0, 0));
 
-		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -6), camera_rot));
+		this->camera.reset(new OrthographicCamera(10, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -6), camera_rot));
 
 		this->redShader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSourceRed));
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
@@ -110,10 +174,10 @@ public:
 		this->squareVA = Engine::VertexArray::Create();
 
 		float squareVertices[4 * 7] = {
-			-0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-			 0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			 0.8f,  0.8f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-			-0.8f,  0.8f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> squareVB = Engine::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
@@ -229,7 +293,11 @@ public:
 		Engine::RenderCommand::SetClearColor({ 0.3, 0.2, 0.8, 1 });
 		Engine::RenderCommand::Clear();
 
-		Engine::Renderer::BeginScene(this->camera);
+		//This is begin scene lmao
+		Engine::Scene::GetActiveScene()->viewProjectionMatrix = camera->GetViewMatrix();
+		Engine::Scene::GetActiveScene()->perspectiveProjectionMatrix = camera->GetPerspectiveMatrix();
+		Engine::Scene::GetActiveScene()->viewPerspectiveProjectionMatrix = camera->GetViewPerspectiveMatrix();
+		//
 
 		for (auto& mat : playerDrawQueue) {
 			PrimitiveDraw::Draw(this->shader, mat, this->squareVA);
@@ -246,14 +314,11 @@ public:
 		mat.data[12] = to.x;
 		mat.data[13] = to.y;
 		mat.data[14] = to.z;
-		mat.data[15] = 1.0f;
 	}
 
 	void SetMatrixPosition(Engine::Matrix4f& mat, const Engine::Vector2& to) {
 		mat.data[12] = to.x;
 		mat.data[13] = to.y;
-		mat.data[14] = 0.0f;
-		mat.data[15] = 1.0f;
 	}
 
 	void SetMatrixSize(Engine::Matrix4f& mat, const Engine::Vector3& to) {
@@ -265,7 +330,6 @@ public:
 	void SetMatrixSize(Engine::Matrix4f& mat, const Engine::Vector2& to) {
 		mat.data[0] = to.x / 2;
 		mat.data[5] = to.y / 2;
-		mat.data[10] = 0;
 	}
 
 	~EndlessRunner()
@@ -278,7 +342,7 @@ private:
 	std::shared_ptr<Engine::Shader> redShader;
 	std::shared_ptr<Engine::VertexArray> triangleVA;
 	std::shared_ptr<Engine::VertexArray> squareVA;
-	std::shared_ptr<Engine::PerspectiveCamera> camera;
+	std::shared_ptr<OrthographicCamera> camera;
 	std::chrono::time_point<std::chrono::high_resolution_clock> start;
 };
 
