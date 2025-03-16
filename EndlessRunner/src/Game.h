@@ -63,12 +63,9 @@ public:
 class Obstacle : public GameObject2D {
 
 public:
+    std::unique_ptr<BoundingBox> boundingBox = std::make_unique<BoundingBox>(0,0,1,1);
 
-    Obstacle(Engine::Vector2 position, Engine::Vector2 scale) : boundingBox(std::make_unique<BoundingBox>(position.x, position.y, scale.x, scale.y)) {
 
-    }
-
-    std::unique_ptr<BoundingBox> boundingBox;
 };
 
 class Shape2D {

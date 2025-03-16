@@ -138,16 +138,15 @@ public:
 
 		// Game initialization
 
-		testCol = std::make_unique<Player2D>(Engine::Vector2(-1.5f, 1.0f), Engine::Vector2(2.0f, 5.0f));
-		debugBoxDrawQueue.push_back(Engine::Matrix4f::Identity());
-
 		player = std::make_unique<Player2D>(Engine::Vector2(1.0f, 1.0f), Engine::Vector2(3.0f, 7.0f));
 		playerDrawQueue.push_back(Engine::Matrix4f::Identity());
 
+		spawner = std::make_unique<ObjectSpawner>();
+		rng = std::make_unique<RandomNumberGenerator>();
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, 0, 0));
 
-		this->camera.reset(new OrthographicCamera(10, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -6), camera_rot));
+		this->camera.reset(new OrthographicCamera(20, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -50), camera_rot));
 
 		this->redShader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSourceRed));
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
@@ -195,7 +194,6 @@ public:
 	}
 
 	std::unique_ptr<Player2D> player;
-	std::unique_ptr<Player2D> testCol;
 	std::unique_ptr<ObjectSpawner> spawner;
 	std::shared_ptr<Obstacle> obstacles;
 	std::unique_ptr<RandomNumberGenerator> rng;
@@ -206,11 +204,37 @@ public:
 	const float FLOOR_LEVEL = 0.0f;
 	const float OBSTACLE_START_POINT = 12.0f;
 	const float OBSTACLE_END_POINT = -12.0f;
-	const float OBSTACLE_SPEED = 17.0F;
-	const float MIN_OBSTACLE_SPAWN_TIME = 0.9f;
+	const float OBSTACLE_SPEED = 19.0F;
+	const float MIN_OBSTACLE_SPAWN_TIME = 0.8f;
 	const float MAX_OBSTACLE_SPAWN_TIME = 2.6f;
-	const float MIN_OBSTACLE_HEIGHT = 3.0f;
-	const float MAX_OBSTACLE_HEIGHT = 8.5f;
+	const float MIN_OBSTACLE_HEIGHT = 2.0f;
+	const float MAX_OBSTACLE_HEIGHT = 4.5f;
+
+	int health = 3;
+	int score = 0;
+
+	float obTimer = 0.0f;
+	float timeSinceSpawn = 0.0f;
+
+	void RandomObstacleSpawn() {
+		timeSinceSpawn += Time::deltaTime();
+
+		if (timeSinceSpawn >= obTimer) {
+			obTimer = this->rng->GetRandFloat(MIN_OBSTACLE_SPAWN_TIME, MAX_OBSTACLE_SPAWN_TIME);
+			timeSinceSpawn = 0.0f;
+			this->spawner->Instantiate(obstacles);
+
+			// Initializing the object that was just created in the spawner
+			float randHeight = this->rng->GetRandFloat(MIN_OBSTACLE_HEIGHT, MAX_OBSTACLE_HEIGHT);
+			const auto& ob = std::dynamic_pointer_cast<Obstacle>(this->spawner->GetLastObject());
+
+			ob->transform.position = Engine::Vector2(OBSTACLE_START_POINT, -3.5f + randHeight / 2);
+			ob->transform.scale = Engine::Vector2(1.0f, randHeight);
+
+			ob->boundingBox->SetDimensions(ob->transform.scale);
+			ob->boundingBox->SetPosition(ob->transform.position);
+		}
+	}
 
 	void Jump() const {
 		if (this->player->isGrounded)
@@ -242,6 +266,7 @@ public:
 		Time::Update();
 		float deltaTime = Time::deltaTime();
 
+		RandomObstacleSpawn();
 		MovePlayer();
 
 		ApplyGravity();
@@ -259,10 +284,22 @@ public:
 		this->player->boundingBox->SetPosition(this->player->transform.position);
 		this->player->boundingBox->SetDimensions(this->player->transform.scale);
 
-		// Collision checking
+		for (auto& ob : *this->spawner->GetObjects()) {
+			ob->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
 
-		if (this->player->boundingBox->isCollidingWith(*this->testCol->boundingBox)) {
-			LogInfo("Collision", "Collision detected!");
+			// Bounding box, for now, will just be directly copying the transform's position to itself
+			const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
+			typedObject->boundingBox->SetPosition(ob->transform.position);
+
+			if (this->player->boundingBox->isCollidingWith(*typedObject->boundingBox)) {
+				this->spawner->DeleteObject(ob);
+				health -= 1;
+				LogError("AABB", "Player hit! Health remaining: " + std::to_string(health));
+				if (health <= 0) {
+					health = 3;
+					score = 0;
+				}
+			}
 		}
 
 		////////////////////////////
@@ -270,13 +307,22 @@ public:
 		SetMatrixPosition(playerDrawQueue[0], this->player->transform.position);
 		SetMatrixSize(playerDrawQueue[0], this->player->transform.scale);
 
-		SetMatrixPosition(debugBoxDrawQueue[0], this->testCol->boundingBox->GetPosition());
-		SetMatrixSize(debugBoxDrawQueue[0], this->testCol->boundingBox->GetDimensions());
-
 //		SetMatrixPosition(debugBoxDrawQueue[1], this->player->boundingBox->GetPosition());
 //		SetMatrixSize(debugBoxDrawQueue[1], this->player->boundingBox->GetDimensions());
 
 		Render();
+
+		for (auto& ob : *this->spawner->GetObjects()) {
+			if (!ob) {
+				break;
+			}
+			if (ob->transform.position.x <= OBSTACLE_END_POINT) {
+				this->spawner->DeleteObject(ob);
+				LogInfo("Spawner", "Object deleted!");
+				score += 1;
+				LogWarning("Score: ", std::to_string(score));
+			}
+		}
 	}
 
 	enum ObjectID {
@@ -287,47 +333,53 @@ public:
 	std::vector<Engine::Matrix4f> obstacleDrawQueue;
 	std::vector<Engine::Matrix4f> debugBoxDrawQueue;
 
-	void Render() const {
-		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    void Render() const {
+        const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
-		Engine::RenderCommand::SetClearColor({ 0.3, 0.2, 0.8, 1 });
-		Engine::RenderCommand::Clear();
+        Engine::RenderCommand::SetClearColor({ 0.3, 0.2, 0.8, 1 });
+        Engine::RenderCommand::Clear();
 
-		//This is begin scene lmao
-		Engine::Scene::GetActiveScene()->viewProjectionMatrix = camera->GetViewMatrix();
-		Engine::Scene::GetActiveScene()->perspectiveProjectionMatrix = camera->GetPerspectiveMatrix();
-		Engine::Scene::GetActiveScene()->viewPerspectiveProjectionMatrix = camera->GetViewPerspectiveMatrix();
-		//
+        //This is begin scene lmao
+        Engine::Scene::GetActiveScene()->viewProjectionMatrix = camera->GetViewMatrix();
+        Engine::Scene::GetActiveScene()->perspectiveProjectionMatrix = camera->GetPerspectiveMatrix();
+        Engine::Scene::GetActiveScene()->viewPerspectiveProjectionMatrix = camera->GetViewPerspectiveMatrix();
+        //
 
-		for (auto& mat : playerDrawQueue) {
-			PrimitiveDraw::Draw(this->shader, mat, this->squareVA);
-		}
-		for (auto& mat : debugBoxDrawQueue) {
-			PrimitiveDraw::Draw(this->redShader, mat, this->squareVA);
-		}
+        for (auto& mat : playerDrawQueue) {
+            PrimitiveDraw::Draw(this->shader, mat, this->squareVA);
+        }
+        for (auto& mat : debugBoxDrawQueue) {
+            PrimitiveDraw::Draw(this->redShader, mat, this->squareVA);
+        }
 
-		Engine::Renderer::EndScene();
+        for (auto& ob : *this->spawner->GetObjects()) {
+            Engine::Matrix4f m = Engine::Matrix4f::Identity();
+            SetMatrixPosition(m, ob->transform.position);
+			SetMatrixSize(m, ob->transform.scale);
+			PrimitiveDraw::Draw(this->redShader, m, this->squareVA);
+        }
 
-	}
+        Engine::Renderer::EndScene();
+    }
 
-	void SetMatrixPosition(Engine::Matrix4f& mat, const Engine::Vector3& to) {
-		mat.data[12] = to.x;
-		mat.data[13] = to.y;
-		mat.data[14] = to.z;
-	}
+    void SetMatrixPosition(Engine::Matrix4f& mat, const Engine::Vector3& to) const {
+        mat.data[12] = to.x;
+        mat.data[13] = to.y;
+        mat.data[14] = to.z;
+    }
 
-	void SetMatrixPosition(Engine::Matrix4f& mat, const Engine::Vector2& to) {
-		mat.data[12] = to.x;
-		mat.data[13] = to.y;
-	}
+    void SetMatrixPosition(Engine::Matrix4f& mat, const Engine::Vector2& to) const {
+        mat.data[12] = to.x;
+        mat.data[13] = to.y;
+    }
 
-	void SetMatrixSize(Engine::Matrix4f& mat, const Engine::Vector3& to) {
+	void SetMatrixSize(Engine::Matrix4f& mat, const Engine::Vector3& to) const {
 		mat.data[0] = to.x / 2;
 		mat.data[5] = to.y / 2;
 		mat.data[10] = to.z / 2;
 	}
 
-	void SetMatrixSize(Engine::Matrix4f& mat, const Engine::Vector2& to) {
+	void SetMatrixSize(Engine::Matrix4f& mat, const Engine::Vector2& to) const {
 		mat.data[0] = to.x / 2;
 		mat.data[5] = to.y / 2;
 	}
