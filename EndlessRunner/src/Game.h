@@ -65,6 +65,12 @@ class Obstacle : public GameObject2D {
 public:
     std::unique_ptr<BoundingBox> boundingBox = std::make_unique<BoundingBox>(0,0,1,1);
 
+};
+
+class Collider2D : public GameObject2D {
+
+public:
+    std::unique_ptr<BoundingBox> boundingBox = std::make_unique<BoundingBox>(0, 0, 1, 1);
 
 };
 

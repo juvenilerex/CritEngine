@@ -47,6 +47,19 @@ std::string fragmentShaderSourceRed = R"(
 	}
 )";
 
+std::string fragmentShaderSourceGreen = R"(
+	#version 460 core
+
+	in vec4 vColor;
+
+	layout(location = 0) out vec4 color;
+
+	void main()
+	{
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+	}
+)";
+
 OrthographicCamera::OrthographicCamera(
 		float height,
 		float aspectRatio,
@@ -131,6 +144,12 @@ class EndlessRunner : public Engine::Application
 
 public:
 
+	std::unique_ptr<Player2D> player;
+	std::unique_ptr<ObjectSpawner> spawner;
+	std::shared_ptr<Obstacle> obstacles;
+	std::shared_ptr<Collider2D> passFlag;
+	std::unique_ptr<RandomNumberGenerator> rng;
+
 	EndlessRunner() {
 		PushLayer(new LayerTest());
 
@@ -148,6 +167,7 @@ public:
 
 		this->camera.reset(new OrthographicCamera(20, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -50), camera_rot));
 
+		this->greenShader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSourceGreen));
 		this->redShader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSourceRed));
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 
@@ -193,22 +213,19 @@ public:
 		this->start = std::chrono::high_resolution_clock::now();
 	}
 
-	std::unique_ptr<Player2D> player;
-	std::unique_ptr<ObjectSpawner> spawner;
-	std::shared_ptr<Obstacle> obstacles;
-	std::unique_ptr<RandomNumberGenerator> rng;
-
-	const float SPEED = 200.0f;
-	const float JUMP_VELOCITY = 23.0f;
-	const float GRAVITY = 49.0f;
+	const float SPEED = 550.0f;
+	const float JUMP_VELOCITY = 25.0f;
+	const float GRAVITY = 55.0f;
 	const float FLOOR_LEVEL = 0.0f;
-	const float OBSTACLE_START_POINT = 12.0f;
+	const float OBSTACLE_START_POINT = 15.0f;
 	const float OBSTACLE_END_POINT = -12.0f;
-	const float OBSTACLE_SPEED = 19.0F;
-	const float MIN_OBSTACLE_SPAWN_TIME = 0.8f;
-	const float MAX_OBSTACLE_SPAWN_TIME = 2.6f;
+	const float OBSTACLE_SPEED = 20.0F;
+	const float MIN_OBSTACLE_SPAWN_TIME = 0.4f;
+	const float MAX_OBSTACLE_SPAWN_TIME = 1.6f;
 	const float MIN_OBSTACLE_HEIGHT = 2.0f;
-	const float MAX_OBSTACLE_HEIGHT = 4.5f;
+	const float MAX_OBSTACLE_HEIGHT = 4.7f;
+	const float LEVEL_BOUNDS_LEFT = -11.88f;
+	const float LEVEL_BOUNDS_RIGHT = 11.88f;
 
 	int health = 3;
 	int score = 0;
@@ -233,6 +250,26 @@ public:
 
 			ob->boundingBox->SetDimensions(ob->transform.scale);
 			ob->boundingBox->SetPosition(ob->transform.position);
+
+			// A 1/4 chance for an obstacle to be a ceiling obstacle
+			int chance = this->rng->GetRandInt(1, 2);
+			if (chance == 1) {
+				ob->transform.position = Engine::Vector2(ob->transform.position.x, ob->transform.position.y * -1 + 8.0f);
+				ob->transform.scale = Engine::Vector2(ob->transform.scale.x, ob->transform.scale.y * 2.35);
+				ob->boundingBox->SetPosition(ob->transform.position);
+				ob->boundingBox->SetDimensions(ob->transform.scale);
+			}
+	
+			this->spawner->Instantiate(passFlag);
+			const auto& flag = std::dynamic_pointer_cast<Collider2D>(this->spawner->GetLastObject());
+
+			flag->transform.position = Engine::Vector2(ob->transform.position.x, -0.0f);
+			flag->transform.scale = Engine::Vector2(1.0f, 20.0f);
+
+			flag->boundingBox->SetDimensions(flag->transform.scale);
+			flag->boundingBox->SetPosition(flag->transform.position);	
+			
+			
 		}
 	}
 
@@ -273,6 +310,14 @@ public:
 
 		this->player->transform.position = this->player->transform.position + this->player->velocity * deltaTime;
 
+		// World bounds
+
+		if (this->player->transform.position.x <= LEVEL_BOUNDS_LEFT) {
+			this->player->transform.position.x = LEVEL_BOUNDS_LEFT + 0.01f;
+		} 
+		if (this->player->transform.position.x >= LEVEL_BOUNDS_RIGHT) {
+			this->player->transform.position.x = LEVEL_BOUNDS_RIGHT - 0.01f;
+		}
 
 		if (this->player->transform.position.y <= FLOOR_LEVEL) {
 			this->player->transform.position.y = 0;
@@ -280,27 +325,42 @@ public:
 			this->player->isGrounded = true;
 		}
 
-		// Ensuring the bounding box copies the exact position and size coordinates of the player
+		
 		this->player->boundingBox->SetPosition(this->player->transform.position);
 		this->player->boundingBox->SetDimensions(this->player->transform.scale);
 
-		for (auto& ob : *this->spawner->GetObjects()) {
-			ob->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
+		for (const auto& ob : *this->spawner->GetObjects()) {
 
-			// Bounding box, for now, will just be directly copying the transform's position to itself
-			const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob);
-			typedObject->boundingBox->SetPosition(ob->transform.position);
+			if (const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob)) {
+				typedObject->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
+				typedObject->boundingBox->SetPosition(typedObject->transform.position);
 
-			if (this->player->boundingBox->isCollidingWith(*typedObject->boundingBox)) {
-				this->spawner->DeleteObject(ob);
-				health -= 1;
-				LogError("AABB", "Player hit! Health remaining: " + std::to_string(health));
-				if (health <= 0) {
-					health = 3;
-					score = 0;
+				if (this->player->boundingBox->isCollidingWith(*typedObject->boundingBox)) {
+					this->spawner->DeleteObject(ob);
+					health -= 1;
+					LogError("AABB", "Player hit! Health: " + std::to_string(health));
+					if (health <= 0) {
+						health = 3;
+						score = 0;
+					}
 				}
 			}
 		}
+
+		for (const auto& ob : *this->spawner->GetObjects()) {
+
+			if (const auto& typedObject = std::dynamic_pointer_cast<Collider2D>(ob)) {
+				typedObject->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
+				typedObject->boundingBox->SetPosition(typedObject->transform.position);
+
+				if (this->player->boundingBox->isCollidingWith(*typedObject->boundingBox)) {
+					this->spawner->DeleteObject(ob);
+					score++;
+					LogWarning("AABB", "Player scored: " + std::to_string(score));
+				}
+			}
+		}
+
 
 		////////////////////////////
 
@@ -312,15 +372,12 @@ public:
 
 		Render();
 
-		for (auto& ob : *this->spawner->GetObjects()) {
+		for (const auto& ob : *this->spawner->GetObjects()) {
 			if (!ob) {
 				break;
 			}
 			if (ob->transform.position.x <= OBSTACLE_END_POINT) {
 				this->spawner->DeleteObject(ob);
-				LogInfo("Spawner", "Object deleted!");
-				score += 1;
-				LogWarning("Score: ", std::to_string(score));
 			}
 		}
 	}
@@ -345,18 +402,23 @@ public:
         Engine::Scene::GetActiveScene()->viewPerspectiveProjectionMatrix = camera->GetViewPerspectiveMatrix();
         //
 
-        for (auto& mat : playerDrawQueue) {
+        for (const auto& mat : playerDrawQueue) {
             PrimitiveDraw::Draw(this->shader, mat, this->squareVA);
         }
-        for (auto& mat : debugBoxDrawQueue) {
+        for (const auto& mat : debugBoxDrawQueue) {
             PrimitiveDraw::Draw(this->redShader, mat, this->squareVA);
         }
 
-        for (auto& ob : *this->spawner->GetObjects()) {
-            Engine::Matrix4f m = Engine::Matrix4f::Identity();
-            SetMatrixPosition(m, ob->transform.position);
-			SetMatrixSize(m, ob->transform.scale);
-			PrimitiveDraw::Draw(this->redShader, m, this->squareVA);
+        for (const auto& ob : *this->spawner->GetObjects()) {
+			if (const auto& obstacle = std::dynamic_pointer_cast<Obstacle>(ob)) {
+				Engine::Matrix4f m = Engine::Matrix4f::Identity();
+				SetMatrixPosition(m, ob->transform.position);
+				SetMatrixSize(m, ob->transform.scale);
+				if(obstacle->transform.scale.y < MAX_OBSTACLE_HEIGHT / 1.5)
+					PrimitiveDraw::Draw(this->redShader, m, this->squareVA);
+				if (obstacle->transform.scale.y > MAX_OBSTACLE_HEIGHT / 1.5)
+					PrimitiveDraw::Draw(this->greenShader, m, this->squareVA);
+			}
         }
 
         Engine::Renderer::EndScene();
@@ -392,6 +454,7 @@ public:
 private:
 	std::shared_ptr<Engine::Shader> shader;
 	std::shared_ptr<Engine::Shader> redShader;
+	std::shared_ptr<Engine::Shader> greenShader;
 	std::shared_ptr<Engine::VertexArray> triangleVA;
 	std::shared_ptr<Engine::VertexArray> squareVA;
 	std::shared_ptr<OrthographicCamera> camera;
