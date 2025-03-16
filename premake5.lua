@@ -1,6 +1,6 @@
 workspace "CritEngine"
 	architecture "x64"
-	startproject "Sandbox"
+	startproject "EndlessRunner"
 
 	configurations
 	{
@@ -30,8 +30,8 @@ project "CritEngine"
 
 	postbuildcommands 
 	{ 
-		"{MKDIR} ../bin/" .. outputDirectory .. "/Sandbox", -- Prevents the next command causing the dll being copied as a file named "Sandbox" in the parent directory.
-		"{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDirectory .. "/Sandbox" 
+		"{MKDIR} ../bin/" .. outputDirectory .. "/EndlessRunner", -- Prevents the next command causing the dll being copied as a file named "Sandbox" in the parent directory.
+		"{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDirectory .. "/EndlessRunner" 
 	}
 
 	filter "system:windows"
@@ -62,8 +62,8 @@ project "CritEngine"
 	include "CritEngine/thirdparty/libs/glm.lua"
 	include "CritEngine/thirdparty/libs/imgui.lua"
 
-project "Sandbox"
-	location "Sandbox"
+project "EndlessRunner"
+	location "EndlessRunner"
 	kind "ConsoleApp"
 	language "C++"
 	
