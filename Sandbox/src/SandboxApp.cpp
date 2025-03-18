@@ -7,6 +7,7 @@
 
 #include <EngineCore/Layer.h>
 #include <EngineCore/Application.h>
+#include <EngineCore/Core/GlobalEngine.h>
 #include <EngineCore/Core/MainLoop.h>
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
@@ -167,6 +168,7 @@ private:
 	std::shared_ptr<Engine::PerspectiveCamera> camera;
 	std::chrono::time_point<std::chrono::high_resolution_clock> start;
 };
+
 
 std::unique_ptr<Engine::Application> CreateApplication()
 {

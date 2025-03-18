@@ -2,6 +2,10 @@
 
 namespace Engine {
 
+	ResourceManager::ResourceManager()
+	{
+	}
+
 	void ResourceManager::RegisterLoader(std::unique_ptr<ResourceLoader> loader)
 	{
 		this->registeredLoaders[loader->GetResourceType()] = std::move(loader);

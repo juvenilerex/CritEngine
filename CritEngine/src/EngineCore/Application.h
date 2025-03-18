@@ -2,7 +2,6 @@
 
 #include <memory>
 
-
 #include "Core/Base.h"
 #include "Window/Window.h"
 #include "LayerStack.h"
@@ -29,8 +28,6 @@ namespace Engine {
 		LayerStack layerStack;
 	};
 
-	std::unique_ptr<Application> CreateApplication();
 }
 
-
-
+extern std::unique_ptr<Engine::Application> CreateApplication();

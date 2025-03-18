@@ -12,6 +12,8 @@ namespace Engine {
 	class ResourceManager
 	{
 	public:
+		ResourceManager();
+
 		void RegisterLoader(std::unique_ptr<ResourceLoader> loader);
 		std::shared_ptr<Resource> GetFromPath(std::string resourceType, std::filesystem::path filepath);
 

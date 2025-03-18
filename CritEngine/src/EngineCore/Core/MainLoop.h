@@ -2,15 +2,14 @@
 
 #include <memory>
 
-#include "../Core/Base.h"
-#include "../Application.h"
+#include "Base.h"
+#include "GlobalEngine.h"
+
 #include "../Logging/Logger.h"
 
 
 namespace Engine
 {
-
-
 	class MainLoop
 	{
 	public:
@@ -19,8 +18,8 @@ namespace Engine
 		ENGINE_API void Tick();
 		ENGINE_API void Stop();
 	private:
+		std::unique_ptr<GlobalEngine> globalEngine;
 		bool is_running = true;
-		std::unique_ptr<Application> application = nullptr;
 	};
 }
 
