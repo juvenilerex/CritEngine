@@ -17,7 +17,7 @@ If you make changes to the engine, or if you want to regenerate project files, r
 
 ## Future Plans
 
-The main goal for CritEngine is to become a fast and flexible 2D/3D engine, allowing easy customizability to its users.
+The main goal for CritEngine is to become a fast and flexible 2D/3D engine, allowing easy customizability for its users.
 
 **Plugin Manager**
 
