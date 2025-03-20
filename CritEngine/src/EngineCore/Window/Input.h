@@ -70,7 +70,7 @@ namespace Keys {
 
 namespace Engine {
 
-    constexpr uint16_t GetKeyCode(Keys::Key key) {
+    constexpr uint16_t KeyCode(Keys::Key key) {
         return Keys::KeyMap[key];
     }
 

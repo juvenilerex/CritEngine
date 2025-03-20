@@ -38,6 +38,16 @@ namespace Engine {
 		return *this->window.get();
 	}
 
+	InputListener& Application::GetInput() const
+	{
+		return this->window->GetInput();
+	}
+
+	MouseInputListener& Application::GetMouseInput() const
+	{
+		return this->window->GetMouseInput();
+	}
+
 	void Application::Tick()
 	{
 		LogInfo("App", "Tick!");

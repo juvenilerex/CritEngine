@@ -46,7 +46,7 @@ namespace Mouse {
 
 namespace Engine {
 
-	constexpr uint8_t GetMouseButton(Mouse::Button button) {
+	constexpr uint8_t MouseButton(Mouse::Button button) {
 		return Mouse::ButtonMap[button];
 	}
 

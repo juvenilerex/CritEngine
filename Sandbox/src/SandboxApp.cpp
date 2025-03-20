@@ -125,12 +125,12 @@ public:
 
 	void Tick() override
 	{
-		if (this->GetWindow().GetInput().GetKeyJustPressed(Engine::GetKeyCode(Keys::A))) 
+		if (this->GetInput().GetKeyJustPressed(Engine::KeyCode(Keys::A))) 
 		{ // If A is pressed
-			LogWarning("Input: ", "A was just pressed");
+			Log("A was just pressed");
 		}
-		if (this->GetWindow().GetMouseInput().GetMouseJustPressed(Engine::GetMouseButton(Mouse::BUTTON_1))) {
-			LogWarning("Mouse: ", "Mouse 1 pressed!");
+		if (this->GetMouseInput().GetMouseJustPressed(Engine::MouseButton(Mouse::BUTTON_1))) {
+			LogWarning("MouseInput", "Mouse 1 pressed!");
 		}
 
 		LogInfo("Sandbox", "Tick!");
