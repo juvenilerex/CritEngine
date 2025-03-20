@@ -213,9 +213,9 @@ public:
 		this->start = std::chrono::high_resolution_clock::now();
 	}
 
-	const float SPEED = 550.0f;
-	const float JUMP_VELOCITY = 25.0f;
-	const float GRAVITY = 55.0f;
+	const float SPEED = 10.0f;
+	const float JUMP_HEIGHT = 26.0f;
+	const float GRAVITY = 70.0f;
 	const float FLOOR_LEVEL = 0.0f;
 	const float OBSTACLE_START_POINT = 15.0f;
 	const float OBSTACLE_END_POINT = -12.0f;
@@ -233,15 +233,14 @@ public:
 	float obTimer = 0.0f;
 	float timeSinceSpawn = 0.0f;
 
-	void RandomObstacleSpawn() {
-		timeSinceSpawn += Time::deltaTime();
+	void RandomObstacleSpawn(const float deltaTime) {
+		timeSinceSpawn += deltaTime;
 
 		if (timeSinceSpawn >= obTimer) {
 			obTimer = this->rng->GetRandFloat(MIN_OBSTACLE_SPAWN_TIME, MAX_OBSTACLE_SPAWN_TIME);
 			timeSinceSpawn = 0.0f;
 			this->spawner->Instantiate(obstacles);
 
-			// Initializing the object that was just created in the spawner
 			float randHeight = this->rng->GetRandFloat(MIN_OBSTACLE_HEIGHT, MAX_OBSTACLE_HEIGHT);
 			const auto& ob = std::dynamic_pointer_cast<Obstacle>(this->spawner->GetLastObject());
 
@@ -251,7 +250,6 @@ public:
 			ob->boundingBox->SetDimensions(ob->transform.scale);
 			ob->boundingBox->SetPosition(ob->transform.position);
 
-			// A 1/4 chance for an obstacle to be a ceiling obstacle
 			int chance = this->rng->GetRandInt(1, 2);
 			if (chance == 1) {
 				ob->transform.position = Engine::Vector2(ob->transform.position.x, ob->transform.position.y * -1 + 8.0f);
@@ -259,7 +257,7 @@ public:
 				ob->boundingBox->SetPosition(ob->transform.position);
 				ob->boundingBox->SetDimensions(ob->transform.scale);
 			}
-	
+
 			this->spawner->Instantiate(passFlag);
 			const auto& flag = std::dynamic_pointer_cast<Collider2D>(this->spawner->GetLastObject());
 
@@ -267,50 +265,46 @@ public:
 			flag->transform.scale = Engine::Vector2(1.0f, 20.0f);
 
 			flag->boundingBox->SetDimensions(flag->transform.scale);
-			flag->boundingBox->SetPosition(flag->transform.position);	
-			
-			
+			flag->boundingBox->SetPosition(flag->transform.position);
+
+
 		}
 	}
 
-	void Jump() const {
-		if (this->player->isGrounded)
-			this->player->velocity.y = JUMP_VELOCITY;
-		this->player->isGrounded = false;
+	void MovePlayer(const float deltaTime) {
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::D))) {
+			this->player->velocity.x = SPEED;
+		}
+		else if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A))) {
+			this->player->velocity.x = -SPEED; 
+		}
+		else {
+			this->player->velocity.x = 0; 
+		}
+		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::SPACE))) {
+			if (this->player->isGrounded) {
+				this->player->velocity.y = JUMP_HEIGHT;
+				this->player->isGrounded = false; 
+			}
+		}
 	}
 
-	void ApplyGravity() const {
-		if (!this->player->isGrounded)
-			this->player->velocity.y -= GRAVITY * Time::deltaTime();
-	}
-
-	void MovePlayer() {
-		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::D)))
-			this->player->velocity.x = SPEED * Time::deltaTime();
-		else if (this->GetWindow().GetInput().GetKeyUp(Engine::GetKeyCode(Keys::D)))
-			this->player->velocity.x = 0;
-		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::A)))
-			this->player->velocity.x = -SPEED * Time::deltaTime();
-		else if (this->GetWindow().GetInput().GetKeyUp(Engine::GetKeyCode(Keys::A)))
-			this->player->velocity.x = 0;
-
-		if (this->GetWindow().GetInput().GetKeyDown(Engine::GetKeyCode(Keys::SPACE)))
-			Jump();
-	}
+	DeltaTime dT;
 
 	void Tick() override
 	{
-		Time::Update();
-		float deltaTime = Time::deltaTime();
+		float deltaTime = dT.GetDeltaTime();
 
-		RandomObstacleSpawn();
-		MovePlayer();
+		RandomObstacleSpawn(deltaTime);
+		MovePlayer(deltaTime);
 
-		ApplyGravity();
+		if (!this->player->isGrounded) {
+			this->player->velocity.y -= GRAVITY * deltaTime; 
+		}
 
-		this->player->transform.position = this->player->transform.position + this->player->velocity * deltaTime;
+		this->player->transform.position.x += this->player->velocity.x * deltaTime;
+		this->player->transform.position.y += this->player->velocity.y * deltaTime;
 
-		// World bounds
 
 		if (this->player->transform.position.x <= LEVEL_BOUNDS_LEFT) {
 			this->player->transform.position.x = LEVEL_BOUNDS_LEFT + 0.01f;
@@ -332,7 +326,7 @@ public:
 		for (const auto& ob : *this->spawner->GetObjects()) {
 
 			if (const auto& typedObject = std::dynamic_pointer_cast<Obstacle>(ob)) {
-				typedObject->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
+				typedObject->transform.position.x -= OBSTACLE_SPEED * deltaTime;
 				typedObject->boundingBox->SetPosition(typedObject->transform.position);
 
 				if (this->player->boundingBox->isCollidingWith(*typedObject->boundingBox)) {
@@ -350,7 +344,7 @@ public:
 		for (const auto& ob : *this->spawner->GetObjects()) {
 
 			if (const auto& typedObject = std::dynamic_pointer_cast<Collider2D>(ob)) {
-				typedObject->transform.position.x -= OBSTACLE_SPEED * Time::deltaTime();
+				typedObject->transform.position.x -= OBSTACLE_SPEED * deltaTime;
 				typedObject->boundingBox->SetPosition(typedObject->transform.position);
 
 				if (this->player->boundingBox->isCollidingWith(*typedObject->boundingBox)) {

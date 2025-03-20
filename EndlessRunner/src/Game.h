@@ -116,27 +116,6 @@ private:
     float x, y, width, height;
 };
 
-// Super bare-bones AABB class for the purposes of this game
-class AABB : public Shape2D {
-public:
-    Engine::Vector2 position;
-    Engine::Vector2 size;
-
-    AABB(const Engine::Vector2& position, const Engine::Vector2& size) : position(position), size(size) {}
-
-    bool isColliding(const Shape2D& other) const override {
-        const AABB* otherAABB = dynamic_cast<const AABB*>(&other);
-        ASSERT(otherAABB, "Collision detection with unsupported shape!"); // Right now this is only compatible between other AABB's
-
-        // AABB collision detection. We are dividing the size by 2 since the bounding box's position represents
-        // the center of the box and collisions seem inaccurate unless it's done this way
-        return (position.x < otherAABB->position.x + otherAABB->size.x &&
-            position.x + size.x > otherAABB->position.x &&
-            position.y < otherAABB->position.y + otherAABB->size.y &&
-            position.y + size.y > otherAABB->position.y);
-    }
-};
-
 class RandomNumberGenerator {
 
 public:
@@ -191,31 +170,24 @@ private:
     std::vector<std::shared_ptr<GameObject2D>> objects;
 };
 
-class Time {
-
+class DeltaTime {
 public:
 
-    static constexpr float FIXED_DELTA_TIME = 1.0f / 60.0f; // Must make it constexpr because of the in-class intialization
+    DeltaTime() : lastTime(std::chrono::high_resolution_clock::now()) {}
 
-    static float deltaTime() {
-        return FIXED_DELTA_TIME;
+    float GetDeltaTime() {
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> delta = currentTime - this->lastTime;
+        this->lastTime = currentTime;
+        return delta.count();
     }
 
-    static void Update() {
-        auto now = std::chrono::high_resolution_clock::now();
-        static auto lastTime = now;
-
-        auto elapsed = std::chrono::duration<float>(now - lastTime).count();
-
-        if (elapsed < FIXED_DELTA_TIME) {
-            auto sleepDuration = std::chrono::duration<float>(FIXED_DELTA_TIME - elapsed);
-            std::this_thread::sleep_for(sleepDuration);
-        }
-        lastTime = now;
+    inline void Reset() {
+        this->lastTime = std::chrono::high_resolution_clock::now();
     }
 
 private:
-    Time(); // Private constructor to prevent instantiation, since this class is purely a utility
+    std::chrono::time_point<std::chrono::high_resolution_clock> lastTime;
 };
 
 class PrimitiveDraw {
