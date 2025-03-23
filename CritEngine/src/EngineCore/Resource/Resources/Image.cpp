@@ -8,9 +8,13 @@ namespace Engine {
 	};
 
 	Image::Image(char* data, uint32_t width, uint32_t height, uint8_t channelCount)
-		: texture(std::make_unique<Texture>(Texture::Create(data, width, height, channelCount).get()))
+		: texture(std::unique_ptr<Texture>(Texture::Create(data, width, height, channelCount).get()))
 	{
 
+	};
+
+	Image::~Image()
+	{
 	};
 
 	Texture* Image::GetTexture()

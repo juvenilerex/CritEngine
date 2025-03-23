@@ -18,7 +18,6 @@ namespace Engine
 		ENGINE_API void Tick();
 		ENGINE_API void Stop();
 	private:
-		std::unique_ptr<GlobalEngine> globalEngine;
 		bool is_running = true;
 	};
 }

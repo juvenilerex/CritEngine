@@ -15,6 +15,8 @@ namespace Engine {
 		ENGINE_API Application();
 		ENGINE_API ~Application();
 
+		ENGINE_API void virtual Initialize();
+
 		ENGINE_API void TickInternal();
 		ENGINE_API void virtual Tick();
 

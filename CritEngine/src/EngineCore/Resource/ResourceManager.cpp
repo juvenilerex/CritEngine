@@ -32,7 +32,7 @@ namespace Engine {
 			}
 		}
 
-		std::shared_ptr<Resource> asset = std::make_shared<Resource>(this->registeredLoaders[resourceType]->Load(filepath));
+		std::shared_ptr<Resource> asset = this->registeredLoaders[resourceType]->Load(filepath);
 
 		UUID id = UUID();
 

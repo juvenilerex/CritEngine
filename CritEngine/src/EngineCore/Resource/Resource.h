@@ -6,5 +6,7 @@ namespace Engine {
 
 	class Resource
 	{
+	public:
+		virtual ~Resource() = 0;
 	};
 }

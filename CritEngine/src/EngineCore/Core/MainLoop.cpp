@@ -3,10 +3,9 @@
 
 namespace Engine {
 
-
 	MainLoop::MainLoop(std::unique_ptr<Application> applicationInstance)
 	{
-		this->globalEngine = std::make_unique<GlobalEngine>(std::move(applicationInstance));
+		GlobalEngine::Initialize(std::move(applicationInstance));
 	};
 
 	void MainLoop::Run()
@@ -26,10 +25,8 @@ namespace Engine {
 		this->is_running = false;
 	};
 
-
 	void MainLoop::Tick()
 	{
-		this->globalEngine->Tick();
+		GlobalEngine::Get().Tick();
 	};
-
 }

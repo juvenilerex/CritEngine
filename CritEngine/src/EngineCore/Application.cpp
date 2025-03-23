@@ -13,6 +13,11 @@ namespace Engine {
 		this->window.reset();
 	};
 
+	void Application::Initialize()
+	{
+		// This function gets called by the main loop after the global engine has been initialized.
+	};
+
 	void Application::TickInternal()
 	{
 		if (this->window != nullptr)

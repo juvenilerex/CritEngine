@@ -13,6 +13,8 @@ namespace Engine {
 		Image();
 		Image(char* data, uint32_t width, uint32_t height, uint8_t channelCount);
 
+		virtual ~Image();
+
 		Texture* GetTexture();
 
 		bool IsValid();
