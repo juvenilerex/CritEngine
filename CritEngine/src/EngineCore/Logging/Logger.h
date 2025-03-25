@@ -15,7 +15,7 @@
 #include "../Math/Vector4.h"
 
 // Improved logger class with automatic type deduction
-class Debug {
+class ENGINE_API Debug {
 public:
 	template<typename... Args>
 	static void Log(Args&&... params) {
@@ -52,8 +52,41 @@ private:
 		else if constexpr (std::is_same_v<std::decay_t<T>, double>) {
 			return std::to_string(arg);
 		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, size_t>) {
+			return std::to_string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, uint8_t>) {
+			return std::to_string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, int8_t>) {
+			return std::to_string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, uint16_t>) {
+			return std::to_string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, int16_t>) {
+			return std::to_string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, uint32_t>) {
+			return std::to_string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, int32_t>) {
+			return std::to_string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, uint64_t>) {
+			return std::to_string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, int64_t>) {
+			return std::to_string(arg);
+		}
 		else if constexpr (std::is_same_v<std::decay_t<T>, const char*>) {
 			return std::string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, char*>) {
+			return std::string(arg);
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, bool>) {
+			return arg ? "True" : "False";
 		}
 		else if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
 			return arg;
@@ -63,6 +96,9 @@ private:
 		}
 		else if constexpr (std::is_same_v<std::decay_t<T>, Engine::Vector3>) {
 			return "(" + std::to_string(arg.x) + "," + std::to_string(arg.y) + "," + std::to_string(arg.z) + ")";
+		}
+		else if constexpr (std::is_same_v<std::decay_t<T>, Engine::Vector4>) {
+			return "(" + std::to_string(arg.x) + "," + std::to_string(arg.y) + "," + std::to_string(arg.z) + ")" + std::to_string(arg.w) + ")";
 		}
 		else {
 			ASSERT(always_false<T>::value, "Unsupported type passed to Logger");
@@ -78,40 +114,9 @@ private:
 	template<typename T>
 	struct always_false : std::false_type {};
 
-	static std::string GetCurrentTimestamp()
-	{
-		auto now = std::chrono::system_clock::now();
-		auto duration = now.time_since_epoch();
-
-		auto hours = std::chrono::duration_cast<std::chrono::hours>(duration);
-		auto minutes = std::chrono::duration_cast<std::chrono::minutes>(duration) - hours;
-		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration) - hours - minutes;
-		auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration) - hours - minutes - seconds;
-
-		std::time_t time_now = std::chrono::system_clock::to_time_t(now);
-
-		// This is considered deprecated because it's not thread-safe, but the alternatives are not cross-platform and
-		// I don't think we need multithreading for this, so we can ignore the warning
-		std::tm local_time = *std::localtime(&time_now);
-
-		/* Regardless, this is how it would be done safely in Windows:
-		std::tm local_time;
-		localtime_s(&local_time, &time_now);
-
-		And for POSIX:
-		std::tm local_time;
-		localtime_r(&time_now, &local_time);
-
-		*/
-		std::ostringstream timestamp;
-		timestamp << std::put_time(&local_time, "%H:%M:%S") << ":"
-			<< std::setfill('0') << std::setw(3) << milliseconds.count();
-
-		return timestamp.str();
-	}
+	const static std::string GetCurrentTimestamp();
 };
 
-const void ENGINE_API Log(const std::string& message);
 const void ENGINE_API LogInfo(const std::string& label, const std::string& message);
 const void ENGINE_API LogWarning(const std::string& label, const std::string& message);
 const void ENGINE_API LogError(const std::string& label, const std::string& message);

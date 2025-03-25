@@ -127,13 +127,14 @@ public:
 	{
 		if (this->GetInput().GetKeyJustPressed(Engine::KeyCode(Keys::A))) 
 		{ // If A is pressed
-			Log("A was just pressed");
+			const bool a = true;
+			Debug::Log(a);
 		}
 		if (this->GetMouseInput().GetMouseJustPressed(Engine::MouseButton(Mouse::BUTTON_1))) {
 			LogWarning("MouseInput", "Mouse 1 pressed!");
 		}
 
-		LogInfo("Sandbox", "Tick!");
+//		LogInfo("Sandbox", "Tick!");
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
