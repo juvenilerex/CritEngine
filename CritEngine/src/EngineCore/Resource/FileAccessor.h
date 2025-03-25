@@ -53,6 +53,8 @@ namespace Engine {
         bool CheckBounds(size_t bytes) const;
         bool CheckOffsetBounds(uint64_t offset) const;
 
+        const char* GetBufferEnd() const;
+
 	private:
         bool IsBigEndian() const;
         bool fileIsBigEndian = false;

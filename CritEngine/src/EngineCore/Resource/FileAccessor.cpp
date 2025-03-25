@@ -170,16 +170,24 @@ namespace Engine {
         return value;
     }
 
+    // Updated to check for upper and lower bounds, then checking if the bytes are in range
+    // This is a bit more robust
     bool FileAccessor::CheckBounds(size_t bytes) const {
-        if (this->position + bytes > this->buffer.data() + this->buffer.size()) {
+        if (this->position < this->buffer.data() || this->position >= GetBufferEnd())
             return false;
-        }
+        if (bytes > static_cast<size_t>(GetBufferEnd() - this->position))
+            return false;
         return true;
     }
 
     bool FileAccessor::CheckOffsetBounds(uint64_t offset) const
     {
         return offset <= this->buffer.size();
+    }
+
+    const char* FileAccessor::GetBufferEnd() const
+    {
+        return this->buffer.data() + this->buffer.size();
     }
 
 } 
