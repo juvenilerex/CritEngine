@@ -8,9 +8,8 @@ namespace Engine {
 	};
 
 	Image::Image(char* data, uint32_t width, uint32_t height, uint8_t channelCount)
-		: texture(std::unique_ptr<Texture>(Texture::Create(data, width, height, channelCount).get()))
+		: texture(Texture::CreateUnique(data, width, height, channelCount))
 	{
-
 	};
 
 	Image::~Image()
@@ -19,7 +18,7 @@ namespace Engine {
 
 	Texture* Image::GetTexture()
 	{
-	    return this->texture.get();
+		return this->texture.get();
 	}
 
 	bool Image::IsValid()

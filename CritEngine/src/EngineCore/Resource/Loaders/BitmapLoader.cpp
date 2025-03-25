@@ -1,5 +1,6 @@
 #include <fstream>
 
+#include "../FileAccessor.h"
 #include "BitmapLoader.h"
 #include "../../Logging/Logger.h"
 
@@ -91,9 +92,16 @@ namespace Engine {
 	{
 		std::ifstream file = std::ifstream(filepath, std::ios::binary);
 
+		/*
+		FileAccessor ac;
+
+		ac.OpenFile(filepath);
+		*/
+
 		if (file.is_open())
 		{
-			BitmapFileHeader fileHeader;
+
+			BitmapFileHeader fileHeader{};
 
 			std::byte rawFileHeader[14];
 			file.read((char*)rawFileHeader, 14);
@@ -109,7 +117,7 @@ namespace Engine {
 
 			// We incrementally load the header file, once we reach past the read header size, we'll initialize the rest of the data ourselves.
 
-			BitmapInfoHeader bitmapHeader;
+			BitmapInfoHeader bitmapHeader{};
 			file.read(reinterpret_cast<char*>(&bitmapHeader), sizeof(4));
 
 			if (!(
@@ -297,8 +305,9 @@ namespace Engine {
 					}
 				}
 			}
-
+			LogInfo("BitmapLoader", "Texture stored");
 			return std::make_shared<Image>(image.data(), bitmapHeader.width, bitmapHeader.height, 4);
+
 
 		}
 

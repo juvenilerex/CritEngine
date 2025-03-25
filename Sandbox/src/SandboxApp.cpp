@@ -124,7 +124,7 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		std::string filepath = "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\32bpp-320x240.bmp";
+		std::string filepath = "C:\\Users\\steve\\Downloads\\bmptestsuite-0.9\\valid\\32bpp-320x240.bmp";
 		std::shared_ptr<Engine::Resource> resource = Engine::GlobalEngine::Get().GetResourceManager().GetFromPath("Image", filepath);
 
 	}
@@ -139,7 +139,7 @@ public:
 			LogWarning("Mouse: ", "Mouse 1 pressed!");
 		}
 
-		LogInfo("Sandbox", "Tick!");
+//		LogInfo("Sandbox", "Tick!");
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 

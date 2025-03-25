@@ -13,7 +13,7 @@ namespace Engine {
 		Image();
 		Image(char* data, uint32_t width, uint32_t height, uint8_t channelCount);
 
-		virtual ~Image();
+		virtual ~Image() override;
 
 		Texture* GetTexture();
 
