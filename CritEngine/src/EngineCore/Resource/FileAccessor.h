@@ -27,14 +27,12 @@ namespace Engine {
 
         void OpenFile(const std::filesystem::path& filePath);
 
-        void SetBigEndian(const bool val); 
-        void SetFileEndianness(const bool isBigEndian); 
+        void ReadAsBigEndian(const bool val);
 
         void Seek(const uint64_t offset);
         void SeekEnd();
 
-        void ReserveBuffer(const uint64_t length);
-        void FreeBuffer();
+        std::vector<uint8_t> ReadBuffer(uint64_t size);
 
         uint8_t ReadUINT8();
         uint16_t ReadUINT16();
@@ -46,21 +44,19 @@ namespace Engine {
         int32_t ReadINT32();
         int64_t ReadINT64();
 
-        const char* GetPosition();
-        size_t GetSize();
+        const uint64_t GetPosition();
+        uint64_t GetSize();
         bool IsAtEof() const;
 
-        bool CheckBounds(size_t bytes) const;
+        bool CheckReadBounds(uint64_t size) const;
         bool CheckOffsetBounds(uint64_t offset) const;
 
-        const char* GetBufferEnd() const;
-
 	private:
-        bool IsBigEndian() const;
+        bool IsSystemBigEndian() const;
         bool fileIsBigEndian = false;
-        bool bigEndianEnabled = false;
+        bool systemIsBigEndian = false;
 
-        char* position;
+        uint64_t position;
         std::ifstream file;
         std::vector<char> buffer;
 

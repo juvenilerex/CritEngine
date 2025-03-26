@@ -1,8 +1,9 @@
 #include <fstream>
+#include <array>
 
-#include "../FileAccessor.h"
 #include "BitmapLoader.h"
 #include "../../Logging/Logger.h"
+
 
 namespace Engine {
 
@@ -31,7 +32,7 @@ namespace Engine {
 	struct BitmapCoreHeader
 	{
 		uint32_t headerSize;
-		uint16_t width;
+		int16_t width;
 		int16_t height;
 		uint16_t planes;
 		uint16_t bitCount;
@@ -40,7 +41,7 @@ namespace Engine {
 	struct BitmapInfoHeader
 	{
 		uint32_t headerSize;
-		uint32_t width;
+		int32_t width;
 		int32_t height;
 		uint16_t planes;
 		uint16_t bitCount;
@@ -90,213 +91,273 @@ namespace Engine {
 
 	std::shared_ptr<Resource> BitmapLoader::Load(std::filesystem::path filepath)
 	{
-		std::ifstream file = std::ifstream(filepath, std::ios::binary);
+		FileAccessor file = FileAccessor();
+		file.OpenFile(filepath);
 
-		/*
-		FileAccessor ac;
-
-		ac.OpenFile(filepath);
-		*/
-
-		if (file.is_open())
+		if (file.GetSize() <= 0)
 		{
+			LogError("BitmapLoader", "Failed to open file.");
+			return nullptr;
+		};
 
-			BitmapFileHeader fileHeader{};
+		BitmapFileHeader fileHeader;
+		fileHeader.signature = file.ReadUINT16();
+		fileHeader.fileSize = file.ReadUINT32();
+		fileHeader.reserved1 = file.ReadUINT16();
+		fileHeader.reserved2 = file.ReadUINT16();
+		fileHeader.bitmapOffset = file.ReadUINT32();
 
-			std::byte rawFileHeader[14];
-			file.read((char*)rawFileHeader, 14);
+		if (fileHeader.signature != 0x4d42)
+		{
+			LogError("BitmapLoader", "Bitmap file signature is invalid!");
+			return nullptr;
+		}
 
-			fileHeader.signature = (uint8_t)rawFileHeader[0] | (uint16_t)rawFileHeader[1] << 8;
-			fileHeader.fileSize = (uint8_t)rawFileHeader[0] | (uint16_t)rawFileHeader[1] << 8;
+		// We incrementally load the header file, once we reach past the read header size, we'll initialize the rest of the data ourselves.
 
-			if (fileHeader.signature != 0x4d42)
+		BitmapInfoHeader bitmapHeader;
+		bitmapHeader.headerSize = file.ReadUINT32();
+
+		if (!(
+			bitmapHeader.headerSize == BITMAPCOREHEADER ||
+			bitmapHeader.headerSize == BITMAPINFOHEADER ||
+			bitmapHeader.headerSize == BITMAPV2INFOHEADER ||
+			bitmapHeader.headerSize == BITMAPV3INFOHEADER ||
+			bitmapHeader.headerSize == BITMAPV4HEADER ||
+			bitmapHeader.headerSize == BITMAPV5HEADER
+			))
+		{
+			LogError("BitmapLoader", "Bitmap header size is invalid!");
+			return nullptr;
+		}
+
+		if (bitmapHeader.headerSize == BITMAPCOREHEADER)
+		{
+			bitmapHeader.width = file.ReadINT16();
+			bitmapHeader.height = file.ReadINT16();
+			bitmapHeader.planes = file.ReadUINT16();
+			bitmapHeader.bitCount = file.ReadUINT16();
+		}
+
+		if (bitmapHeader.headerSize >= BITMAPINFOHEADER)
+		{
+			bitmapHeader.width = file.ReadINT32();
+			bitmapHeader.height = file.ReadINT32();
+			bitmapHeader.planes = file.ReadUINT16();
+			bitmapHeader.bitCount = file.ReadUINT16();
+			bitmapHeader.compression = file.ReadUINT32();
+			bitmapHeader.imageSize = file.ReadUINT32();
+			bitmapHeader.pixelsPerMeterX = file.ReadUINT32();
+			bitmapHeader.pixelsPerMeterY = file.ReadUINT32();
+			bitmapHeader.colorsUsed = file.ReadUINT32();
+			bitmapHeader.importantColors = file.ReadUINT32();
+		}
+		else
+		{
+			bitmapHeader.compression = 0;
+			bitmapHeader.imageSize = 0;
+			bitmapHeader.pixelsPerMeterX = 1;
+			bitmapHeader.pixelsPerMeterY = 1;
+			if (bitmapHeader.bitCount >= 16)
 			{
-				LogError("BitmapLoader", "Bitmap file signature is invalid!");
-				return nullptr;
-			}
-
-			// We incrementally load the header file, once we reach past the read header size, we'll initialize the rest of the data ourselves.
-
-			BitmapInfoHeader bitmapHeader{};
-			file.read(reinterpret_cast<char*>(&bitmapHeader), sizeof(4));
-
-			if (!(
-				bitmapHeader.headerSize == BITMAPCOREHEADER ||
-				bitmapHeader.headerSize == BITMAPINFOHEADER ||
-				bitmapHeader.headerSize == BITMAPV2INFOHEADER ||
-				bitmapHeader.headerSize == BITMAPV3INFOHEADER ||
-				bitmapHeader.headerSize == BITMAPV4HEADER ||
-				bitmapHeader.headerSize == BITMAPV5HEADER
-				))
-			{
-				LogError("BitmapLoader", "Bitmap header size is invalid!");
-				return nullptr;
-			}
-
-			if (bitmapHeader.headerSize == BITMAPCOREHEADER)
-			{
-				file.seekg(sizeof(BitmapFileHeader));
-				file.read(reinterpret_cast<char*>(&bitmapHeader), sizeof(BITMAPCOREHEADER));
-
-				uint32_t width = reinterpret_cast<BitmapCoreHeader*>(&bitmapHeader)->width;
-				int32_t height = reinterpret_cast<BitmapCoreHeader*>(&bitmapHeader)->height;
-
-				bitmapHeader.width = width;
-				bitmapHeader.height = height;
-			}
-
-			if (bitmapHeader.headerSize <= BITMAPINFOHEADER)
-			{
-				file.seekg(sizeof(BitmapFileHeader));
-				file.read(reinterpret_cast<char*>(&bitmapHeader), sizeof(BITMAPINFOHEADER));
-			}
-			else
-			{
-				bitmapHeader.compression = 0;
-				bitmapHeader.imageSize = 0;
-				bitmapHeader.pixelsPerMeterX = 1;
-				bitmapHeader.pixelsPerMeterY = 1;
-				if (bitmapHeader.bitCount >= 16)
-				{
-					bitmapHeader.colorsUsed = 0;
-				}
-				else
-				{
-					bitmapHeader.colorsUsed = 1 << bitmapHeader.bitCount;
-				}
-				
-				bitmapHeader.importantColors = 0;
-			}
-
-			if (bitmapHeader.headerSize <= BITMAPV2INFOHEADER)
-			{
-				file.read(reinterpret_cast<char*>(&bitmapHeader + BITMAPINFOHEADER), sizeof(BITMAPV2INFOHEADER - BITMAPINFOHEADER));
+				bitmapHeader.colorsUsed = 0;
 			}
 			else
 			{
-				if (bitmapHeader.bitCount == 16)
+				bitmapHeader.colorsUsed = 1 << bitmapHeader.bitCount;
+			}
+			
+			bitmapHeader.importantColors = 0;
+		}
+
+		if(!(
+			bitmapHeader.bitCount == 1 ||
+			bitmapHeader.bitCount == 4 ||
+			bitmapHeader.bitCount == 8 ||
+			bitmapHeader.bitCount == 16 ||
+			bitmapHeader.bitCount == 24 ||
+			bitmapHeader.bitCount == 32
+			))
+		{
+			LogError("BitmapLoader", "Bits per pixel is invalid, must be 1, 4, 8, 16, 24, or 32.");
+			return nullptr;
+		}
+
+		if (bitmapHeader.headerSize >= BITMAPV2INFOHEADER)
+		{
+			bitmapHeader.redBitMask = file.ReadUINT32();
+			bitmapHeader.greenBitMask = file.ReadUINT32();
+			bitmapHeader.blueBitMask = file.ReadUINT32();
+		}
+		else
+		{
+			if (bitmapHeader.bitCount == 16)
+			{
+				bitmapHeader.redBitMask =   0b11111000000000000000000000000000;
+				bitmapHeader.greenBitMask = 0b00000111111000000000000000000000;
+				bitmapHeader.blueBitMask =  0b00000000000111110000000000000000;
+			}
+			else if (bitmapHeader.bitCount == 24)
+			{
+				bitmapHeader.redBitMask =   0b00000000000000000000000000000000;
+				bitmapHeader.greenBitMask = 0b00000000000000000000000000000000;
+				bitmapHeader.blueBitMask =  0b00000000000000000000000000000000;
+			}
+		}
+
+		if (bitmapHeader.headerSize >= BITMAPV3INFOHEADER)
+		{
+			bitmapHeader.alphaBitMask = file.ReadUINT32();
+		}
+		else
+		{
+			bitmapHeader.alphaBitMask = 0b00000000000000000000000000000000;
+		}
+
+		if (bitmapHeader.headerSize >= BITMAPV4HEADER)
+		{
+			bitmapHeader.colorSpaceType = file.ReadUINT32();
+			bitmapHeader.redX = file.ReadUINT32();
+			bitmapHeader.redY = file.ReadUINT32();
+			bitmapHeader.redZ = file.ReadUINT32();
+			bitmapHeader.greenX = file.ReadUINT32();
+			bitmapHeader.greenY = file.ReadUINT32();
+			bitmapHeader.greenZ = file.ReadUINT32();
+			bitmapHeader.blueX = file.ReadUINT32();
+			bitmapHeader.blueY = file.ReadUINT32();
+			bitmapHeader.blueZ = file.ReadUINT32();
+			bitmapHeader.gammaRed = file.ReadUINT32();
+			bitmapHeader.gammaGreen = file.ReadUINT32();
+			bitmapHeader.gammaBlue = file.ReadUINT32();
+		}
+		else
+		{
+			bitmapHeader.colorSpaceType = 1;
+			bitmapHeader.redX = 0;
+			bitmapHeader.redY = 0;
+			bitmapHeader.redZ = 0;
+			bitmapHeader.greenX = 0;
+			bitmapHeader.greenY = 0;
+			bitmapHeader.greenZ = 0;
+			bitmapHeader.blueX = 0;
+			bitmapHeader.blueY = 0;
+			bitmapHeader.blueZ = 0;
+			bitmapHeader.gammaRed = 1;
+			bitmapHeader.gammaGreen = 1;
+			bitmapHeader.gammaBlue = 1;
+		}
+
+		if (bitmapHeader.headerSize == BITMAPV5HEADER)
+		{
+			bitmapHeader.intent = file.ReadUINT32();
+			bitmapHeader.ICCProfileData = file.ReadUINT32();
+			bitmapHeader.ICCProfileSize = file.ReadUINT32();
+			bitmapHeader.reserved3 = file.ReadUINT32();
+		}
+		else
+		{
+			bitmapHeader.intent = LCS_CALIBRATED_RGB;
+			bitmapHeader.ICCProfileData = 0;
+			bitmapHeader.ICCProfileSize = 0;
+			bitmapHeader.reserved3 = 0;
+		}
+		
+		// Prepare for processing color data.
+		std::vector<char> image = std::vector<char>();
+		image.resize(std::abs(bitmapHeader.width) * std::abs(bitmapHeader.height) * 4);
+		std::array<char, 4> rawColorData = { 0, 0, 0, 0 };
+
+		float uint32RowSize = ((float)bitmapHeader.width * ((float)bitmapHeader.bitCount / 8)) / sizeof(uint32_t);
+		uint8_t rowPadding = (uint8_t)(std::ceil(uint32RowSize) - uint32RowSize) * sizeof(uint32_t);
+
+		uint8_t redBitMaskOffset = 0;
+		uint8_t greenBitMaskOffset = 0;
+		uint8_t blueBitMaskOffset = 0;
+		uint8_t alphaBitMaskOffset = 0;
+		bool useDefaultBitMask = false;
+		for (int i = 0; i < 31; i++)
+		{
+			if (((1 << i) & bitmapHeader.redBitMask >> i) == 1) redBitMaskOffset = i;
+			if (((1 << i) & bitmapHeader.greenBitMask >> i) == 1) greenBitMaskOffset = i;
+			if (((1 << i) & bitmapHeader.blueBitMask >> i) == 1) blueBitMaskOffset = i;
+			if (((1 << i) & bitmapHeader.alphaBitMask >> i) == 1) alphaBitMaskOffset = i;
+		}
+		useDefaultBitMask = (redBitMaskOffset | greenBitMaskOffset | blueBitMaskOffset | alphaBitMaskOffset) == 0;
+		
+		// Process color Data.
+		file.Seek(fileHeader.bitmapOffset);
+
+		for (uint32_t y = 0; y < (uint32_t) abs(bitmapHeader.height); y++)
+		{
+			for (uint32_t x = 0; x < (uint32_t) abs(bitmapHeader.width); x++)
+			{
+				if (std::fmod(x % 8, 1.f / ((float)bitmapHeader.bitCount / 8.f)) < 1)
 				{
-					bitmapHeader.redBitMask =   0b11111000000000000000000000000000;
-					bitmapHeader.greenBitMask = 0b00000111111000000000000000000000;
-					bitmapHeader.blueBitMask =  0b00000000000111110000000000000000;
+					std::vector<uint8_t> vec = file.ReadBuffer(bitmapHeader.bitCount / 8);
+					std::copy(vec.begin(), vec.end(), rawColorData.begin());
+				}
+
+				if (bitmapHeader.bitCount == 1)
+				{
+					// Get Color Palette Data and parse it into RGBA8888 format
+				}
+				else if (bitmapHeader.bitCount == 4)
+				{
+					// Get Color Palette Data and parse it into RGBA8888 format
+				}
+				else if (bitmapHeader.bitCount == 8)
+				{
+					// Get Color Palette Data and parse it into RGBA8888 format
+				}
+				else if (bitmapHeader.bitCount == 16)
+				{
+					uint16_t color =
+						rawColorData[0] << 8 |
+						rawColorData[1];
+
+					image[(x + bitmapHeader.width * y) * 4] = (color & bitmapHeader.redBitMask) >> redBitMaskOffset;
+					image[(x + bitmapHeader.width * y) * 4 + 1] = (color & bitmapHeader.greenBitMask) >> greenBitMaskOffset;
+					image[(x + bitmapHeader.width * y) * 4 + 2] = (color & bitmapHeader.blueBitMask) >> blueBitMaskOffset;
+					image[(x + bitmapHeader.width * y) * 4 + 3] = 0;
 				}
 				else if (bitmapHeader.bitCount == 24)
 				{
-					bitmapHeader.redBitMask =   0b11111111000000000000000000000000;
-					bitmapHeader.greenBitMask = 0b00000000111111110000000000000000;
-					bitmapHeader.blueBitMask =  0b00000000000000001111111100000000;
-				}
-			}
-
-			if (bitmapHeader.headerSize <= BITMAPV3INFOHEADER)
-			{
-				file.read(reinterpret_cast<char*>(&bitmapHeader + BITMAPV2INFOHEADER), sizeof(BITMAPV3INFOHEADER - BITMAPV2INFOHEADER));
-			}
-			else
-			{
-				bitmapHeader.alphaBitMask = 0b00000000000000000000000000000000;
-			}
-
-			if (bitmapHeader.headerSize <= BITMAPV4HEADER)
-			{
-				file.read(reinterpret_cast<char*>(&bitmapHeader + BITMAPV3INFOHEADER), sizeof(BITMAPV4HEADER - BITMAPV3INFOHEADER));
-			}
-			else
-			{
-				bitmapHeader.colorSpaceType = 1;
-				bitmapHeader.redX = 0;
-				bitmapHeader.redY = 0;
-				bitmapHeader.redZ = 0;
-				bitmapHeader.greenX = 0;
-				bitmapHeader.greenY = 0;
-				bitmapHeader.greenZ = 0;
-				bitmapHeader.blueX = 0;
-				bitmapHeader.blueY = 0;
-				bitmapHeader.blueZ = 0;
-				bitmapHeader.gammaRed = 1;
-				bitmapHeader.gammaGreen = 1;
-				bitmapHeader.gammaBlue = 1;
-			}
-
-			if (bitmapHeader.headerSize == BITMAPV5HEADER)
-			{
-				file.read(reinterpret_cast<char*>(&bitmapHeader + BITMAPV4HEADER), sizeof(BITMAPV5HEADER - BITMAPV4HEADER));
-			}
-			else
-			{
-				bitmapHeader.intent = LCS_CALIBRATED_RGB;
-				bitmapHeader.ICCProfileData = 0;
-				bitmapHeader.ICCProfileSize = 0;
-				bitmapHeader.reserved3 = 0;
-			}
-			
-			// Process Data.
-			std::vector<char> image = std::vector<char>();
-			image.reserve(bitmapHeader.width * std::abs(bitmapHeader.height) * 4);
-			std::vector<char> rawRow = std::vector<char>();
-			rawRow.reserve(bitmapHeader.width* bitmapHeader.bitCount / 8);
-
-			file.seekg(fileHeader.bitmapOffset);
-
-			float uint32RowSize = (float)(bitmapHeader.width * bitmapHeader.bitCount) / sizeof(uint32_t);
-			uint8_t rowPadding = (uint8_t)(std::ceil(uint32RowSize) - uint32RowSize) * sizeof(uint32_t);
-
-			int redBitMaskOffset = 0;
-			int greenBitMaskOffset = 0;
-			int blueBitMaskOffset = 0;
-			int alphaBitMaskOffset = 0;
-			for (int i = 0; i < 31; i++)
-			{
-				if (((1 << i) & bitmapHeader.redBitMask >> i) == 1) redBitMaskOffset = i;
-				if (((1 << i) & bitmapHeader.greenBitMask >> i) == 1) greenBitMaskOffset = i;
-				if (((1 << i) & bitmapHeader.blueBitMask >> i) == 1) blueBitMaskOffset = i;
-				if (((1 << i) & bitmapHeader.alphaBitMask >> i) == 1) alphaBitMaskOffset = i;
-			}
-			
-			for (uint32_t y = 0; y < (uint32_t) abs(bitmapHeader.height); y++)
-			{
-				file.read(rawRow.data(), bitmapHeader.width * bitmapHeader.bitCount / 8);
-				file.seekg(rowPadding, std::ios::cur);
-
-				for (uint32_t x = 0; x < bitmapHeader.width; x++)
-				{
-					if (bitmapHeader.bitCount == 1)
+					if (useDefaultBitMask)
 					{
-						// Get Color Palette Data and parse it into RGBA8888 format
+						image[(x + bitmapHeader.width * y) * 4] = rawColorData[2];
+						image[(x + bitmapHeader.width * y) * 4 + 1] = rawColorData[1];
+						image[(x + bitmapHeader.width * y) * 4 + 2] = rawColorData[0];
+						image[(x + bitmapHeader.width * y) * 4 + 3] = (uint8_t)0xFF;
 					}
-					else if (bitmapHeader.bitCount == 4)
+					else
 					{
-						// Get Color Palette Data and parse it into RGBA8888 format
-					}
-					else if (bitmapHeader.bitCount == 8)
-					{
-						// Get Color Palette Data and parse it into RGBA8888 format
-					}
-					else if (bitmapHeader.bitCount == 16)
-					{
-						uint16_t color = 
-							rawRow[x * bitmapHeader.bitCount / 8] << 8 | 
-							rawRow[x * bitmapHeader.bitCount / 8 + 1];
+						uint32_t color =
+							rawColorData[0] << 16 |
+							rawColorData[1] << 8 |
+							rawColorData[2];
 
 						image[(x + bitmapHeader.width * y) * 4] = (color & bitmapHeader.redBitMask) >> redBitMaskOffset;
 						image[(x + bitmapHeader.width * y) * 4 + 1] = (color & bitmapHeader.greenBitMask) >> greenBitMaskOffset;
 						image[(x + bitmapHeader.width * y) * 4 + 2] = (color & bitmapHeader.blueBitMask) >> blueBitMaskOffset;
 						image[(x + bitmapHeader.width * y) * 4 + 3] = 0;
 					}
-					else if (bitmapHeader.bitCount == 24)
+				}
+				else if (bitmapHeader.bitCount == 32)
+				{
+					if (useDefaultBitMask)
 					{
-						image[(x + bitmapHeader.width * y) * 4] = rawRow[x * bitmapHeader.bitCount / 8];
-						image[(x + bitmapHeader.width * y) * 4 + 1] = rawRow[x * bitmapHeader.bitCount / 8 + 1];
-						image[(x + bitmapHeader.width * y) * 4 + 2] = rawRow[x * bitmapHeader.bitCount / 8 + 2];
-						image[(x + bitmapHeader.width * y) * 4 + 3] = (uint8_t)255;
+						image[(x + bitmapHeader.width * y) * 4] = rawColorData[2];
+						image[(x + bitmapHeader.width * y) * 4 + 1] = rawColorData[1];
+						image[(x + bitmapHeader.width * y) * 4 + 2] = rawColorData[0];
+						image[(x + bitmapHeader.width * y) * 4 + 3] = rawColorData[3];
 					}
-					else if (bitmapHeader.bitCount == 32)
+					else
 					{
 						uint32_t color =
-							rawRow[x * bitmapHeader.bitCount / 8] << 24 |
-							rawRow[x * bitmapHeader.bitCount / 8 + 1] << 16 |
-							rawRow[x * bitmapHeader.bitCount / 8 + 2] << 8 |
-							rawRow[x * bitmapHeader.bitCount / 8 + 3];
+							rawColorData[0] << 24 |
+							rawColorData[1] << 16 |
+							rawColorData[2] << 8 |
+							rawColorData[3];
 
 						image[(x + bitmapHeader.width * y) * 4] = (color & bitmapHeader.redBitMask) >> redBitMaskOffset;
 						image[(x + bitmapHeader.width * y) * 4 + 1] = (color & bitmapHeader.greenBitMask) >> greenBitMaskOffset;
@@ -305,13 +366,10 @@ namespace Engine {
 					}
 				}
 			}
-			LogInfo("BitmapLoader", "Texture stored");
-			return std::make_shared<Image>(image.data(), bitmapHeader.width, bitmapHeader.height, 4);
 
-
+			file.Seek(file.GetPosition() + rowPadding);
 		}
-
-		LogError("BitmapLoader", "Failed to open file.");
-		return nullptr;
+		LogInfo("BitmapLoader", "Texture stored");
+		return std::make_shared<Image>(image.data(), abs(bitmapHeader.width), abs(bitmapHeader.height), 4);
 	}
 }

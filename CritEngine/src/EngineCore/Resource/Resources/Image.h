@@ -10,14 +10,14 @@ namespace Engine {
 	{
 	public:
 
-		Image();
-		Image(char* data, uint32_t width, uint32_t height, uint8_t channelCount);
+		ENGINE_API Image();
+		ENGINE_API Image(char* data, uint32_t width, uint32_t height, uint8_t channelCount);
 
-		virtual ~Image() override;
+		ENGINE_API virtual ~Image() override;
 
-		Texture* GetTexture();
+		ENGINE_API Texture* GetTexture();
 
-		bool IsValid();
+		ENGINE_API bool IsValid();
 
 	private:
 		std::unique_ptr<Texture> texture;

@@ -6,6 +6,8 @@
 
 namespace Engine {
 
+	//TODO: Add color palette support so that we can parse lower bpp formats.
+
 	class BitmapLoader : public ResourceLoader
 	{
 	public:

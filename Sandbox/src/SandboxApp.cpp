@@ -18,6 +18,7 @@
 #include <EngineCore/Graphics/Renderer.h>
 #include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
+#include <EngineCore/Resource/Resources/Image.h>
 
 std::string vertexShaderSource = R"(
 	#version 460 core
@@ -28,14 +29,17 @@ std::string vertexShaderSource = R"(
 	
 	layout (location = 0) in vec3 aPos;
 	layout (location = 1) in vec4 aColor;
+	layout (location = 2) in vec2 aTexUV;
 
 	out vec4 vColor;
+	out vec2 vTexUV;
 
 	void main()
 	{
 		
 		gl_Position = uPerspectiveProjection * uViewProjection * uModelProjection * vec4(aPos, 1.0);
 		vColor = aColor;
+		vTexUV = aTexUV;
 	}
 )";
 
@@ -43,12 +47,15 @@ std::string fragmentShaderSource = R"(
 	#version 460 core
 
 	in vec4 vColor;
+	in vec2 vTexUV;
+
+	uniform sampler2D texture1;
 
 	layout(location = 0) out vec4 color;
 
 	void main()
 	{
-		color = vColor;
+		color = texture(texture1, vTexUV);
 	}
 )";
 
@@ -85,38 +92,20 @@ public:
 
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 
-		this->triangleVA = Engine::VertexArray::Create();
-
-		float triangleVertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-			 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
-		};
-
-		std::shared_ptr<Engine::VertexBuffer> triangleVB = Engine::VertexBuffer::Create(triangleVertices, sizeof(triangleVertices));
-		triangleVB->SetLayout({
-			{Engine::ShaderDataType::Float3, "aPos"},
-			{Engine::ShaderDataType::Float4, "aColor"},
-							  });
-		triangleVA->AddVertexBuffer(triangleVB);
-
-		uint32_t triangleIndices[3] = { 0, 1, 2 };
-		std::shared_ptr<Engine::IndexBuffer> triangleIB = Engine::IndexBuffer::Create(triangleIndices, sizeof(triangleIndices) / sizeof(uint32_t));
-		triangleVA->SetIndexBuffer(triangleIB);
-
 		this->squareVA = Engine::VertexArray::Create();
 
-		float squareVertices[4 * 7] = {
-			-0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-			 0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			 0.8f,  0.8f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-			-0.8f,  0.8f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f
+		float squareVertices[4 * 9] = {
+			-0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+			 0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+			 0.8f,  0.8f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+			-0.8f,  0.8f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> squareVB = Engine::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 		squareVB->SetLayout({
 			{Engine::ShaderDataType::Float3, "aPos"},
 			{Engine::ShaderDataType::Float4, "aColor"},
+			{Engine::ShaderDataType::Float2, "aTexUV"},
 							});
 		squareVA->AddVertexBuffer(squareVB);
 
@@ -124,9 +113,13 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		std::string filepath = "C:\\Users\\steve\\Downloads\\bmptestsuite-0.9\\valid\\32bpp-320x240.bmp";
-		std::shared_ptr<Engine::Resource> resource = Engine::GlobalEngine::Get().GetResourceManager().GetFromPath("Image", filepath);
+		std::string filepath = "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\32bpp-320x240.bmp"; 
+		this->image = std::static_pointer_cast<Engine::Image>(Engine::GlobalEngine::Get().GetResourceManager().GetFromPath("Image", filepath));
 
+
+
+		this->shader->Bind();
+		this->shader->UploadUniformInt("texture1", 0);
 	}
 
 	void Tick() override
@@ -151,13 +144,14 @@ public:
 		// TODO: Abstract this behind some generalized object class?
 		this->shader->Bind();
 		this->shader->UploadUniformMat4("uModelProjection", Engine::Matrix4f({
-			cosf(time.count() * 80), 0, sinf(time.count() * 80), 0,
+			cosf(time.count() * 2.5), 0, sinf(time.count() * 2.5), 0,
 			0, 1, 0, 0,
-			-sinf(time.count() * 80), 0, cosf(time.count() * 80), 0,
-			0, sinf(time.count() * 4), 0, 1
+			-sinf(time.count() * 2.5), 0, cosf(time.count() * 2.5), 0,
+			0, sinf(time.count() * 1), 0, 1
 		}));
+
+		this->image->GetTexture()->Bind(0);
 		Engine::Renderer::Submit(this->shader, this->squareVA);
-		Engine::Renderer::Submit(this->shader, this->triangleVA);
 
 		Engine::Renderer::EndScene();
 	}
@@ -167,8 +161,10 @@ public:
 		LogWarning("Sandbox", "Destroyed!");
 	}
 private:
+
+	std::shared_ptr<Engine::Image> image;
+
 	std::shared_ptr<Engine::Shader> shader;
-	std::shared_ptr<Engine::VertexArray> triangleVA;
 	std::shared_ptr<Engine::VertexArray> squareVA;
 	std::shared_ptr<Engine::PerspectiveCamera> camera;
 	std::chrono::time_point<std::chrono::high_resolution_clock> start;
