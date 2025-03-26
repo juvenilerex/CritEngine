@@ -20,7 +20,8 @@ namespace Engine {
 		EventKeyboard = 1 << 1,
 		EventMouse = 1 << 2,
 		EventMouseButton = 1 << 3,
-		EventInput = 1 << 4
+		EventInput = 1 << 4,
+		EventWindow = 1 << 5
 	};
 
 	enum class EventType {
@@ -38,18 +39,14 @@ namespace Engine {
 		virtual ENGINE_API EventType GetEventType() const = 0;
 		virtual ENGINE_API std::string GetName() const = 0;
 
-		// Custom function for printing to the debug logger
-		virtual ENGINE_API std::string Print() const = 0;
+		virtual ENGINE_API std::string Print() const { return ""; }
 
 		virtual ENGINE_API int GetCategories() const = 0;
 
 		void ENGINE_API SetHandled(const bool isHandled);
 		bool ENGINE_API IsHandled() const;
 
-		bool IsInCategory(EventCategory category)
-		{
-			return GetCategories() & category;
-		}
+		bool IsInCategory(const EventCategory category) const { return GetCategories() & category; }
 
 	private:
 		bool eventHandled = false;
@@ -66,10 +63,13 @@ namespace Engine {
 
 		template<typename T>
 		bool Dispatch(EventFunc<T> func) {
-			ASSERT(this->event.GetEventType() == T::GetStaticType(), "Can not mismatch event types");
-			bool handled = func(static_cast<T&>(this->event));
-			this->event.SetHandled(handled);
-			return handled;
+			if (this->event.GetEventType() == T::GetStaticType()) {
+
+				bool handled = func(static_cast<T&>(this->event));
+				this->event.SetHandled(handled);
+				return handled;
+
+			}
 		}
 
 	private:

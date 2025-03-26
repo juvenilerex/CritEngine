@@ -62,20 +62,9 @@ public:
 
 	void OnUpdate() override {
 		LogInfo("ExampleLayer", "Update");
-		OnEvent(ev);
 	}
 
-	Engine::Example ev;
-
 	void OnEvent(Engine::Event& event) override {
-		Engine::EventDispatcher dispatcher(event);
-
-		dispatcher.Dispatch<Engine::Example>([this](Engine::Example& e) -> bool {
-			// Handle the event here
-			e.Hi();
-
-			return true; // Return true if the event was handled
-		});
 
 	}
 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <memory>
-
-
 #include "Core/Base.h"
 #include "Window/Window.h"
 #include "LayerStack.h"
+#include "Event/WindowEvent.h"
+
+#define BIND_EVENT_FUNC(func) [this] (auto& event) -> decltype(auto) { return func(event); }
 
 namespace Engine {
 
@@ -28,7 +28,10 @@ namespace Engine {
 		ENGINE_API InputListener& GetInput() const;
 		ENGINE_API MouseInputListener& GetMouseInput() const;
 
-	private:
+		bool OnWindowResize(WindowResizeEvent& event);
+		bool OnWindowClose(WindowCloseEvent& event);
+
+	private:					
 		std::unique_ptr<Window> window = nullptr;
 		LayerStack layerStack;
 	};

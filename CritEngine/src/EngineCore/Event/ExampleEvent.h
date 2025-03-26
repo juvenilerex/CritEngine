@@ -12,10 +12,6 @@ namespace Engine {
 			Debug::Log("Hello from Example class");
 		}
 
-		std::string Print() const override {
-			return "";
-		}
-
 		SET_EVENT_TYPE(KeyPressed);
 		SET_EVENT_CATEGORY(EventInput);
 

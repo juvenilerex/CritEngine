@@ -7,6 +7,8 @@ namespace Engine {
 	Application::Application()
 	{
 		this->window = std::make_unique<Window>(800, 600, "Sandbox");
+
+		this->window->SetEventCallback(BIND_EVENT_FUNC(this->OnEvent));		
 	};
 
 	Application::~Application()
@@ -35,16 +37,19 @@ namespace Engine {
 		this->layerStack.PushLayer(overlay);
 	}
 
-	void Application::OnEvent(Event& event)
-	{
-		EventDispatcher dispatcher(event);
+    void Application::OnEvent(Event& event)
+    {
+        EventDispatcher dispatcher(event);
 
-		for (auto it = layerStack.begin(); it != layerStack.end(); it++) {
-			if (event.IsHandled())
-				return;
+        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNC(this->OnWindowResize));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(this->OnWindowClose));
+
+        for (auto it = layerStack.begin(); it != layerStack.end(); it++) {
+            if (event.IsHandled())
+                return;
 			(*it)->OnEvent(event);
-		}
-	}
+        }
+    }
 
 	Window& Application::GetWindow()
 	{
@@ -60,6 +65,18 @@ namespace Engine {
 	MouseInputListener& Application::GetMouseInput() const
 	{
 		return this->window->GetMouseInput();
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& event)
+	{
+		Debug::Log(event.Print());
+		return false;
+	}
+
+	bool Application::OnWindowClose(WindowCloseEvent& event)
+	{
+		// Window closing logic here
+		return false;
 	}
 
 	void Application::Tick()
