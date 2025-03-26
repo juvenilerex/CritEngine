@@ -10,6 +10,7 @@
 #include <EngineCore/Core/MainLoop.h>
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
+#include <EngineCore/Event/ExampleEvent.h>
 #include <EngineCore/Window/Input.h>
 #include <EngineCore/Window/InputMouse.h>
 #include <EngineCore/Entry.h>
@@ -56,11 +57,26 @@ class LayerTest : public Engine::Layer {
 public:
 
 	LayerTest() : Layer("ExampleLayer") {
-
+	   
 	}
 
 	void OnUpdate() override {
 		LogInfo("ExampleLayer", "Update");
+		OnEvent(ev);
+	}
+
+	Engine::Example ev;
+
+	void OnEvent(Engine::Event& event) override {
+		Engine::EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<Engine::Example>([this](Engine::Example& e) -> bool {
+			// Handle the event here
+			e.Hi();
+
+			return true; // Return true if the event was handled
+		});
+
 	}
 
 };

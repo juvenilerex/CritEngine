@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Logging/Logger.h"
+#include "Event/Event.h"
 
 namespace Engine {
 
@@ -17,6 +18,8 @@ namespace Engine {
 	{
 		if (this->window != nullptr)
 		{
+			for (Layer* layer : this->layerStack)
+				layer->OnUpdate();
 			this->window->PollEvents();
 			this->window->SwapBuffers();
 		}
@@ -30,6 +33,17 @@ namespace Engine {
 	void Application::PushOverlay(Layer* overlay)
 	{
 		this->layerStack.PushLayer(overlay);
+	}
+
+	void Application::OnEvent(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+
+		for (auto it = layerStack.begin(); it != layerStack.end(); it++) {
+			if (event.IsHandled())
+				return;
+			(*it)->OnEvent(event);
+		}
 	}
 
 	Window& Application::GetWindow()

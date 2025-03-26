@@ -22,6 +22,8 @@ namespace Engine {
 		ENGINE_API void PushLayer(Layer* layer);
 		ENGINE_API void PushOverlay(Layer* overlay);
 
+		ENGINE_API void OnEvent(Event& event);
+
 		ENGINE_API Window& GetWindow();
 		ENGINE_API InputListener& GetInput() const;
 		ENGINE_API MouseInputListener& GetMouseInput() const;
