@@ -71,7 +71,7 @@ namespace Engine {
     uint8_t FileAccessor::ReadUINT8() {
         ASSERT(CheckReadBounds(sizeof(uint8_t)), "Can not read out of buffer's bounds");
 
-        uint8_t value = static_cast<uint8_t>(*this->buffer.data() + this->position);
+        uint8_t value = static_cast<uint8_t>(*(this->buffer.data() + this->position));
         this->position += sizeof(uint8_t);
         return value;
     }
@@ -115,7 +115,7 @@ namespace Engine {
     int8_t FileAccessor::ReadINT8() {
         ASSERT(CheckReadBounds(sizeof(int8_t)), "Can not read out of buffer's bounds");
 
-        int8_t value = static_cast<int8_t>(*this->buffer.data() + this->position);
+        int8_t value = static_cast<int8_t>(*(this->buffer.data() + this->position));
         this->position += sizeof(int8_t);
         return value;
     }

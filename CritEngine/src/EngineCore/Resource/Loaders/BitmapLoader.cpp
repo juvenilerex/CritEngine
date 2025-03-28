@@ -20,6 +20,21 @@ namespace Engine {
 		PROFILE_LINKED
 	};
 
+	struct ColorPaletteCore
+	{
+		uint8_t blue;
+		uint8_t green;
+		uint8_t red;
+	};
+
+	struct ColorPalette
+	{
+		uint8_t blue;
+		uint8_t green;
+		uint8_t red;
+		uint8_t alpha;
+	};
+
 	struct BitmapFileHeader
 	{
 		uint16_t signature;
@@ -261,6 +276,34 @@ namespace Engine {
 			bitmapHeader.ICCProfileSize = 0;
 			bitmapHeader.reserved3 = 0;
 		}
+		// Read color palette data if applicable.
+
+		uint8_t colorPaletteSize = (fileHeader.bitmapOffset - 14 - bitmapHeader.headerSize) / sizeof(bitmapHeader.headerSize == BITMAPCOREHEADER ? 3 : 4);
+
+		std::array<ColorPalette, 256> colorPalette = std::array<ColorPalette, 256>();
+		if (bitmapHeader.bitCount <= 8)
+		{
+			for (int i = 0; i < colorPaletteSize && i < (1 << bitmapHeader.bitCount); i++)
+			{
+				if (bitmapHeader.headerSize != BITMAPCOREHEADER)
+				{
+					//4 bytes per entry
+					colorPalette[i].blue = file.ReadUINT8();
+					colorPalette[i].green = file.ReadUINT8();
+					colorPalette[i].red = file.ReadUINT8();
+					colorPalette[i].alpha = file.ReadUINT8();
+				}
+				else
+				{
+					//3 bytes
+					colorPalette[i].blue = file.ReadUINT8();
+					colorPalette[i].green = file.ReadUINT8();
+					colorPalette[i].red = file.ReadUINT8();
+					colorPalette[i].alpha = 255;
+				}
+			}
+		}
+		
 		
 		// Prepare for processing color data.
 		std::vector<char> image = std::vector<char>();
@@ -268,21 +311,45 @@ namespace Engine {
 		std::array<char, 4> rawColorData = { 0, 0, 0, 0 };
 
 		float uint32RowSize = ((float)bitmapHeader.width * ((float)bitmapHeader.bitCount / 8)) / sizeof(uint32_t);
-		uint8_t rowPadding = (uint8_t)(std::ceil(uint32RowSize) - uint32RowSize) * sizeof(uint32_t);
+		uint8_t rowPadding = (uint8_t)((std::ceil(uint32RowSize) - uint32RowSize) * sizeof(uint32_t));
 
-		uint8_t redBitMaskOffset = 0;
-		uint8_t greenBitMaskOffset = 0;
+		uint32_t blueBitMaskCopy = bitmapHeader.blueBitMask;
 		uint8_t blueBitMaskOffset = 0;
-		uint8_t alphaBitMaskOffset = 0;
-		bool useDefaultBitMask = false;
-		for (int i = 0; i < 31; i++)
+		while (blueBitMaskCopy)
 		{
-			if (((1 << i) & bitmapHeader.redBitMask >> i) == 1) redBitMaskOffset = i;
-			if (((1 << i) & bitmapHeader.greenBitMask >> i) == 1) greenBitMaskOffset = i;
-			if (((1 << i) & bitmapHeader.blueBitMask >> i) == 1) blueBitMaskOffset = i;
-			if (((1 << i) & bitmapHeader.alphaBitMask >> i) == 1) alphaBitMaskOffset = i;
+			blueBitMaskOffset++;
+			blueBitMaskCopy >>= 1;
 		}
-		useDefaultBitMask = (redBitMaskOffset | greenBitMaskOffset | blueBitMaskOffset | alphaBitMaskOffset) == 0;
+		blueBitMaskOffset -= 32 - bitmapHeader.bitCount;
+
+		uint32_t greenBitMaskCopy = bitmapHeader.greenBitMask;
+		uint8_t greenBitMaskOffset = 0;
+		while (greenBitMaskCopy)
+		{
+			greenBitMaskOffset++;
+			greenBitMaskCopy >>= 1;
+		}
+		greenBitMaskOffset -= 32 - bitmapHeader.bitCount;
+
+		uint32_t redBitMaskCopy = bitmapHeader.redBitMask;
+		uint8_t redBitMaskOffset = 0;
+		while (redBitMaskCopy)
+		{
+			redBitMaskOffset++;
+			redBitMaskCopy >>= 1;
+		}
+		redBitMaskOffset -= 32 - bitmapHeader.bitCount;
+
+		uint32_t alphaBitMaskCopy = bitmapHeader.alphaBitMask;
+		uint8_t alphaBitMaskOffset = 0;
+		while (alphaBitMaskCopy)
+		{
+			alphaBitMaskOffset++;
+			alphaBitMaskCopy >>= 1;
+		}
+		alphaBitMaskOffset -= 32 - bitmapHeader.bitCount;
+
+		bool useDefaultBitMask = (bitmapHeader.blueBitMask | bitmapHeader.greenBitMask | bitmapHeader.redBitMask | bitmapHeader.alphaBitMask) == 0;
 		
 		// Process color Data.
 		file.Seek(fileHeader.bitmapOffset);
@@ -291,33 +358,56 @@ namespace Engine {
 		{
 			for (uint32_t x = 0; x < (uint32_t) abs(bitmapHeader.width); x++)
 			{
+
 				if (std::fmod(x % 8, 1.f / ((float)bitmapHeader.bitCount / 8.f)) < 1)
 				{
-					std::vector<uint8_t> vec = file.ReadBuffer(bitmapHeader.bitCount / 8);
+					std::vector<uint8_t> vec = file.ReadBuffer(ceil((float)bitmapHeader.bitCount / 8.f));
 					std::copy(vec.begin(), vec.end(), rawColorData.begin());
 				}
 
 				if (bitmapHeader.bitCount == 1)
 				{
-					// Get Color Palette Data and parse it into RGBA8888 format
+					uint8_t mask = 0b10000000;
+
+					mask >>= (x % 8);
+
+					image[(x + bitmapHeader.width * y) * 4] = colorPalette[rawColorData[0] & mask].red;
+					image[(x + bitmapHeader.width * y) * 4 + 1] = colorPalette[rawColorData[0] & mask].green;
+					image[(x + bitmapHeader.width * y) * 4 + 2] = colorPalette[rawColorData[0] & mask].blue;
+					image[(x + bitmapHeader.width * y) * 4 + 3] = colorPalette[rawColorData[0] & mask].alpha;
 				}
 				else if (bitmapHeader.bitCount == 4)
 				{
-					// Get Color Palette Data and parse it into RGBA8888 format
+					uint8_t mask = 0b11110000;
+
+					mask >>= bitmapHeader.bitCount * (x % 2);
+
+					uint8_t filteredIndex = (rawColorData[0] & mask) >> (bitmapHeader.bitCount * ((x+1) % 2));
+
+					image[(x + bitmapHeader.width * y) * 4] = colorPalette[filteredIndex].red;
+					image[(x + bitmapHeader.width * y) * 4 + 1] = colorPalette[filteredIndex].green;
+					image[(x + bitmapHeader.width * y) * 4 + 2] = colorPalette[filteredIndex].blue;
+					image[(x + bitmapHeader.width * y) * 4 + 3] = colorPalette[filteredIndex].alpha;
 				}
 				else if (bitmapHeader.bitCount == 8)
 				{
-					// Get Color Palette Data and parse it into RGBA8888 format
+					
+					image[(x + bitmapHeader.width * y) * 4] = colorPalette[rawColorData[0]].red;
+					image[(x + bitmapHeader.width * y) * 4 + 1] = colorPalette[rawColorData[0]].green;
+					image[(x + bitmapHeader.width * y) * 4 + 2] = colorPalette[rawColorData[0]].blue;
+					image[(x + bitmapHeader.width * y) * 4 + 3] = colorPalette[rawColorData[0]].alpha;
 				}
 				else if (bitmapHeader.bitCount == 16)
 				{
+					
 					uint16_t color =
-						rawColorData[0] << 8 |
-						rawColorData[1];
+						rawColorData[1] << 8 |
+						rawColorData[0];
 
-					image[(x + bitmapHeader.width * y) * 4] = (color & bitmapHeader.redBitMask) >> redBitMaskOffset;
-					image[(x + bitmapHeader.width * y) * 4 + 1] = (color & bitmapHeader.greenBitMask) >> greenBitMaskOffset;
-					image[(x + bitmapHeader.width * y) * 4 + 2] = (color & bitmapHeader.blueBitMask) >> blueBitMaskOffset;
+					// Currently Colors aren't normalized to RGBA8
+					image[(x + bitmapHeader.width * y) * 4] = ((color >> greenBitMaskOffset) & bitmapHeader.redBitMask >> 32 - bitmapHeader.bitCount);
+					image[(x + bitmapHeader.width * y) * 4 + 1] = ((color >> blueBitMaskOffset) & bitmapHeader.greenBitMask >> 32 - bitmapHeader.bitCount);
+					image[(x + bitmapHeader.width * y) * 4 + 2] = ((color >> 0) & bitmapHeader.blueBitMask >> 32 - bitmapHeader.bitCount);
 					image[(x + bitmapHeader.width * y) * 4 + 3] = 0;
 				}
 				else if (bitmapHeader.bitCount == 24)

@@ -113,10 +113,8 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		std::string filepath = "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\32bpp-320x240.bmp"; 
+		std::string filepath = "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\555-1x1.bmp"; 
 		this->image = std::static_pointer_cast<Engine::Image>(Engine::GlobalEngine::Get().GetResourceManager().GetFromPath("Image", filepath));
-
-
 
 		this->shader->Bind();
 		this->shader->UploadUniformInt("texture1", 0);
@@ -132,7 +130,7 @@ public:
 			LogWarning("Mouse: ", "Mouse 1 pressed!");
 		}
 
-//		LogInfo("Sandbox", "Tick!");
+		//LogInfo("Sandbox", "Tick!");
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
@@ -144,10 +142,10 @@ public:
 		// TODO: Abstract this behind some generalized object class?
 		this->shader->Bind();
 		this->shader->UploadUniformMat4("uModelProjection", Engine::Matrix4f({
-			cosf(time.count() * 2.5), 0, sinf(time.count() * 2.5), 0,
+			cosf(time.count() * 1.5), 0, sinf(time.count() * 1.5), 0,
 			0, 1, 0, 0,
-			-sinf(time.count() * 2.5), 0, cosf(time.count() * 2.5), 0,
-			0, sinf(time.count() * 1), 0, 1
+			-sinf(time.count() * 1.5), 0, cosf(time.count() * 1.5), 0,
+			0, sinf(time.count() * 0.5), 0, 1
 		}));
 
 		this->image->GetTexture()->Bind(0);
