@@ -212,12 +212,9 @@ namespace Engine {
 				bitmapHeader.greenBitMask = 0b00000111111000000000000000000000;
 				bitmapHeader.blueBitMask =  0b00000000000111110000000000000000;
 			}
-			else if (bitmapHeader.bitCount == 24)
-			{
-				bitmapHeader.redBitMask =   0b00000000000000000000000000000000;
-				bitmapHeader.greenBitMask = 0b00000000000000000000000000000000;
-				bitmapHeader.blueBitMask =  0b00000000000000000000000000000000;
-			}
+			bitmapHeader.redBitMask =   0b00000000000000000000000000000000;
+			bitmapHeader.greenBitMask = 0b00000000000000000000000000000000;
+			bitmapHeader.blueBitMask =  0b00000000000000000000000000000000;
 		}
 
 		if (bitmapHeader.headerSize >= BITMAPV3INFOHEADER)

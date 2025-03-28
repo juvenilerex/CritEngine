@@ -113,7 +113,7 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		std::string filepath = "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\555-1x1.bmp"; 
+		std::string filepath = "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\32bpp-1x1.bmp"; 
 		this->image = std::static_pointer_cast<Engine::Image>(Engine::GlobalEngine::Get().GetResourceManager().GetFromPath("Image", filepath));
 
 		this->shader->Bind();
