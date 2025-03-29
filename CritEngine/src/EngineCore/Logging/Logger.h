@@ -43,53 +43,16 @@ private:
 	template<typename T>
 	static std::string Process(T&& arg) {
 
-		if constexpr (std::is_same_v<std::decay_t<T>, int>) {
+		// Using SFINAE (Substition failure is not an error) to reduce code for handling types
+		// (Concepts is safer and preferred but only availble in later C++ standards)
+		if constexpr (std::is_arithmetic_v<std::decay_t<T>> && !std::is_same_v<std::decay_t<T>, bool>) {
 			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, float>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, double>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, size_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, uint8_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, int8_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, uint16_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, int16_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, uint32_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, int32_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, uint64_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, int64_t>) {
-			return std::to_string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, const char*>) {
-			return std::string(arg);
-		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, char*>) {
-			return std::string(arg);
 		}
 		else if constexpr (std::is_same_v<std::decay_t<T>, bool>) {
 			return arg ? "True" : "False";
 		}
-		else if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-			return arg;
+		else if constexpr (std::is_convertible_v<std::decay_t<T>, std::string>) {
+			return std::string(arg);
 		}
 		else if constexpr (std::is_same_v<std::decay_t<T>, Engine::Vector2>) {
 			return "(" + std::to_string(arg.x) + "," + std::to_string(arg.y) + ")";
@@ -98,7 +61,7 @@ private:
 			return "(" + std::to_string(arg.x) + "," + std::to_string(arg.y) + "," + std::to_string(arg.z) + ")";
 		}
 		else if constexpr (std::is_same_v<std::decay_t<T>, Engine::Vector4>) {
-			return "(" + std::to_string(arg.x) + "," + std::to_string(arg.y) + "," + std::to_string(arg.z) + ")" + std::to_string(arg.w) + ")";
+			return "(" + std::to_string(arg.x) + "," + std::to_string(arg.y) + "," + std::to_string(arg.z) + "," + std::to_string(arg.w) + ")";
 		}
 		else {
 			ASSERT(always_false<T>::value, "Unsupported type passed to Logger");
