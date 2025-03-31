@@ -24,7 +24,6 @@ namespace Engine {
 
 		glfwSetWindowUserPointer(this->windowHandle, this);
 
-		this->mouseInput = std::make_unique<MouseInputListener>(this->GetHandle());
 		this->input = std::make_unique<InputListener>(this->GetHandle());
 		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
 		this->renderContext->Init();
@@ -77,12 +76,6 @@ namespace Engine {
 	{
 		ASSERT(this->input);
 		return *this->input.get();
-	}
-
-	MouseInputListener& Window::GetMouseInput()
-	{
-		ASSERT(this->mouseInput);
-		return *this->mouseInput.get();
 	}
 
 };

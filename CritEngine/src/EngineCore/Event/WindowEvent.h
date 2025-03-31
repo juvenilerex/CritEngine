@@ -9,10 +9,8 @@ namespace Engine {
 	public:
 		WindowResizeEvent(const int width, const int height) : width(width), height(height) {}
 
-		std::string Print() const override {
-			std::ostringstream ss;
-			ss << "WindowResizeEvent: " << this->width << ", " << this->height;
-			return ss.str();
+		void Print() const override {
+			Debug::Log("WindowResizeEvent", this->width, ", ", this->height);
 		}
 
 		int GetWidth() const { return this->width; }

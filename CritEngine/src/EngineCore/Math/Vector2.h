@@ -58,6 +58,8 @@ namespace Engine {
 		Vector2 operator-(const Vector2& other) const { return Vector2::Sub(*this, other); }
 		Vector2 operator*(const Vector2& other) const { return Vector2::Mul(*this, other); }
 		Vector2 operator/(const Vector2& other) const { return Vector2::Div(*this, other); }
+		bool operator==(const Vector2& other) const { return Vector2::IsEqual(*this, other); }
+		bool operator!=(const Vector2& other) const { return !Vector2::IsEqual(*this, other); }
 
 		Vector2 operator+(const float rhs) const { return Vector2::Add(*this, rhs); }
 		Vector2 operator-(const float rhs) const { return Vector2::Sub(*this, rhs); }

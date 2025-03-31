@@ -1,6 +1,5 @@
 #include "Application.h"
 #include "Logging/Logger.h"
-#include "Event/Event.h"
 
 namespace Engine {
 
@@ -8,7 +7,8 @@ namespace Engine {
 	{
 		this->window = std::make_unique<Window>(800, 600, "Sandbox");
 
-		this->window->SetEventCallback(BIND_EVENT_FUNC(this->OnEvent));		
+		this->window->SetEventCallback(BIND_EVENT_FUNC(this->OnEvent));
+		GetInput().SetEventCallback(BIND_EVENT_FUNC(this->OnInput));
 	};
 
 	Application::~Application()
@@ -22,6 +22,8 @@ namespace Engine {
 		{
 			for (Layer* layer : this->layerStack)
 				layer->OnUpdate();
+			this->window->GetInput().PollKeyEvents();
+			this->window->GetInput().PollMouseEvents();
 			this->window->PollEvents();
 			this->window->SwapBuffers();
 		}
@@ -51,6 +53,35 @@ namespace Engine {
         }
     }
 
+	void Application::OnInput(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUNC(this->SendInput));
+		dispatcher.Dispatch<MousePressedEvent>(BIND_EVENT_FUNC(this->SendMouse));
+		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FUNC(this->SendMousePos));
+//		dispatcher.Dispatch<KeyJustPressedEvent>(BIND_EVENT_FUNC(this->SendInput));
+//		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FUNC(this->SendInput));
+
+	}
+
+	bool Application::SendInput(KeyboardEvent& event) {
+		Debug::Log("KeyPressedEvent: ", event.GetKeyCode());
+		return false;
+	}
+
+	bool Application::SendMouse(MouseEvent& event)
+	{
+		Debug::Log("MousePressedEvent: ", event.GetButton());
+		return false;
+	}
+
+	bool Application::SendMousePos(MouseMovedEvent& event)
+	{
+		Debug::Log("MouseMovedEvent: ", event.GetCurPos());
+		return false;
+	}
+
 	Window& Application::GetWindow()
 	{
 		ASSERT(this->window)
@@ -62,14 +93,9 @@ namespace Engine {
 		return this->window->GetInput();
 	}
 
-	MouseInputListener& Application::GetMouseInput() const
-	{
-		return this->window->GetMouseInput();
-	}
-
 	bool Application::OnWindowResize(WindowResizeEvent& event)
 	{
-		Debug::Log(event.Print());
+		event.Print();
 		return false;
 	}
 

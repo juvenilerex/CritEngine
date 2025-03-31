@@ -4,8 +4,8 @@
 #include "Window/Window.h"
 #include "LayerStack.h"
 #include "Event/WindowEvent.h"
-
-#define BIND_EVENT_FUNC(func) [this] (auto& event) -> decltype(auto) { return func(event); }
+#include "Event/KeyboardEvent.h"
+#include "Input/Input.h"
 
 namespace Engine {
 
@@ -23,10 +23,16 @@ namespace Engine {
 		ENGINE_API void PushOverlay(Layer* overlay);
 
 		ENGINE_API void OnEvent(Event& event);
+		ENGINE_API void OnInput(Event& event);
 
 		ENGINE_API Window& GetWindow();
 		ENGINE_API InputListener& GetInput() const;
-		ENGINE_API MouseInputListener& GetMouseInput() const;
+
+		// Testing functions
+		bool SendInput(KeyboardEvent& event);
+		bool SendMouse(MouseEvent& event);
+		bool SendMousePos(MouseMovedEvent& event);
+		//
 
 		bool OnWindowResize(WindowResizeEvent& event);
 		bool OnWindowClose(WindowCloseEvent& event);

@@ -11,8 +11,8 @@
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
 #include <EngineCore/Event/ExampleEvent.h>
-#include <EngineCore/Window/Input.h>
-#include <EngineCore/Window/InputMouse.h>
+#include <EngineCore/Event/KeyboardEvent.h>
+#include <EngineCore/Input/Input.h>
 #include <EngineCore/Entry.h>
 #include <EngineCore/Math/Vector2.h>
 #include <EngineCore/Graphics/Renderer.h>
@@ -63,7 +63,7 @@ public:
 	void OnUpdate() override {
 		LogInfo("ExampleLayer", "Update");
 	}
-
+	
 	void OnEvent(Engine::Event& event) override {
 
 	}
@@ -76,6 +76,7 @@ class Sandbox : public Engine::Application
 public:
 
 	Sandbox() {
+
 		PushLayer(new LayerTest());
 
 		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
@@ -130,14 +131,6 @@ public:
 
 	void Tick() override
 	{
-		if (this->GetInput().GetKeyJustPressed(Engine::KeyCode(Keys::A))) 
-		{ // If A is pressed
-			const bool a = true;
-			Debug::Log(a);
-		}
-		if (this->GetMouseInput().GetMouseJustPressed(Engine::MouseButton(Mouse::BUTTON_1))) {
-			LogWarning("MouseInput", "Mouse 1 pressed!");
-		}
 
 //		LogInfo("Sandbox", "Tick!");
 

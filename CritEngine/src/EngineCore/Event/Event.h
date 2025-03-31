@@ -12,6 +12,9 @@
 
 #define SET_EVENT_CATEGORY(cat) virtual int GetCategories() const override { return cat; }
 
+#define BIND_EVENT_FUNC(func) [this] (auto& event) -> decltype(auto) { return func(event); }
+#define BIND_EVENT_FUNC_WITH_EVENT_ARGS(func, ...) [this] (auto& event) -> decltype(auto) { return func(event, event.__VA_ARGS__()); }
+
 namespace Engine {
 
 	enum EventCategory {
@@ -31,7 +34,7 @@ namespace Engine {
 		WindowMoved,
 		OnTick, OnRender,
 		KeyPressed, KeyReleased, KeyJustPressed,
-		MousePressed, MouseReleased, MouseMoved, MouseScroll
+		MousePressed, MouseReleased, MouseJustPressed, MouseMoved, MouseScroll
 	};
 
 	class Event {
@@ -39,7 +42,7 @@ namespace Engine {
 		virtual ENGINE_API EventType GetEventType() const = 0;
 		virtual ENGINE_API std::string GetName() const = 0;
 
-		virtual ENGINE_API std::string Print() const { return ""; }
+		virtual ENGINE_API void Print() const {}
 
 		virtual ENGINE_API int GetCategories() const = 0;
 

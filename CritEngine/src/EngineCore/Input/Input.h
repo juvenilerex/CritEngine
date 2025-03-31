@@ -2,6 +2,9 @@
 
 #include "../Core/Base.h"
 #include <unordered_map>
+#include "../Event/Event.h"
+#include "../Event/KeyboardEvent.h"
+#include "../Event/MouseEvent.h"
 #include <array>
 
 struct GLFWwindow;
@@ -13,25 +16,41 @@ namespace Engine {
 	public:
 		ENGINE_API InputListener(GLFWwindow* windowHandle);
 
-		ENGINE_API bool GetKeyJustPressed(int key) const;
-		ENGINE_API bool GetKeyDown(int key) const;
-		ENGINE_API bool GetKeyUp(int key) const;
+        ENGINE_API void PollKeyEvents() const;
+        ENGINE_API void PollMouseEvents() const;
 
 		ENGINE_API static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        ENGINE_API static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+        ENGINE_API static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+
+        ENGINE_API void SetEventCallback(const std::function<void(Event&)> callback) {
+            this->eventCallback = callback;
+        };
+        std::function<void(Event&)> eventCallback;
 
 	private:
+        unsigned int frameCount = 0;
 		GLFWwindow* windowHandle;
-		static std::unordered_map<int, bool> KeyStates;
-		static std::unordered_map<int, bool> KeyReleased;
 
+        static std::unordered_map<int, bool> ButtonStates;
+        static std::unordered_map<int, bool> ButtonReleased;
+        static std::unordered_map<int, bool> ButtonJustPressed;
+        static std::unordered_map<int, bool> KeyStates;
+        static std::unordered_map<int, bool> KeyReleased;
+        static std::unordered_map<int, bool> KeyJustPressed;
+
+        static Vector2 CurPos;
+        static Vector2 PrevCurPos;
+
+        static double posX;
+        static double posY;
 	};
-
 }
 
 // GLFW keycode wrapper here so we can use it in the sandbox
 namespace Keys {
 
-    enum Key : uint8_t {
+    enum Key : int {
         SPACE, APOSTROPHE, COMMA, MINUS, PERIOD, SLASH,
         DIGIT_0, DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, DIGIT_5, DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9,
         SEMICOLON, EQUAL,
@@ -49,7 +68,7 @@ namespace Keys {
         LAST
     };
 
-    constexpr std::array<uint16_t, LAST + 1> KeyMap = {
+    constexpr std::array<int, LAST + 1> KeyMap = {
         32, 39, 44, 45, 46, 47,
         48, 49, 50, 51, 52, 53, 54, 55, 56, 57,
         59, 61,
@@ -70,8 +89,28 @@ namespace Keys {
 
 namespace Engine {
 
-    constexpr uint16_t KeyCode(Keys::Key key) {
+    constexpr int KeyCode(Keys::Key key) {
         return Keys::KeyMap[key];
+    }
+
+}
+
+namespace Mouse {
+
+    enum Button : unsigned int {
+        BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4, BUTTON_5, BUTTON_6, BUTTON_7, BUTTON_8
+    };
+
+    constexpr std::array<unsigned int, BUTTON_8 + 1> ButtonMap = {
+        { 0, 1, 2, 3, 4, 5, 6, 7 }
+    };
+
+}
+
+namespace Engine {
+
+    constexpr unsigned int MouseButton(Mouse::Button button) {
+        return Mouse::ButtonMap[button];
     }
 
 }
