@@ -128,6 +128,25 @@ public:
 		this->start = std::chrono::high_resolution_clock::now();
 	}
 
+	void OnInputEvent(Engine::Event& event) override {
+
+		Engine::EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<Engine::KeyPressedEvent>(BIND_EVENT_FUNC(this->TestKeys));
+		dispatcher.Dispatch<Engine::MousePressedEvent>(BIND_EVENT_FUNC(this->TestMouse));
+
+	}
+
+	bool TestKeys(Engine::KeyboardEvent& event) {
+		event.Print();
+		return false;
+	}
+
+	bool TestMouse(Engine::MouseEvent& event) {
+		event.Print();
+		return false;
+	}
+
 	void Tick() override
 	{
 

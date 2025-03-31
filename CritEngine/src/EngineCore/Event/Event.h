@@ -77,4 +77,9 @@ namespace Engine {
 
 	};
 
+	class InputEvent : public Event {
+		SET_EVENT_TYPE(None);
+		SET_EVENT_CATEGORY(EventInput);
+	};
+
 }

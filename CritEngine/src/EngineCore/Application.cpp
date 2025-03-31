@@ -8,7 +8,7 @@ namespace Engine {
 		this->window = std::make_unique<Window>(800, 600, "Sandbox");
 
 		this->window->SetEventCallback(BIND_EVENT_FUNC(this->OnEvent));
-		GetInput().SetEventCallback(BIND_EVENT_FUNC(this->OnInput));
+		this->GetInput().SetEventCallback(BIND_EVENT_FUNC(this->OnInputEvent));
 	};
 
 	Application::~Application()
@@ -53,38 +53,6 @@ namespace Engine {
         }
     }
 
-	// Tests
-	void Application::OnInput(Event& event)
-	{
-		EventDispatcher dispatcher(event);
-
-		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUNC(this->SendInput));
-//		dispatcher.Dispatch<MouseReleasedEvent>(BIND_EVENT_FUNC(this->SendMouse));
-//		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FUNC(this->SendMousePos));
-//		dispatcher.Dispatch<KeyJustPressedEvent>(BIND_EVENT_FUNC(this->SendInput));
-//		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FUNC(this->SendInput));
-
-	}
-
-	bool Application::SendInput(KeyboardEvent& event) {
-		Debug::Log("KeyPressedEvent: ", event.GetKeyCode());
-		return false;
-	}
-
-	bool Application::SendMouse(MouseEvent& event)
-	{
-		Debug::Log("MousePressedEvent: ", event.GetButton());
-		return false;
-	}
-
-	bool Application::SendMousePos(MouseMovedEvent& event)
-	{
-		Debug::Log("MouseMovedEvent: ", event.GetCurPos());
-		return false;
-	}
-
-	///////////////////////////////////////////////////////////////////
-
 	Window& Application::GetWindow()
 	{
 		ASSERT(this->window)
@@ -111,6 +79,11 @@ namespace Engine {
 	void Application::Tick()
 	{
 		LogInfo("App", "Tick!");
+	}
+
+	void Application::OnInputEvent(Event& event)
+	{
+		
 	}
 
 }
