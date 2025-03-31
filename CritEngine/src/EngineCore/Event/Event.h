@@ -13,20 +13,18 @@
 #define SET_EVENT_CATEGORY(cat) virtual int GetCategories() const override { return cat; }
 
 #define BIND_EVENT_FUNC(func) [this] (auto& event) -> decltype(auto) { return func(event); }
-#define BIND_EVENT_FUNC_WITH_EVENT_ARGS(func, ...) [this] (auto& event) -> decltype(auto) { return func(event, event.__VA_ARGS__()); }
 
 namespace Engine {
 
 	enum EventCategory {
 		None = 0,
-		EventApplication = 1 << 0,
-		EventKeyboard = 1 << 1,
-		EventMouse = 1 << 2,
-		EventMouseButton = 1 << 3,
-		EventInput = 1 << 4,
-		EventWindow = 1 << 5
+		EventKeyboard = 1 << 0,
+		EventMouse = 1 << 1,
+		EventInput = 1 << 2,
+		EventWindow = 1 << 3
 	};
 
+	// Some of these may or may not be used in the future
 	enum class EventType {
 		None = 0,
 		WindowClose, WindowResize,
@@ -67,7 +65,6 @@ namespace Engine {
 		template<typename T>
 		bool Dispatch(EventFunc<T> func) {
 			if (this->event.GetEventType() == T::GetStaticType()) {
-
 				bool handled = func(static_cast<T&>(this->event));
 				this->event.SetHandled(handled);
 				return handled;

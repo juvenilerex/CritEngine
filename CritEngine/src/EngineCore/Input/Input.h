@@ -42,6 +42,8 @@ namespace Engine {
         static Vector2 CurPos;
         static Vector2 PrevCurPos;
 
+        static bool CurPosChanged;
+
         static double posX;
         static double posY;
 	};

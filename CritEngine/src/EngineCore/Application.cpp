@@ -53,12 +53,13 @@ namespace Engine {
         }
     }
 
+	// Tests
 	void Application::OnInput(Event& event)
 	{
 		EventDispatcher dispatcher(event);
 
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUNC(this->SendInput));
-		dispatcher.Dispatch<MouseReleasedEvent>(BIND_EVENT_FUNC(this->SendMouse));
+//		dispatcher.Dispatch<MouseReleasedEvent>(BIND_EVENT_FUNC(this->SendMouse));
 //		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FUNC(this->SendMousePos));
 //		dispatcher.Dispatch<KeyJustPressedEvent>(BIND_EVENT_FUNC(this->SendInput));
 //		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FUNC(this->SendInput));
@@ -81,6 +82,8 @@ namespace Engine {
 		Debug::Log("MouseMovedEvent: ", event.GetCurPos());
 		return false;
 	}
+
+	///////////////////////////////////////////////////////////////////
 
 	Window& Application::GetWindow()
 	{

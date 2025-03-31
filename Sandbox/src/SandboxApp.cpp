@@ -10,7 +10,6 @@
 #include <EngineCore/Core/MainLoop.h>
 #include <EngineCore/Logging/Logger.h>
 #include <EngineCore/Event/Event.h>
-#include <EngineCore/Event/ExampleEvent.h>
 #include <EngineCore/Event/KeyboardEvent.h>
 #include <EngineCore/Input/Input.h>
 #include <EngineCore/Entry.h>

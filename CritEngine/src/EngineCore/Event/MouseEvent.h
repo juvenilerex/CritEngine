@@ -12,7 +12,7 @@ namespace Engine {
 		void SetButton(unsigned int _button) { this->button = _button; }
 
 		SET_EVENT_TYPE(None);
-		SET_EVENT_CATEGORY(EventMouse);
+		SET_EVENT_CATEGORY(EventMouse | EventInput);
 
 	private:
 		unsigned int button;

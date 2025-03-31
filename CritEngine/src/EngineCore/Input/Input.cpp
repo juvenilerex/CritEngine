@@ -14,6 +14,7 @@ namespace Engine {
     std::unordered_map<int, bool> InputListener::ButtonJustPressed;
     Vector2 InputListener::CurPos;
     Vector2 InputListener::PrevCurPos;
+    bool InputListener::CurPosChanged = false;
 
     InputListener::InputListener(GLFWwindow* windowHandle) : windowHandle(windowHandle) {
         glfwSetKeyCallback(windowHandle, KeyCallback);
@@ -52,9 +53,15 @@ namespace Engine {
 
     void InputListener::CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     {
-        PrevCurPos = CurPos;
-        CurPos.x = xpos;
-        CurPos.y = ypos;
+        if (CurPos.x != xpos || CurPos.y != ypos) {
+            PrevCurPos = CurPos;
+            CurPos.x = xpos;
+            CurPos.y = ypos;
+            CurPosChanged = true;
+        }
+        else {
+            CurPosChanged = false;
+        }
     }
 
     void InputListener::PollKeyEvents() const {
@@ -109,9 +116,10 @@ namespace Engine {
             }
         }
 
-        if (PrevCurPos != CurPos) {
+        if (CurPosChanged) {
             MouseMovedEvent moveEvent(CurPos.x, CurPos.y);
             this->eventCallback(moveEvent);
+            CurPosChanged = false;
         }
 
     }

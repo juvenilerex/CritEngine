@@ -12,7 +12,7 @@ namespace Engine {
 		void SetKeyCode(unsigned int keycode) { this->keyCode = keycode; }
 		
 		SET_EVENT_TYPE(None);
-		SET_EVENT_CATEGORY(EventKeyboard);
+		SET_EVENT_CATEGORY(EventKeyboard | EventInput);
 
 	private:
 		unsigned int keyCode;
