@@ -41,6 +41,7 @@ namespace Engine {
         if (action == GLFW_PRESS) {
             ButtonStates[button] = true;
             ButtonReleased[button] = false;
+            ButtonJustPressed[button] = true;
         }
         else if (action == GLFW_RELEASE) {
             ButtonStates[button] = false;
@@ -87,7 +88,7 @@ namespace Engine {
 
         for (const auto& [button, pressed] : ButtonStates) {
             if (pressed) {
-                KeyPressedEvent pressEvent(button);
+                MousePressedEvent pressEvent(button);
                 this->eventCallback(pressEvent);
             }
         }

@@ -58,8 +58,8 @@ namespace Engine {
 		EventDispatcher dispatcher(event);
 
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FUNC(this->SendInput));
-		dispatcher.Dispatch<MousePressedEvent>(BIND_EVENT_FUNC(this->SendMouse));
-		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FUNC(this->SendMousePos));
+		dispatcher.Dispatch<MouseReleasedEvent>(BIND_EVENT_FUNC(this->SendMouse));
+//		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FUNC(this->SendMousePos));
 //		dispatcher.Dispatch<KeyJustPressedEvent>(BIND_EVENT_FUNC(this->SendInput));
 //		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FUNC(this->SendInput));
 
