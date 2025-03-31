@@ -16,13 +16,12 @@ namespace Engine {
 		ResourceManager();
 
 		ENGINE_API void RegisterLoader(std::unique_ptr<ResourceLoader> loader);
-		ENGINE_API std::shared_ptr<Resource> GetFromPath(std::string resourceType, std::filesystem::path filepath);
+		ENGINE_API std::shared_ptr<void> GetResourceData(const Resource& resourceHandle);
 
 	private:
 		std::unordered_map<std::string, std::unique_ptr<ResourceLoader>> registeredLoaders;
 
-		std::unordered_map<UUID, std::weak_ptr<Resource>> resource_cache;
-		std::unordered_map<std::string, UUID> filename_uuid_map;
+		std::unordered_map<UUID, std::weak_ptr<void>> resourceDataCache;
 	};
 
 }

@@ -13,7 +13,7 @@ namespace Engine {
 		virtual ~ResourceLoader() {};
 
 		virtual std::string GetResourceType() = 0;
-		virtual std::shared_ptr<Resource> Load(std::filesystem::path filepath) = 0;
+		virtual std::shared_ptr<void> Load(std::filesystem::path filepath) = 0;
 	};
 
 }

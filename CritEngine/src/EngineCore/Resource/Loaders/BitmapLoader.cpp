@@ -104,7 +104,7 @@ namespace Engine {
 		return "Image";
 	}
 
-	std::shared_ptr<Resource> BitmapLoader::Load(std::filesystem::path filepath)
+	std::shared_ptr<void> BitmapLoader::Load(std::filesystem::path filepath)
 	{
 		FileAccessor file = FileAccessor();
 		file.OpenFile(filepath);
@@ -457,6 +457,6 @@ namespace Engine {
 			file.Seek(file.GetPosition() + rowPadding);
 		}
 		LogInfo("BitmapLoader", "Texture stored");
-		return std::make_shared<Image>(image.data(), abs(bitmapHeader.width), abs(bitmapHeader.height), 4);
+		return Texture::Create(image.data(), abs(bitmapHeader.width), abs(bitmapHeader.height), 4);
 	}
 }

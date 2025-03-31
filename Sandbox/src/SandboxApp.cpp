@@ -18,7 +18,8 @@
 #include <EngineCore/Graphics/Renderer.h>
 #include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
-#include <EngineCore/Resource/Resources/Image.h>
+#include <EngineCore/Graphics/Texture.h>
+#include <EngineCore/Resource/Resource.h>
 
 std::string vertexShaderSource = R"(
 	#version 460 core
@@ -113,8 +114,9 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		std::string filepath = "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\32bpp-1x1.bmp"; 
-		this->image = std::static_pointer_cast<Engine::Image>(Engine::GlobalEngine::Get().GetResourceManager().GetFromPath("Image", filepath));
+		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\32bpp-1x1.bmp");
+
+		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
 		this->shader->Bind();
 		this->shader->UploadUniformInt("texture1", 0);
@@ -148,7 +150,7 @@ public:
 			0, sinf(time.count() * 0.5), 0, 1
 		}));
 
-		this->image->GetTexture()->Bind(0);
+		this->image->Bind(0);
 		Engine::Renderer::Submit(this->shader, this->squareVA);
 
 		Engine::Renderer::EndScene();
@@ -160,7 +162,7 @@ public:
 	}
 private:
 
-	std::shared_ptr<Engine::Image> image;
+	std::shared_ptr<Engine::Texture> image;
 
 	std::shared_ptr<Engine::Shader> shader;
 	std::shared_ptr<Engine::VertexArray> squareVA;

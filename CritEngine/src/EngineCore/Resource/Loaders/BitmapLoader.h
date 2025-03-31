@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../ResourceLoader.h"
-#include "../Resources/Image.h"
 #include "../FileAccessor.h"
+#include "../../Graphics/Texture.h"
 
 namespace Engine {
 
@@ -14,7 +14,7 @@ namespace Engine {
 		virtual ~BitmapLoader() override {};
 
 		virtual std::string GetResourceType() override;
-		virtual std::shared_ptr<Resource> Load(std::filesystem::path filepath) override;		
+		virtual std::shared_ptr<void> Load(std::filesystem::path filepath) override;		
 		
 
 	};

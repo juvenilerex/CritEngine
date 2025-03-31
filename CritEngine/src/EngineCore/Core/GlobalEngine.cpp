@@ -19,7 +19,7 @@ namespace Engine {
 
 	GlobalEngine& GlobalEngine::Get()
 	{
-		return *GlobalEngine::globalInstance.get();
+		return *GlobalEngine::globalInstance;
 	}
 
 	ResourceManager& GlobalEngine::GetResourceManager()
