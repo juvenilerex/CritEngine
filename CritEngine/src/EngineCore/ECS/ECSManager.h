@@ -1,11 +1,9 @@
 #include "ECSCommon.h"
 
-#include <iostream>
-#include <string>
 #include <typeindex>
 #include <typeinfo>
 #include <unordered_map>
-#include <algorithm> // Include algorithm for std::remove
+#include <algorithm>
 
 namespace Engine {
 
