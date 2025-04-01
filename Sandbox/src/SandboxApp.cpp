@@ -91,11 +91,10 @@ public:
 		// Start with a constructor and pass in a reference to an ECS manager for dependency injection
 		PhysicsSystem(Engine::ECSManager& manager) : System(manager) {}
 
-
 		void Update() override {
 			// Get all instances of certain components throughout the manager
-			auto transforms = manager.GetAllComponents<Transform>();
-			auto physics = manager.GetAllComponents<Physics>();
+			const auto& transforms = manager.GetAllComponents<Transform>();
+			const auto& physics = manager.GetAllComponents<Physics>();
 
 			// Perform logic, make modifications, etc..
 			for (size_t i = 0; i < transforms.size(); i++) {
