@@ -44,8 +44,8 @@ namespace Engine {
 
 		virtual ENGINE_API int GetCategories() const = 0;
 
-		void ENGINE_API SetHandled(const bool isHandled);
-		bool ENGINE_API IsHandled() const;
+		ENGINE_API void SetHandled(const bool isHandled);
+		ENGINE_API bool IsHandled() const;
 
 		bool IsInCategory(const EventCategory category) const { return GetCategories() & category; }
 
@@ -64,17 +64,17 @@ namespace Engine {
 
 		template<typename T>
 		bool Dispatch(EventFunc<T> func) {
+
 			if (this->event.GetEventType() == T::GetStaticType()) {
 				bool handled = func(static_cast<T&>(this->event));
 				this->event.SetHandled(handled);
 				return handled;
-
 			}
+			return false;
 		}
 
 	private:
 		Event& event;
-
 	};
 
 	class InputEvent : public Event {

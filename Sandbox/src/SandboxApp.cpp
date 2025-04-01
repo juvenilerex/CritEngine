@@ -17,6 +17,7 @@
 #include <EngineCore/Graphics/Renderer.h>
 #include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
+#include <EngineCore/ECS/ECSManager.h>
 
 std::string vertexShaderSource = R"(
 	#version 460 core
@@ -60,7 +61,7 @@ public:
 	}
 
 	void OnUpdate() override {
-		LogInfo("ExampleLayer", "Update");
+//		LogInfo("ExampleLayer", "Update");
 	}
 	
 	void OnEvent(Engine::Event& event) override {
@@ -69,12 +70,64 @@ public:
 
 };
 
+
 class Sandbox : public Engine::Application
 {
 
 public:
 
+	// Components will be just data structures that inherit from the Component type. This is an example
+	struct Transform : ECS::Component {
+		float x, y;
+	};
+
+	struct Physics : ECS::Component {
+		float velocity = 0;
+	};
+
+	// Systems essentially add underlying behavior to components
+	class PhysicsSystem : public ECS::System {
+	public:
+		// Start with a constructor and pass in a reference to an ECS manager for dependency injection
+		PhysicsSystem(Engine::ECSManager& manager) : System(manager) {}
+
+
+		void Update() override {
+			// Get all instances of certain components throughout the manager
+			auto transforms = manager.GetAllComponents<Transform>();
+			auto physics = manager.GetAllComponents<Physics>();
+
+			// Perform logic, make modifications, etc..
+			for (size_t i = 0; i < transforms.size(); i++) {
+				transforms[i]->x += physics[i]->velocity;
+			}
+		}
+	};
+
+	Engine::ECSManager manager;
+	ECS::Entity player;
+
 	Sandbox() {
+
+		// Register any systems we may want to. All systems will update every frame with UpdateSystems()
+		// Return is optional
+		manager.RegisterSystem<PhysicsSystem>(manager);
+
+		// Add an Entity to the system. Entities are purely just an ID, and to keep track of them easily, AddEntity()
+		// returns the new ID number. Then we'll assign it to an Entity object
+		player = manager.AddEntity();
+
+		// We simply add a component to an Entity. The component is automatically created and returned to us when this is called
+		auto transform = manager.AddComponent<Transform>(player);
+
+		transform->x = 2.0f;
+
+		auto physics = manager.AddComponent<Physics>(player);
+
+		physics->velocity = 1.5f;
+
+		//////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////
 
 		PushLayer(new LayerTest());
 
@@ -139,16 +192,22 @@ public:
 
 	bool TestKeys(Engine::KeyboardEvent& event) {
 		event.Print();
-		return false;
+		return true; 
 	}
 
 	bool TestMouse(Engine::MouseEvent& event) {
 		event.Print();
-		return false;
+		return true;
 	}
 
 	void Tick() override
-	{
+	{	
+		// Testing our ECS 
+		manager.UpdateSystems();
+		auto transform = manager.GetComponent<Transform>(player);
+		Debug::Log("TransformComponent X: ", transform->x);
+
+		//////////////////////
 
 //		LogInfo("Sandbox", "Tick!");
 
