@@ -4,6 +4,7 @@
 #include <typeinfo>
 #include <unordered_map>
 #include <algorithm>
+#include <memory>
 
 namespace Engine {
 
