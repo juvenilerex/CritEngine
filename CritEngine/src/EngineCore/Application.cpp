@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Logging/Logger.h"
+#include "Core/GlobalEngine.h"
 
 namespace Engine {
 
@@ -78,6 +79,7 @@ namespace Engine {
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
 		// Window closing logic here
+		GlobalEngine::Shutdown();
 		return false;
 	}
 
