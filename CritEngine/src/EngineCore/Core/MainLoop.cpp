@@ -3,6 +3,8 @@
 
 namespace Engine {
 
+	bool MainLoop::is_running = true;
+
 	MainLoop::MainLoop(std::unique_ptr<Application> applicationInstance)
 	{
 		GlobalEngine::Initialize(std::move(applicationInstance));
@@ -11,7 +13,6 @@ namespace Engine {
 	void MainLoop::Run()
 	{
 		LogInfo("MainLoop", "Starting");
-		this->is_running = true;
 
 		while (is_running)
 		{
@@ -22,7 +23,7 @@ namespace Engine {
 
 	void MainLoop::Stop()
 	{
-		this->is_running = false;
+		is_running = false;
 	};
 
 	void MainLoop::Tick()
