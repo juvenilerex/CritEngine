@@ -1,0 +1,3 @@
+[submodule "CritEngine/thirdparty/libs/glfw"]
+	path = CritEngine/thirdparty/libs/glfw
+	url = https://github.com/glfw/glfw.git
