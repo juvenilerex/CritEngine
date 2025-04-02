@@ -18,7 +18,6 @@ namespace Engine {
 
 		ENGINE_API static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray);
 
-
 		ENGINE_API inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	private:
 
