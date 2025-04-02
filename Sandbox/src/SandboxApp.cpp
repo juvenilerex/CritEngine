@@ -21,6 +21,8 @@
 #include <EngineCore/Graphics/Texture.h>
 #include <EngineCore/Resource/Resource.h>
 #include <EngineCore/ECS/ECSManager.h>
+#include <EngineCore/ECS/Components/Transform.h>
+#include <EngineCore/ECS/Components/Physics.h>
 
 
 std::string vertexShaderSource = R"(
@@ -86,13 +88,6 @@ class Sandbox : public Engine::Application
 
 public:
 	// Components will be just data structures that inherit from the Component type. This is an example
-	struct Transform : ECS::Component {
-		float x, y;
-	};
-
-	struct Physics : ECS::Component {
-		float velocity = 0;
-	};
 
 	// Systems essentially add underlying behavior to components
 	class PhysicsSystem : public ECS::System {
@@ -102,12 +97,12 @@ public:
 
 		void Update() override {
 			// Get all instances of certain components throughout the manager
-			const auto& transforms = manager.GetAllComponents<Transform>();
-			const auto& physics = manager.GetAllComponents<Physics>();
+			const auto& transforms = manager.GetAllComponents<TransformComponent2D>();
+			const auto& physics = manager.GetAllComponents<PhysicsComponent2D>();
 
 			// Perform logic, make modifications, etc..
 			for (size_t i = 0; i < transforms.size(); i++) {
-				transforms[i]->x += physics[i]->velocity;
+				transforms[i]->position = transforms[i]->position + physics[i]->velocity;
 			}
 		}
 	};
@@ -127,11 +122,11 @@ public:
 		player = manager.AddEntity();
 
 		// We simply add a component to an Entity. The component is automatically created and returned to us when this is called
-		auto transform = manager.AddComponent<Transform>(player);
+		auto transform = manager.AddComponent<TransformComponent2D>(player);
 
-		transform->x = 2.0f;
+		transform->position.x = 2.0f;
 
-		auto physics = manager.AddComponent<Physics>(player);
+		auto physics = manager.AddComponent<PhysicsComponent2D>(player);
 
 		physics->velocity = 1.5f;
 
@@ -164,7 +159,7 @@ public:
 			{Engine::ShaderDataType::Float3, "aPos"},
 			{Engine::ShaderDataType::Float4, "aColor"},
 			{Engine::ShaderDataType::Float2, "aTexUV"},
-							});
+		});
 		squareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
@@ -202,8 +197,8 @@ public:
 	{	
 		// Testing our ECS 
 		manager.UpdateSystems();
-		auto transform = manager.GetComponent<Transform>(player);
-		Debug::Log("TransformComponent X: ", transform->x);
+		auto transform = manager.GetComponent<TransformComponent2D>(player);
+		Debug::Log("TransformComponent Position: ", transform->position);
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
