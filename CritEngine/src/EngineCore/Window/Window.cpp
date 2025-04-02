@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "../Graphics/OpenGL/OpenGLContext.h"
 #include "../Graphics/RenderContext.h"
+#include "../Event/WindowEvent.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
@@ -22,15 +23,31 @@ namespace Engine {
 		ASSERT(this->windowHandle, "Failed to create GLFW window!");
 
 		glfwSetWindowUserPointer(this->windowHandle, this);
-		glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* window)
-		{
-			Window* window_object = static_cast<Window*>(glfwGetWindowUserPointer(window));
-		});
-		
-		this->mouseInput = std::make_unique<MouseInputListener>(this->GetHandle());
+
 		this->input = std::make_unique<InputListener>(this->GetHandle());
 		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
 		this->renderContext->Init();
+
+
+		glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* window)
+		{
+			Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+			
+			WindowCloseEvent _event;
+			win->eventCallback(_event);
+		});
+
+
+		glfwSetWindowSizeCallback(this->windowHandle, [](GLFWwindow* window, int width, int height) 
+		{
+            Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));		
+
+			win->SetWidth(width);
+			win->SetHeight(height);
+
+			WindowResizeEvent _event(width, height);
+			win->eventCallback(_event);
+		});
 
 	}
 
@@ -59,12 +76,6 @@ namespace Engine {
 	{
 		ASSERT(this->input);
 		return *this->input.get();
-	}
-
-	MouseInputListener& Window::GetMouseInput()
-	{
-		ASSERT(this->mouseInput);
-		return *this->mouseInput.get();
 	}
 
 };

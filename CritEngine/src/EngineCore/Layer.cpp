@@ -10,8 +10,5 @@ namespace Engine {
 	{
 	}
 
-	void Layer::Test()
-	{
-	}
 }
 
