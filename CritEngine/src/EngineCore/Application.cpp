@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Logging/Logger.h"
+#include "Core/MainLoop.h"
 
 namespace Engine {
 
@@ -77,8 +78,8 @@ namespace Engine {
 
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
-		// Window closing logic here
-		return false;
+		MainLoop::Stop();
+		return true;
 	}
 
 	void Application::Tick()
