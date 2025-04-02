@@ -4,18 +4,26 @@
 
 namespace Engine {
 
-	void GlobalEngine::Initialize(std::unique_ptr<Application> injectedApp)
+	void GlobalEngine::Initialize(std::unique_ptr<Application> injectedApp, MainLoop mainLoop)
 	{
 		std::unique_ptr<GlobalEngine> engine = std::make_unique<GlobalEngine>(GlobalEngine());
 
 		engine->application = std::move(injectedApp);
+		engine->mainLoop = mainLoop;
 
 		engine->resourceManager = ResourceManager();
 		engine->resourceManager.RegisterLoader(std::make_unique<BitmapLoader>());
 
 		GlobalEngine::globalInstance = std::move(engine);
 		GlobalEngine::globalInstance->application->Initialize();
-	};
+
+		GlobalEngine::globalInstance->mainLoop.Run();
+	}
+
+	void GlobalEngine::Shutdown()
+	{
+		GlobalEngine::globalInstance->mainLoop.Stop();
+	}
 
 	GlobalEngine& GlobalEngine::Get()
 	{

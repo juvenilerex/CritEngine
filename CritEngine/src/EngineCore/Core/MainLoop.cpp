@@ -1,11 +1,11 @@
 
 #include "MainLoop.h"
+#include "GlobalEngine.h"
 
 namespace Engine {
 
-	MainLoop::MainLoop(std::unique_ptr<Application> applicationInstance)
+	MainLoop::MainLoop()
 	{
-		GlobalEngine::Initialize(std::move(applicationInstance));
 	};
 
 	void MainLoop::Run()
@@ -15,7 +15,7 @@ namespace Engine {
 
 		while (is_running)
 		{
-			Tick();
+			this->Tick();
 		}
 
 	};
