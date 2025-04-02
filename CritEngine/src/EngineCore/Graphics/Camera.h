@@ -19,6 +19,11 @@ namespace Engine {
 		void CalculateViewMatrix();
 		void CalculatePerspectiveMatrix();
 
+		void SetVerticalFOV(float verticalFOV);
+		void SetAspectRatio(float aspectRatio);
+		void SetNearPlane(float nearPlane);
+		void SetFarPlane(float farPlane);
+
 	private:
 		Matrix4f viewMatrix = Matrix4f::Identity();
 		Matrix4f perspectiveMatrix = Matrix4f::Identity();
@@ -36,7 +41,7 @@ namespace Engine {
 	{
 	public:
 
-		OrthographicCamera(float verticalFOV, float aspectRatio, float nearPlane, float farPlane, Vector3 position = Vector3(0, 0, 0), Quaternion rotation = Quaternion());
+		OrthographicCamera(float height, float aspectRatio, float nearPlane, float farPlane, Vector3 position = Vector3(0, 0, 0), Quaternion rotation = Quaternion());
 
 		Matrix4f GetViewPerspectiveMatrix();
 		Matrix4f GetPerspectiveMatrix();
@@ -44,6 +49,11 @@ namespace Engine {
 
 		void CalculateViewMatrix();
 		void CalculatePerspectiveMatrix();
+
+		void SetHeight(float height);
+		void SetAspectRatio(float aspectRatio);
+		void SetNearPlane(float nearPlane);
+		void SetFarPlane(float farPlane);
 
 	private:
 		Matrix4f viewMatrix = Matrix4f::Identity();

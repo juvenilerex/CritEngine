@@ -17,6 +17,11 @@ namespace Engine {
 			RenderCommand::rendererAPI->Clear();
 		}
 
+		ENGINE_API inline static void SetViewportSize(const int width, const int height)
+		{
+			RenderCommand::rendererAPI->SetViewportSize(width, height);
+		}
+
 		ENGINE_API inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray)
 		{
 			RenderCommand::rendererAPI->DrawIndexed(vertexArray);

@@ -19,7 +19,7 @@ namespace Engine {
 
 	void Application::Initialize()
 	{
-		// This function gets called by the main loop after the global engine has been initialized.
+		// This function gets called after the global engine has been initialized.
 	};
 
 	void Application::TickInternal()

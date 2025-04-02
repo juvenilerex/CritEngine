@@ -205,6 +205,9 @@ public:
 		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
 		Engine::RenderCommand::Clear();
 
+		this->camera->SetAspectRatio(this->GetWindow().GetAspectRatio());
+
+
 		Engine::Renderer::BeginScene(this->camera);
 
 		// TODO: Abstract this behind some generalized object class?

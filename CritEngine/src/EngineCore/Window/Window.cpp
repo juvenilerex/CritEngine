@@ -45,6 +45,10 @@ namespace Engine {
 			win->SetWidth(width);
 			win->SetHeight(height);
 
+			RenderCommand::SetViewportSize(width, height);
+
+			
+
 			WindowResizeEvent _event(width, height);
 			win->eventCallback(_event);
 		});

@@ -67,6 +67,27 @@ namespace Engine {
 		this->viewPerspectiveMatrix = this->perspectiveMatrix * this->viewMatrix;
 	}
 
+	void PerspectiveCamera::SetVerticalFOV(float verticalFOV)
+	{
+		this->verticalFOV = verticalFOV;
+		this->CalculatePerspectiveMatrix();
+	}
+	void PerspectiveCamera::SetAspectRatio(float aspectRatio)
+	{
+		this->aspectRatio = aspectRatio;
+		this->CalculatePerspectiveMatrix();
+	}
+	void PerspectiveCamera::SetNearPlane(float nearPlane)
+	{
+		this->nearPlane = nearPlane;
+		this->CalculatePerspectiveMatrix();
+	}
+	void PerspectiveCamera::SetFarPlane(float farPlane)
+	{
+		this->farPlane = farPlane;
+		this->CalculatePerspectiveMatrix();
+	}
+
 	////////////////////////////////////////////////////////
 	//  Orthographic Camera  ///////////////////////////////
 	////////////////////////////////////////////////////////
@@ -134,5 +155,26 @@ namespace Engine {
 
 		this->viewPerspectiveMatrix = this->perspectiveMatrix * this->viewMatrix;
 
+	}
+
+	void OrthographicCamera::SetHeight(float height)
+	{
+		this->height = height;
+		this->CalculatePerspectiveMatrix();
+	}
+	void OrthographicCamera::SetAspectRatio(float aspectRatio)
+	{
+		this->aspectRatio = aspectRatio;
+		this->CalculatePerspectiveMatrix();
+	}
+	void OrthographicCamera::SetNearPlane(float nearPlane)
+	{
+		this->nearPlane = nearPlane;
+		this->CalculatePerspectiveMatrix();
+	}
+	void OrthographicCamera::SetFarPlane(float farPlane)
+	{
+		this->farPlane = farPlane;
+		this->CalculatePerspectiveMatrix();
 	}
 }
