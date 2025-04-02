@@ -99,10 +99,45 @@ namespace Engine {
 	{
 		glUseProgram(0);
 	}
-	
+
+	void Shader::UploadUniformMat3(const std::string name, const Matrix3f& mat3)
+	{
+		int location = glGetUniformLocation(this->shaderID, name.c_str());
+		glUniformMatrix3fv(location, 1, GL_FALSE, &mat3.data[0]);
+	}
 	void Shader::UploadUniformMat4(const std::string name, const Matrix4f& mat4)
 	{
 		int location = glGetUniformLocation(this->shaderID, name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, &mat4.data[0]);
+	}
+	void Shader::UploadUniformFloat(const std::string name, const float& float1)
+	{
+		int location = glGetUniformLocation(this->shaderID, name.c_str());
+		glUniform1fv(location, 1, &float1);
+	}
+	void Shader::UploadUniformFloat2(const std::string name, const Vector2& float2)
+	{
+		int location = glGetUniformLocation(this->shaderID, name.c_str());
+		glUniform2fv(location, 1, &float2.x);
+	}
+	void Shader::UploadUniformFloat3(const std::string name, const Vector3& float3)
+	{
+		int location = glGetUniformLocation(this->shaderID, name.c_str());
+		glUniform3fv(location, 1, &float3.x);
+	}
+	void Shader::UploadUniformFloat4(const std::string name, const Vector4& float4)
+	{
+		int location = glGetUniformLocation(this->shaderID, name.c_str());
+		glUniform4fv(location, 1, &float4.x);
+	}
+	void Shader::UploadUniformInt(const std::string name, const int& int1)
+	{
+		int location = glGetUniformLocation(this->shaderID, name.c_str());
+		glUniform1iv(location, 1, &int1);
+	}
+	void Shader::UploadUniformBool(const std::string name, const int& boolean)
+	{
+		int location = glGetUniformLocation(this->shaderID, name.c_str());
+		glUniform1iv(location, 1, &boolean);
 	}
 }

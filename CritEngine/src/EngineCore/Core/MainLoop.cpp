@@ -3,17 +3,15 @@
 
 namespace Engine {
 
-
 	MainLoop::MainLoop(std::unique_ptr<Application> applicationInstance)
 	{
-		LogInfo("MainLoop", "Starting");
-		this->application = std::move(applicationInstance);
+		GlobalEngine::Initialize(std::move(applicationInstance));
 	};
 
 	void MainLoop::Run()
 	{
+		LogInfo("MainLoop", "Starting");
 		this->is_running = true;
-
 
 		while (is_running)
 		{
@@ -27,11 +25,8 @@ namespace Engine {
 		this->is_running = false;
 	};
 
-
 	void MainLoop::Tick()
 	{
-		this->application->TickInternal();
-		this->application->Tick();
+		GlobalEngine::Get().Tick();
 	};
-
 }
