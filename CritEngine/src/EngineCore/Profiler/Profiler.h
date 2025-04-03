@@ -1,8 +1,5 @@
 #pragma once
 
-#include "../Logging/Logger.h"
-#include <chrono>
-
 #ifdef CE_DEBUG
 	#define CE_PROFILE_MANUAL(name) Engine::Profile _profilenow(name);
 	#define CE_PROFILE_MANUAL_STOP _profilenow.Stop();

@@ -1,4 +1,6 @@
 #include <chrono>
+
+#include "../Logging/Logger.h"
 #include "Profiler.h"
 
 namespace Engine {
