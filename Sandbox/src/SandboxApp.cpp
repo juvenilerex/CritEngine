@@ -21,6 +21,7 @@
 #include <EngineCore/Graphics/Texture.h>
 #include <EngineCore/Resource/Resource.h>
 #include <EngineCore/ECS/ECSManager.h>
+#include <EngineCore/Profiler/Profiler.h>
 
 
 std::string vertexShaderSource = R"(
@@ -120,6 +121,7 @@ public:
   
     // Register any systems we may want to. All systems will update every frame with UpdateSystems()
 		// Return is optional
+		CE_PROFILE_MANUAL("Sandbox Initialization: ");
 		manager.RegisterSystem<PhysicsSystem>(manager);
 
 		// Add an Entity to the system. Entities are purely just an ID, and to keep track of them easily, AddEntity()
@@ -171,12 +173,15 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\32bpp-1x1.bmp");
+		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\steve\\Downloads\\bmptestsuite-0.9\\valid\\32bpp-1x1.bmp");
 
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
 		this->shader->Bind();
 		this->shader->UploadUniformInt("texture1", 0);
+
+		CE_PROFILE_MANUAL_STOP;
+
 	}
 
 	void OnInputEvent(Engine::Event& event) override {
@@ -201,6 +206,8 @@ public:
 	void Tick() override
 	{	
 		// Testing our ECS 
+		CE_PROFILE_FUNC("Update Loop");
+
 		manager.UpdateSystems();
 		auto transform = manager.GetComponent<Transform>(player);
 		Debug::Log("TransformComponent X: ", transform->x);
