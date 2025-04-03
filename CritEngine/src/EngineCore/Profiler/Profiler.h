@@ -15,7 +15,6 @@ namespace Engine {
 		void ENGINE_API Stop();
 
 	private:
-		bool isProfiling = false;
 		std::string funcName;
 		std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 	};
