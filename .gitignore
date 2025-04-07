@@ -8,4 +8,3 @@ obj
 *.vcxproj.filters
 *.vcxproj.user
 !thirdparty/*
-/CritEngine/thirdparty
