@@ -1,3 +1,6 @@
+local DependencyFetcher = require "dependency_fetcher" 
+DependencyFetcher.Setup()  -- Check and fetch dependencies before anything else
+
 workspace "CritEngine"
 	architecture "x64"
 	startproject "Sandbox"
