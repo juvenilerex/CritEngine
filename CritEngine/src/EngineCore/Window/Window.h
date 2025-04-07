@@ -15,7 +15,7 @@ namespace Engine {
 	{
 	public:
 
-		ENGINE_API Window(int width, int height, std::string title);
+		ENGINE_API Window(const int width, const int height, const std::string& title);
 		ENGINE_API ~Window();
 
 		ENGINE_API GLFWwindow* GetHandle();

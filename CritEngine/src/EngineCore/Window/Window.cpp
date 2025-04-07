@@ -8,7 +8,7 @@
 
 namespace Engine {
 
-	Window::Window(int width, int height, std::string title) 
+	Window::Window(const int width, const int height, const std::string& title)
 		: width(width), height(height)
 	{
 		bool success = glfwInit();
