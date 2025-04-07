@@ -7,4 +7,6 @@ obj
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
-!thirdparty/*
+/CritEngine/thirdparty/*
+!CritEngine/thirdparty/*.lua
+/CritEngine/thirdparty/*/

@@ -3,14 +3,14 @@ project "GLM"
 	language "C"
 	architecture "x86_64"
 
-	targetdir "../bin/%{cfg.buildcfg}"
-	objdir "../obj/%{cfg.buildcfg}"
+	targetdir "bin/%{cfg.buildcfg}"
+	objdir "obj/%{cfg.buildcfg}"
 	
-	includedirs { "glm/" }
+	includedirs { "libs/glm/" }
 
 	files
 	{
-		"glm/glm/**"
+		"libs/glm/glm/**"
 	}
     
 	filter "system:linux"
