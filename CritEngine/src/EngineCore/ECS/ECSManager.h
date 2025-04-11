@@ -1,7 +1,6 @@
+#pragma once
 #include "ECSCommon.h"
 
-#include <typeindex>
-#include <typeinfo>
 #include <unordered_map>
 #include <algorithm>
 

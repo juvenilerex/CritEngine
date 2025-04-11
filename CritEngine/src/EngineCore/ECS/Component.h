@@ -9,7 +9,7 @@ namespace ECS {
         inline void BindToEntity(const size_t ID) { this->boundEntityID = ID; }
         inline size_t GetEntity() const { return boundEntityID; }
     private:
-        size_t boundEntityID;
+        size_t boundEntityID = 0;
     };
 
 }

@@ -10,3 +10,4 @@ obj
 /CritEngine/thirdparty/*
 !CritEngine/thirdparty/*.lua
 /CritEngine/thirdparty/*/
+Sandbox/imgui.ini

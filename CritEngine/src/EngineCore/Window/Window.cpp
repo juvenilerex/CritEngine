@@ -1,10 +1,7 @@
 #pragma once
 #include "Window.h"
-#include "../Graphics/OpenGL/OpenGLContext.h"
-#include "../Graphics/RenderContext.h"
-#include "../Event/WindowEvent.h"
+
 #include <GLFW/glfw3.h>
-#include <iostream>
 
 namespace Engine {
 

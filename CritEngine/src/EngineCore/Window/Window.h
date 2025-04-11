@@ -1,11 +1,13 @@
 #pragma once
 
 #include "../Event/Event.h"
-#include "../Logging/Logger.h"
 #include "../Graphics/RenderContext.h"
 #include "../Graphics/Renderer.h"
+#ifdef CE_RENDERER_OPENGL4
+	#include "../Graphics/OpenGL/OpenGLContext.h"
+#endif
 #include "../Input/Input.h"
-#include <string>
+#include "../Event/WindowEvent.h"
 
 struct GLFWwindow;
 
