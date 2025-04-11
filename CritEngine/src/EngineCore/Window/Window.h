@@ -22,6 +22,8 @@ namespace Engine {
 
 		ENGINE_API void PollEvents();
 		ENGINE_API void SwapBuffers();
+		ENGINE_API void ImGuiStartFrame();
+		ENGINE_API void ImGuiRender();
 
 		ENGINE_API InputListener& GetInput();
 

@@ -15,6 +15,7 @@ namespace Engine {
 	Application::~Application()
 	{
 		this->window.reset();
+		ImGui::DestroyContext();
 	};
 
 	void Application::Initialize()
@@ -59,6 +60,11 @@ namespace Engine {
         }
     }
 
+	void* Application::GetImGuiContext()
+	{
+		return ImGui::GetCurrentContext();
+	}
+
 	Window& Application::GetWindow()
 	{
 		ASSERT(this->window)
@@ -82,14 +88,12 @@ namespace Engine {
 		return true;
 	}
 
+	void Application::OnGUIUpdate() {}
+	void Application::OnInputEvent(Event& event) {}
+
 	void Application::Tick()
 	{
 		LogInfo("App", "Tick!");
-	}
-
-	void Application::OnInputEvent(Event& event)
-	{
-		
 	}
 
 }

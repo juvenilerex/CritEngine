@@ -27,7 +27,7 @@ namespace Engine {
 		this->input = std::make_unique<InputListener>(this->GetHandle());
 		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
 		this->renderContext->Init();
-
+		this->renderContext->InitImGui();
 
 		glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* window)
 		{
@@ -65,6 +65,16 @@ namespace Engine {
 	void Window::SwapBuffers()
 	{
 		this->renderContext->SwapBuffers();
+	}
+
+	void Window::ImGuiStartFrame()
+	{
+		this->renderContext->ImGuiStartFrame();
+	}
+
+	void Window::ImGuiRender()
+	{
+		this->renderContext->ImGuiRender();
 	}
 
 	void Window::PollEvents()

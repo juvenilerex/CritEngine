@@ -45,7 +45,8 @@ project "CritEngine"
 		defines 
 		{
 			"ENGINE_BUILD_DLL",
-			"CE_PLATFORM_WINDOWS"
+			"CE_PLATFORM_WINDOWS",
+			"CE_RENDERER_OPENGL4"
 		}
 
 	filter "configurations:Debug"
@@ -81,17 +82,16 @@ project "Sandbox"
 		"%{prj.name}/src/**.cpp"
 	}
 
-
-
 	includedirs 
 	{
 		"%{wks.location}/CritEngine/src",
-		"CritEngine/thirdparty/libs/glm/"
+		"CritEngine/thirdparty/libs/glm/",
+		"CritEngine/thirdparty/libs/imgui/"
 	}
 	
 	links 
 	{
-		"CritEngine", "GLM"
+		"CritEngine", "GLM", "ImGui"
 	}
 
 	filter "system:windows"

@@ -23,6 +23,7 @@
 #include <EngineCore/ECS/ECSManager.h>
 #include <EngineCore/Profiler/Profiler.h>
 
+#include <imgui.h>
 
 std::string vertexShaderSource = R"(
 	#version 460 core
@@ -118,8 +119,11 @@ public:
   
 	void Sandbox::Initialize()
 	{
+		// I've linked Sandbox with ImGui and this function will ensure that we use the instance inside the application rather than a new one.
+		// Without linking we'd have to make a metric ton of wrapper functions, so for now, this is a quick solution.
+		ImGui::SetCurrentContext((ImGuiContext*)this->GetImGuiContext());
   
-    // Register any systems we may want to. All systems will update every frame with UpdateSystems()
+		// Register any systems we may want to. All systems will update every frame with UpdateSystems()
 		// Return is optional
 		CE_PROFILE_MANUAL("Sandbox Initialization: ");
 		manager.RegisterSystem<PhysicsSystem>(manager);
@@ -203,6 +207,13 @@ public:
 		return true;
 	}
 
+	// For simplicity-sake and full control, we can make direct ImGui calls from here to design UI elements and do whatever
+	void OnGUIUpdate() override {
+		ImGui::Begin("Debug Window");
+		ImGui::Text("Hello, ImGui!");
+		ImGui::End();
+	}
+
 	void Tick() override
 	{	
 		// Testing our ECS 
@@ -238,6 +249,7 @@ public:
 	{
 		LogWarning("Sandbox", "Destroyed!");
 	}
+
 private:
 
 	std::shared_ptr<Engine::Texture> image;
