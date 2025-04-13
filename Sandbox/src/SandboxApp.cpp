@@ -21,8 +21,7 @@
 #include <EngineCore/Graphics/Texture.h>
 #include <EngineCore/Resource/Resource.h>
 #include <EngineCore/ECS/ECSManager.h>
-#include <EngineCore/ECS/Components/Transform.h>
-#include <EngineCore/ECS/Components/Physics.h>
+#include <EngineCore/ECS/Components/Spatial.h>
 
 
 std::string vertexShaderSource = R"(
@@ -97,12 +96,11 @@ public:
 
 		void Update() override {
 			// Get all instances of certain components throughout the manager
-			const auto& transforms = manager.GetAllComponents<TransformComponent2D>();
-			const auto& physics = manager.GetAllComponents<PhysicsComponent2D>();
+			const auto& primatives = manager.GetAllComponents<SpatialComponent>();
 
 			// Perform logic, make modifications, etc..
-			for (size_t i = 0; i < transforms.size(); i++) {
-				transforms[i]->position = transforms[i]->position + physics[i]->velocity;
+			for (size_t i = 0; i < primatives.size(); i++) {
+				primatives[i]->position = primatives[i]->position + primatives[i]->velocity;
 			}
 		}
 	};
@@ -122,13 +120,10 @@ public:
 		player = manager.AddEntity();
 
 		// We simply add a component to an Entity. The component is automatically created and returned to us when this is called
-		auto transform = manager.AddComponent<TransformComponent2D>(player);
+		auto primative = manager.AddComponent<SpatialComponent>(player);
 
-		transform->position.x = 2.0f;
-
-		auto physics = manager.AddComponent<PhysicsComponent2D>(player);
-
-		physics->velocity = .025f;
+		primative->position.x = 2.0f;
+		primative->velocity.x = .025f;
 
 		//////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -197,7 +192,7 @@ public:
 	{	
 		// Testing our ECS 
 		manager.UpdateSystems();
-		auto transform = manager.GetComponent<TransformComponent2D>(player);
+		auto transform = manager.GetComponent<SpatialComponent>(player);
 		Debug::Log("TransformComponent Position: ", transform->position);
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
