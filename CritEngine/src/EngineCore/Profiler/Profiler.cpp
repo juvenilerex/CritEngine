@@ -1,4 +1,4 @@
-#include <chrono>
+﻿#include <chrono>
 
 #include "../Logging/Logger.h"
 #include "Profiler.h"
@@ -12,8 +12,8 @@ namespace Engine {
 	void Profile::Stop()
 	{
 		auto endTime = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-		Debug::Log(this->funcName, duration, "ms");
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+		Debug::Log(this->funcName, (float)duration/1000.f, "ms");
 	}
 
 	ScopedProfile::~ScopedProfile()
