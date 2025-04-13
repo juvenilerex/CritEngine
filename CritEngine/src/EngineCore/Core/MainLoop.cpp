@@ -1,22 +1,20 @@
 
 #include "MainLoop.h"
+#include "GlobalEngine.h"
 
 namespace Engine {
 
-	bool MainLoop::is_running = true;
-
-	MainLoop::MainLoop(std::unique_ptr<Application> applicationInstance)
+	MainLoop::MainLoop()
 	{
-		GlobalEngine::Initialize(std::move(applicationInstance));
 	};
 
 	void MainLoop::Run()
 	{
 		LogInfo("MainLoop", "Starting");
-
+    this->is_running = true;
 		while (is_running)
 		{
-			Tick();
+			this->Tick();
 		}
 
 	};

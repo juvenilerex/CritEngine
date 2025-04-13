@@ -21,7 +21,9 @@
 #include <EngineCore/Graphics/Texture.h>
 #include <EngineCore/Resource/Resource.h>
 #include <EngineCore/ECS/ECSManager.h>
+#include <EngineCore/ECS/Components/Spatial.h>
 #include <EngineCore/Profiler/Profiler.h>
+
 
 #include <imgui.h>
 
@@ -88,13 +90,6 @@ class Sandbox : public Engine::Application
 
 public:
 	// Components will be just data structures that inherit from the Component type. This is an example
-	struct Transform : ECS::Component {
-		float x, y;
-	};
-
-	struct Physics : ECS::Component {
-		float velocity = 0;
-	};
 
 	// Systems essentially add underlying behavior to components
 	class PhysicsSystem : public ECS::System {
@@ -104,12 +99,11 @@ public:
 
 		void Update() override {
 			// Get all instances of certain components throughout the manager
-			const auto& transforms = manager.GetAllComponents<Transform>();
-			const auto& physics = manager.GetAllComponents<Physics>();
+			const auto& primatives = manager.GetAllComponents<SpatialComponent>();
 
 			// Perform logic, make modifications, etc..
-			for (size_t i = 0; i < transforms.size(); i++) {
-				transforms[i]->x += physics[i]->velocity;
+			for (size_t i = 0; i < primatives.size(); i++) {
+				primatives[i]->position = primatives[i]->position + primatives[i]->velocity;
 			}
 		}
 	};
@@ -133,13 +127,10 @@ public:
 		player = manager.AddEntity();
 
 		// We simply add a component to an Entity. The component is automatically created and returned to us when this is called
-		auto transform = manager.AddComponent<Transform>(player);
+		auto primative = manager.AddComponent<SpatialComponent>(player);
 
-		transform->x = 2.0f;
-
-		auto physics = manager.AddComponent<Physics>(player);
-
-		physics->velocity = 1.5f;
+		primative->position.x = 2.0f;
+		primative->velocity.x = .025f;
 
 		//////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -152,7 +143,7 @@ public:
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
 
-		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -2), camera_rot));
+		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 
@@ -170,7 +161,7 @@ public:
 			{Engine::ShaderDataType::Float3, "aPos"},
 			{Engine::ShaderDataType::Float4, "aColor"},
 			{Engine::ShaderDataType::Float2, "aTexUV"},
-							});
+		});
 		squareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
@@ -220,24 +211,22 @@ public:
 		CE_PROFILE_FUNC("Update Loop");
 
 		manager.UpdateSystems();
-		auto transform = manager.GetComponent<Transform>(player);
-		Debug::Log("TransformComponent X: ", transform->x);
+		auto transform = manager.GetComponent<SpatialComponent>(player);
+		Debug::Log("TransformComponent Position: ", transform->position);
 
 		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
 		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
 		Engine::RenderCommand::Clear();
 
+		this->camera->SetAspectRatio(this->GetWindow().GetAspectRatio());
+
+
 		Engine::Renderer::BeginScene(this->camera);
 
 		// TODO: Abstract this behind some generalized object class?
 		this->shader->Bind();
-		this->shader->UploadUniformMat4("uModelProjection", Engine::Matrix4f({
-			cosf(time.count() * 1.5), 0, sinf(time.count() * 1.5), 0,
-			0, 1, 0, 0,
-			-sinf(time.count() * 1.5), 0, cosf(time.count() * 1.5), 0,
-			0, sinf(time.count() * 0.5), 0, 1
-		}));
+		this->shader->UploadUniformMat4("uModelProjection", transform->GetMatrix());
 
 		this->image->Bind(0);
 		Engine::Renderer::Submit(this->shader, this->squareVA);
