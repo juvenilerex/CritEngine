@@ -1,21 +1,6 @@
-#include "Transform.h"
+#include "Spatial.h"
 
-Engine::Matrix4f TransformComponent2D::GetMatrix()
-{
-	float a = this->rotation;
-	Engine::Vector2 p = this->position;
-
-	Engine::Matrix4f transform = Engine::Matrix4f({
-		cos(a), -sin(a), 0, 0,
-		sin(a), cos(a), 0, 0,
-		0, 0, 1, 0,
-		p.x, p.y, 0, 1
-	});
-
-	return transform;
-}
-
-Engine::Matrix4f TransformComponent3D::GetMatrix()
+Engine::Matrix4f SpatialComponent::GetMatrix()
 {
 	Engine::Quaternion q = this->rotation;
 	Engine::Vector3 p = this->position;

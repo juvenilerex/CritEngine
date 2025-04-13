@@ -2,22 +2,14 @@
 #include "../Component.h"
 #include "../../Math/Common.h"
 
-struct PhysicsComponent2D : ECS::Component
+struct SpatialComponent : ECS::Component
 {
-	Engine::Vector2 velocity;
-	Engine::Vector2 acceleration;
-	Engine::Vector2 centerOfMass;
-	float angularVelocity;
-	float angularAcceleration;
-	float mass;
-	float friction;
-	float elasticity;
-	float drag;
-	uint32_t collisionMask;
-};
+	// Transform
+	Engine::Quaternion rotation;
+	Engine::Vector3 position;
+	Engine::Vector3 scale;
 
-struct PhysicsComponent3D : ECS::Component
-{
+	// Physics
 	Engine::Vector3 velocity;
 	Engine::Vector3 acceleration;
 	Engine::Vector3 angularVelocity;
@@ -28,4 +20,7 @@ struct PhysicsComponent3D : ECS::Component
 	float elasticity;
 	float drag;
 	uint32_t collisionMask;
+
+
+	ENGINE_API Engine::Matrix4f GetMatrix();
 };
