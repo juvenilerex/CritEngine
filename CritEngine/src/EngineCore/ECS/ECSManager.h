@@ -1,7 +1,6 @@
+#pragma once
 #include "ECSCommon.h"
 
-#include <typeindex>
-#include <typeinfo>
 #include <unordered_map>
 #include <algorithm>
 #include <memory>
@@ -52,7 +51,7 @@ namespace Engine {
 		const std::vector<T*>& GetAllComponents() {
 			// This lets us reuse the same memory after every call inside a thread. This keeps us from having to redudantly allocate new std::vectors each frame
 			// This likely will need to be tweaked when multi-threading is implemented though or just a better method (such as views)
-			thread_local std::vector<T*> cache;
+			thread_local std::vector<T*> cache(512);
 			cache.clear();
 
 			for (const auto& cmp : components) {

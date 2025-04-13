@@ -21,20 +21,25 @@ namespace Engine {
 
 		ENGINE_API void TickInternal();
 		ENGINE_API void virtual Tick();
+		ENGINE_API void virtual OnGUIUpdate();
 		ENGINE_API void virtual OnInputEvent(Event& event);
+
+		ENGINE_API void ImGuiStartFrame();
+		ENGINE_API void ImGuiRender();
 
 		ENGINE_API void PushLayer(Layer* layer);
 		ENGINE_API void PushOverlay(Layer* overlay);
 
 		ENGINE_API void OnEvent(Event& event);
 
+		ENGINE_API void* GetImGuiContext();
 		ENGINE_API Window& GetWindow();
 		ENGINE_API InputListener& GetInput() const;
 
 		bool OnWindowResize(WindowResizeEvent& event);
 		bool OnWindowClose(WindowCloseEvent& event);
 
-	private:					
+	private:		
 		std::unique_ptr<Window> window = nullptr;
 		LayerStack layerStack;
 	};

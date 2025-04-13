@@ -1,9 +1,6 @@
 #pragma once
-
-#include <iostream>
 #include <functional>
 
-#include "../Core/Base.h"
 #include "../Logging/Logger.h"
 
 #define SET_EVENT_TYPE(type) static EventType GetStaticType() { return EventType::type; }\

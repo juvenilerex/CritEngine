@@ -12,9 +12,13 @@ namespace Engine {
 	public:
 
 		OpenGLContext(GLFWwindow* windowHandle);
+		~OpenGLContext();
 
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
+		virtual void InitImGui() override;
+		virtual void ImGuiStartFrame() override;
+		virtual void ImGuiRender() override;
 
 	private:
 		GLFWwindow* windowHandle;

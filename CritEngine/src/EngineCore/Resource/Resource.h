@@ -18,7 +18,7 @@ namespace Engine {
 
 		ENGINE_API ~Resource();
 
-		ENGINE_API std::shared_ptr<void> Get();
+		ENGINE_API std::shared_ptr<void> Get() const;
 
 		UUID id;
 		std::vector<UUID> dependencies;

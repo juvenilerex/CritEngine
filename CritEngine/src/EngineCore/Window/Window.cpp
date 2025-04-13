@@ -1,14 +1,11 @@
 #pragma once
 #include "Window.h"
-#include "../Graphics/OpenGL/OpenGLContext.h"
-#include "../Graphics/RenderContext.h"
-#include "../Event/WindowEvent.h"
+
 #include <GLFW/glfw3.h>
-#include <iostream>
 
 namespace Engine {
 
-	Window::Window(int width, int height, std::string title) 
+	Window::Window(const int width, const int height, const std::string& title)
 		: width(width), height(height)
 	{
 		bool success = glfwInit();
@@ -27,7 +24,7 @@ namespace Engine {
 		this->input = std::make_unique<InputListener>(this->GetHandle());
 		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
 		this->renderContext->Init();
-
+		this->renderContext->InitImGui();
 
 		glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* window)
 		{
@@ -69,6 +66,16 @@ namespace Engine {
 	void Window::SwapBuffers()
 	{
 		this->renderContext->SwapBuffers();
+	}
+
+	void Window::ImGuiStartFrame()
+	{
+		this->renderContext->ImGuiStartFrame();
+	}
+
+	void Window::ImGuiRender()
+	{
+		this->renderContext->ImGuiRender();
 	}
 
 	void Window::PollEvents()

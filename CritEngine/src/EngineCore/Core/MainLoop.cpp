@@ -11,8 +11,7 @@ namespace Engine {
 	void MainLoop::Run()
 	{
 		LogInfo("MainLoop", "Starting");
-		this->is_running = true;
-
+    this->is_running = true;
 		while (is_running)
 		{
 			this->Tick();
@@ -22,7 +21,7 @@ namespace Engine {
 
 	void MainLoop::Stop()
 	{
-		this->is_running = false;
+		is_running = false;
 	};
 
 	void MainLoop::Tick()

@@ -22,7 +22,10 @@
 #include <EngineCore/Resource/Resource.h>
 #include <EngineCore/ECS/ECSManager.h>
 #include <EngineCore/ECS/Components/Spatial.h>
+#include <EngineCore/Profiler/Profiler.h>
 
+
+#include <imgui.h>
 
 std::string vertexShaderSource = R"(
 	#version 460 core
@@ -110,9 +113,13 @@ public:
   
 	void Sandbox::Initialize()
 	{
+		// I've linked Sandbox with ImGui and this function will ensure that we use the instance inside the application rather than a new one.
+		// Without linking we'd have to make a metric ton of wrapper functions, so for now, this is a quick solution.
+		ImGui::SetCurrentContext((ImGuiContext*)this->GetImGuiContext());
   
-    // Register any systems we may want to. All systems will update every frame with UpdateSystems()
+		// Register any systems we may want to. All systems will update every frame with UpdateSystems()
 		// Return is optional
+		CE_PROFILE_MANUAL("Sandbox Initialization: ");
 		manager.RegisterSystem<PhysicsSystem>(manager);
 
 		// Add an Entity to the system. Entities are purely just an ID, and to keep track of them easily, AddEntity()
@@ -161,12 +168,15 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\32bpp-1x1.bmp");
+		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\steve\\Downloads\\bmptestsuite-0.9\\valid\\32bpp-1x1.bmp");
 
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
 		this->shader->Bind();
 		this->shader->UploadUniformInt("texture1", 0);
+
+		CE_PROFILE_MANUAL_STOP;
+
 	}
 
 	void OnInputEvent(Engine::Event& event) override {
@@ -188,9 +198,18 @@ public:
 		return true;
 	}
 
+	// For simplicity-sake and full control, we can make direct ImGui calls from here to design UI elements and do whatever
+	void OnGUIUpdate() override {
+		ImGui::Begin("Debug Window");
+		ImGui::Text("Hello, ImGui!");
+		ImGui::End();
+	}
+
 	void Tick() override
 	{	
 		// Testing our ECS 
+		CE_PROFILE_FUNC("Update Loop");
+
 		manager.UpdateSystems();
 		auto transform = manager.GetComponent<SpatialComponent>(player);
 		Debug::Log("TransformComponent Position: ", transform->position);
@@ -219,6 +238,7 @@ public:
 	{
 		LogWarning("Sandbox", "Destroyed!");
 	}
+
 private:
 
 	std::shared_ptr<Engine::Texture> image;
