@@ -128,7 +128,7 @@ public:
 
 		auto physics = manager.AddComponent<PhysicsComponent2D>(player);
 
-		physics->velocity = 1.5f;
+		physics->velocity = .025f;
 
 		//////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -141,7 +141,7 @@ public:
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
 
-		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -2), camera_rot));
+		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 
@@ -212,12 +212,7 @@ public:
 
 		// TODO: Abstract this behind some generalized object class?
 		this->shader->Bind();
-		this->shader->UploadUniformMat4("uModelProjection", Engine::Matrix4f({
-			cosf(time.count() * 1.5), 0, sinf(time.count() * 1.5), 0,
-			0, 1, 0, 0,
-			-sinf(time.count() * 1.5), 0, cosf(time.count() * 1.5), 0,
-			0, sinf(time.count() * 0.5), 0, 1
-		}));
+		this->shader->UploadUniformMat4("uModelProjection", transform->GetMatrix());
 
 		this->image->Bind(0);
 		Engine::Renderer::Submit(this->shader, this->squareVA);
