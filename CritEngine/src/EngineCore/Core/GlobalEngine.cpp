@@ -38,10 +38,11 @@ namespace Engine {
 	void GlobalEngine::Tick()
 	{
 		this->application->TickInternal();
-		this->application->Tick();
 		this->application->GetWindow().ImGuiStartFrame();
-		this->application->OnGUIUpdate();
+		this->application->Tick();
 		this->application->GetWindow().ImGuiRender();
+		//this->application->OnGUIUpdate();
+		
 	}
 
 	GlobalEngine::GlobalEngine()

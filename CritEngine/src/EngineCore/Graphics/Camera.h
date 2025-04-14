@@ -24,6 +24,11 @@ namespace Engine {
 		void SetNearPlane(float nearPlane);
 		void SetFarPlane(float farPlane);
 
+		void SetPosition(Vector3 position);
+		void SetRotation(Quaternion Rotation);
+		Vector3 GetPosition();
+		Quaternion GetRotation();
+
 	private:
 		Matrix4f viewMatrix = Matrix4f::Identity();
 		Matrix4f perspectiveMatrix = Matrix4f::Identity();
@@ -54,6 +59,11 @@ namespace Engine {
 		void SetAspectRatio(float aspectRatio);
 		void SetNearPlane(float nearPlane);
 		void SetFarPlane(float farPlane);
+
+		void SetPosition(Vector3 position);
+		void SetRotation(Quaternion Rotation);
+		Vector3 GetPosition();
+		Quaternion GetRotation();
 
 	private:
 		Matrix4f viewMatrix = Matrix4f::Identity();

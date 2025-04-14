@@ -19,6 +19,7 @@ namespace Engine {
 		this->windowHandle = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 		ASSERT(this->windowHandle, "Failed to create GLFW window!");
 
+		glfwSetInputMode(this->windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetWindowUserPointer(this->windowHandle, this);
 
 		this->input = std::make_unique<InputListener>(this->GetHandle());

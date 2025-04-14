@@ -87,6 +87,25 @@ namespace Engine {
 		this->farPlane = farPlane;
 		this->CalculatePerspectiveMatrix();
 	}
+	void PerspectiveCamera::SetPosition(Vector3 position)
+	{
+		this->position = position;
+		this->CalculateViewMatrix();
+	}
+	void PerspectiveCamera::SetRotation(Quaternion rotation)
+	{
+		this->rotation = rotation;
+		this->CalculateViewMatrix();
+	}
+
+	Vector3 PerspectiveCamera::GetPosition()
+	{
+		return this->position;
+	}
+	Quaternion PerspectiveCamera::GetRotation()
+	{
+		return this->rotation;
+	}
 
 	////////////////////////////////////////////////////////
 	//  Orthographic Camera  ///////////////////////////////
@@ -176,5 +195,24 @@ namespace Engine {
 	{
 		this->farPlane = farPlane;
 		this->CalculatePerspectiveMatrix();
+	}
+	void OrthographicCamera::SetPosition(Vector3 position)
+	{
+		this->position = position;
+		this->CalculateViewMatrix();
+	}
+	void OrthographicCamera::SetRotation(Quaternion rotation)
+	{
+		this->rotation = rotation;
+		this->CalculateViewMatrix();
+	}
+
+	Vector3 OrthographicCamera::GetPosition()
+	{
+		return this->position;
+	}
+	Quaternion OrthographicCamera::GetRotation()
+	{
+		return this->rotation;
 	}
 }

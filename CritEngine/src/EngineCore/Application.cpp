@@ -89,7 +89,6 @@ namespace Engine {
 		return true;
 	}
 
-	void Application::OnGUIUpdate() {}
 	void Application::OnInputEvent(Event& event) {}
 
 	void Application::Tick()

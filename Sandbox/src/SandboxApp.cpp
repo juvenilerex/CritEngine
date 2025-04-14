@@ -130,21 +130,18 @@ public:
 		// We simply add a component to an Entity. The component is automatically created and returned to us when this is called
 		auto primative = manager.AddComponent<SpatialComponent>(player);
 
-		primative->position.x = 2.0f;
-		primative->velocity.x = .025f;
+		primative->velocity.x = .0025f;
 
 		//////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 
 		PushLayer(new LayerTest());
 
-		this->start = std::chrono::high_resolution_clock::now();
-
 		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
 
-		this->camera.reset(new Engine::PerspectiveCamera(90, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
+		this->camera.reset(new Engine::PerspectiveCamera(30, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
 		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
 
@@ -169,7 +166,7 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\8bpp-320x240.bmp");
+		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\zenon.bmp");
 
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
@@ -184,6 +181,7 @@ public:
 
 		dispatcher.Dispatch<Engine::KeyPressedEvent>(BIND_EVENT_FUNC(this->TestKeys));
 		dispatcher.Dispatch<Engine::MousePressedEvent>(BIND_EVENT_FUNC(this->TestMouse));
+		dispatcher.Dispatch<Engine::MouseMovedEvent>(BIND_EVENT_FUNC(this->MoveCamera));
 
 	}
 
@@ -197,11 +195,19 @@ public:
 		return true;
 	}
 
-	// For simplicity-sake and full control, we can make direct ImGui calls from here to design UI elements and do whatever
-	void OnGUIUpdate() override {
-		ImGui::Begin("Debug Window");
-		ImGui::Text("Hello, ImGui!");
-		ImGui::End();
+	bool MoveCamera(Engine::MouseMovedEvent& event)
+	{
+		if (this->prevCursorPos.x == 0 && this->prevCursorPos.y == 0)
+		{
+			this->prevCursorPos = event.GetCurPos();
+		}
+		Engine::Vector2 velocity = (this->prevCursorPos - event.GetCurPos()) / 1000.f;
+		Debug::Log(velocity);
+
+		this->camera->SetRotation(Engine::Quaternion::FromEulerAngles(Engine::Vector3(velocity.y, 0, 0)) * this->camera->GetRotation() * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, velocity.x, 0)));
+		
+		this->prevCursorPos = event.GetCurPos();
+		return true;
 	}
 
 	void Tick() override
@@ -211,15 +217,15 @@ public:
 
 		manager.UpdateSystems();
 		auto transform = manager.GetComponent<SpatialComponent>(player);
-		Debug::Log("TransformComponent Position: ", transform->position);
-
-		const std::chrono::duration<float> time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
 		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
 		Engine::RenderCommand::Clear();
 
 		this->camera->SetAspectRatio(this->GetWindow().GetAspectRatio());
 
+		ImGui::Begin("Debug Window");
+		ImGui::Text("TransformComponent Position: %f, %f, %f", transform->position.x, transform->position.y, transform->position.z);
+		ImGui::End();
 
 		Engine::Renderer::BeginScene(this->camera);
 		
@@ -245,7 +251,7 @@ private:
 	std::shared_ptr<Engine::Shader> shader;
 	std::shared_ptr<Engine::VertexArray> squareVA;
 	std::shared_ptr<Engine::PerspectiveCamera> camera;
-	std::chrono::time_point<std::chrono::high_resolution_clock> start;
+	Engine::Vector2 prevCursorPos;
 };
 
 
