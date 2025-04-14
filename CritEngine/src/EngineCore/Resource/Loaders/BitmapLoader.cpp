@@ -107,7 +107,7 @@ namespace Engine {
 
 	std::shared_ptr<void> BitmapLoader::Load(std::filesystem::path filepath)
 	{
-		CE_PROFILE_FUNC("Load Bitmap");
+		CE_PROFILE_FUNC(Load_Bitmap);
 		FileAccessor file = FileAccessor();
 		file.OpenFile(filepath);
 

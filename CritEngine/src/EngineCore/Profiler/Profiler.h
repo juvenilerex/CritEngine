@@ -1,9 +1,9 @@
 #pragma once
 
 #ifdef CE_DEBUG
-	#define CE_PROFILE_MANUAL(name) Engine::Profile _profilenow(name);
-	#define CE_PROFILE_MANUAL_STOP _profilenow.Stop();
-	#define CE_PROFILE_FUNC(name) Engine::ScopedProfile _scopedprofile(name);
+    #define CE_PROFILE_MANUAL(name) Engine::Profile _profile##name(#name);
+	#define CE_PROFILE_MANUAL_STOP(name) _profile##name.Stop();
+    #define CE_PROFILE_FUNC(name) Engine::ScopedProfile _scopedprofile##name(#name);
 #endif
 
 namespace Engine {

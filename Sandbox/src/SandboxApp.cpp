@@ -117,6 +117,8 @@ public:
 		// Without linking we'd have to make a metric ton of wrapper functions, so for now, this is a quick solution.
 		ImGui::SetCurrentContext((ImGuiContext*)this->GetImGuiContext());
   
+		CE_PROFILE_FUNC(SandboxInitialization);
+
 		// Register any systems we may want to. All systems will update every frame with UpdateSystems()
 		// Return is optional
 		CE_PROFILE_MANUAL("Sandbox Initialization: ");
@@ -208,7 +210,7 @@ public:
 	void Tick() override
 	{	
 		// Testing our ECS 
-		CE_PROFILE_FUNC("Update Loop");
+		CE_PROFILE_FUNC(UpdateLoop);
 
 		manager.UpdateSystems();
 		auto transform = manager.GetComponent<SpatialComponent>(player);
@@ -223,7 +225,7 @@ public:
 
 
 		Engine::Renderer::BeginScene(this->camera);
-
+		
 		// TODO: Abstract this behind some generalized object class?
 		this->shader->Bind();
 		this->shader->UploadUniformMat4("uModelProjection", transform->GetMatrix());
