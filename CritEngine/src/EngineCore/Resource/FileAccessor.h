@@ -32,7 +32,7 @@ namespace Engine {
         void Seek(const uint64_t offset);
         void SeekEnd();
 
-        std::vector<uint8_t> ReadBuffer(uint64_t size);
+        void ReadBuffer(uint8_t* dest, uint64_t size);
 
         uint8_t ReadUINT8();
         uint16_t ReadUINT16();

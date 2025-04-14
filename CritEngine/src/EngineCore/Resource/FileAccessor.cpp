@@ -1,5 +1,6 @@
 ﻿#include "FileAccessor.h"
 #include "../Logging/Logger.h"
+#include "../Profiler/Profiler.h"
 
 namespace Engine {
 
@@ -169,16 +170,12 @@ namespace Engine {
         return offset <= this->buffer.size();
     }
 
-    std::vector<uint8_t> FileAccessor::ReadBuffer(uint64_t size)
+    void FileAccessor::ReadBuffer(uint8_t* dest, uint64_t size)
     {
+        //CE_PROFILE_FUNC(ReadBufferDataAssert);
         ASSERT(CheckReadBounds(size), "Can not read out of buffer's bounds");
-
-        std::vector<uint8_t> slice = std::vector<uint8_t>();
-        slice.resize(size);
-
-        std::memcpy(slice.data(), this->buffer.data() + this->position, size);
+        std::memcpy(dest, this->buffer.data() + this->position, size);
         this->position += size;
-        return slice;
     }
 
 } 
