@@ -307,7 +307,7 @@ namespace Engine {
 		// Prepare for processing color data.
 		std::vector<char> image = std::vector<char>();
 		image.resize(std::abs(bitmapHeader.width) * std::abs(bitmapHeader.height) * 4);
-		std::array<char, 4> rawColorData = { 0, 0, 0, 0 };
+		std::array<uint8_t, 4> rawColorData = { 0, 0, 0, 0 };
 
 		float uint32RowSize = ((float)bitmapHeader.width * ((float)bitmapHeader.bitCount / 8)) / sizeof(uint32_t);
 		uint8_t rowPadding = (uint8_t)((std::ceil(uint32RowSize) - uint32RowSize) * sizeof(uint32_t));
@@ -363,7 +363,7 @@ namespace Engine {
 					{
 						if (x % 8 == 0)
 						{
-							rawColorData[0] = file.ReadUINT8();
+							file.ReadBuffer(rawColorData.data(), 1);
 						}
 
 						uint8_t mask = 0b10000000;
@@ -387,7 +387,7 @@ namespace Engine {
 					{
 						if (x % 2 == 0)
 						{
-							rawColorData[0] = file.ReadUINT8();
+							file.ReadBuffer(rawColorData.data(), 1);
 						}
 
 						uint8_t mask = 0b11110000;
@@ -411,18 +411,12 @@ namespace Engine {
 				{
 					for (uint32_t x = 0; x < (uint32_t)abs(bitmapHeader.width); x++)
 					{
-						rawColorData[0] = file.ReadUINT8();
+						file.ReadBuffer(rawColorData.data(), 1);
 
-						uint8_t mask = 0b11110000;
-
-						mask >>= bitmapHeader.bitCount * (x % 2);
-
-						uint8_t filteredIndex = (rawColorData[0] & mask) >> (bitmapHeader.bitCount * ((x + 1) % 2));
-
-						image[(x + bitmapHeader.width * y) * 4] = colorPalette[filteredIndex].red;
-						image[(x + bitmapHeader.width * y) * 4 + 1] = colorPalette[filteredIndex].green;
-						image[(x + bitmapHeader.width * y) * 4 + 2] = colorPalette[filteredIndex].blue;
-						image[(x + bitmapHeader.width * y) * 4 + 3] = colorPalette[filteredIndex].alpha;
+						image[(x + bitmapHeader.width * y) * 4] = colorPalette[rawColorData[0]].red;
+						image[(x + bitmapHeader.width * y) * 4 + 1] = colorPalette[rawColorData[0]].green;
+						image[(x + bitmapHeader.width * y) * 4 + 2] = colorPalette[rawColorData[0]].blue;
+						image[(x + bitmapHeader.width * y) * 4 + 3] = colorPalette[rawColorData[0]].alpha;
 					}
 					file.Seek(file.GetPosition() + rowPadding);
 				}
@@ -434,8 +428,7 @@ namespace Engine {
 				{
 					for (uint32_t x = 0; x < (uint32_t)abs(bitmapHeader.width); x++)
 					{
-						rawColorData[0] = file.ReadUINT8();
-						rawColorData[1] = file.ReadUINT8();
+						file.ReadBuffer(rawColorData.data(), 2);
 
 						uint16_t color =
 							rawColorData[1] << 8 |
@@ -457,9 +450,12 @@ namespace Engine {
 				{
 					for (uint32_t x = 0; x < (uint32_t)abs(bitmapHeader.width); x++)
 					{
-						rawColorData[0] = file.ReadUINT8();
-						rawColorData[1] = file.ReadUINT8();
-						rawColorData[2] = file.ReadUINT8();
+						file.ReadBuffer(rawColorData.data(), 3);
+
+						image[(x + bitmapHeader.width * y) * 4] = rawColorData[2];
+						image[(x + bitmapHeader.width * y) * 4 + 1] = rawColorData[1];
+						image[(x + bitmapHeader.width * y) * 4 + 2] = rawColorData[0];
+						image[(x + bitmapHeader.width * y) * 4 + 3] = (uint8_t)0xFF;
 
 						if (useDefaultBitMask)
 						{
@@ -491,10 +487,7 @@ namespace Engine {
 				{
 					for (uint32_t x = 0; x < (uint32_t)abs(bitmapHeader.width); x++)
 					{
-						rawColorData[0] = file.ReadUINT8();
-						rawColorData[1] = file.ReadUINT8();
-						rawColorData[2] = file.ReadUINT8();
-						rawColorData[3] = file.ReadUINT8();
+						file.ReadBuffer(rawColorData.data(), 4);
 
 						if (useDefaultBitMask)
 						{
