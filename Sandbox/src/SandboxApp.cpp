@@ -102,10 +102,17 @@ public:
 			const auto& primatives = manager.GetAllComponents<SpatialComponent>();
 
 			// Perform logic, make modifications, etc..
+			const std::chrono::time_point<std::chrono::high_resolution_clock> curTime = std::chrono::high_resolution_clock::now();
+			const std::chrono::duration<float> deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - this->prevTime);
 			for (size_t i = 0; i < primatives.size(); i++) {
-				primatives[i]->position = primatives[i]->position + primatives[i]->velocity;
+				primatives[i]->rotation = primatives[i]->rotation * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, (deltaTime.count() * 10.f), 0));
+				
+				primatives[i]->position.y = sinf(std::chrono::duration_cast<std::chrono::milliseconds>(curTime - this->startTime).count() * 0.001f);
 			}
+			this->prevTime = curTime;
 		}
+		std::chrono::time_point<std::chrono::high_resolution_clock> prevTime = std::chrono::high_resolution_clock::now();
+		std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
 	};
 
 	Engine::ECSManager manager;
@@ -204,6 +211,7 @@ public:
 		Engine::Vector2 velocity = (this->prevCursorPos - event.GetCurPos()) / 1000.f;
 		Debug::Log(velocity);
 
+		// Prevent roll by separating yaw and pitch rotations in the multiplication order.
 		this->camera->SetRotation(Engine::Quaternion::FromEulerAngles(Engine::Vector3(velocity.y, 0, 0)) * this->camera->GetRotation() * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, velocity.x, 0)));
 		
 		this->prevCursorPos = event.GetCurPos();
