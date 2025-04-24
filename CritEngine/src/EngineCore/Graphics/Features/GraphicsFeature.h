@@ -14,7 +14,7 @@ namespace Engine {
 	class GraphicsFeature
 	{
 	public:
-		GraphicsFeature::GraphicsFeature(GraphicsFeatureSupport supportLevel);
+		GraphicsFeature(GraphicsFeatureSupport supportLevel = GraphicsFeatureSupport::Unsupported);
 
 		GraphicsFeatureSupport GetSupportLevel();
 	private:
