@@ -277,7 +277,7 @@ namespace Engine {
 		}
 		// Read color palette data if applicable.
 
-		uint8_t colorPaletteSize = (fileHeader.bitmapOffset - 14 - bitmapHeader.headerSize) / sizeof(bitmapHeader.headerSize == BITMAPCOREHEADER ? 3 : 4);
+		uint8_t colorPaletteSize = static_cast<uint8_t>((fileHeader.bitmapOffset - 14 - bitmapHeader.headerSize) / sizeof(bitmapHeader.headerSize == BITMAPCOREHEADER ? 3 : 4));
 
 		std::array<ColorPalette, 256> colorPalette = std::array<ColorPalette, 256>();
 		if (bitmapHeader.bitCount <= 8)
@@ -435,9 +435,9 @@ namespace Engine {
 							rawColorData[0];
 
 						// Currently Colors aren't normalized to RGBA8
-						image[(x + bitmapHeader.width * y) * 4] = ((color >> greenBitMaskOffset) & bitmapHeader.redBitMask >> 32 - bitmapHeader.bitCount);
-						image[(x + bitmapHeader.width * y) * 4 + 1] = ((color >> blueBitMaskOffset) & bitmapHeader.greenBitMask >> 32 - bitmapHeader.bitCount);
-						image[(x + bitmapHeader.width * y) * 4 + 2] = ((color >> 0) & bitmapHeader.blueBitMask >> 32 - bitmapHeader.bitCount);
+						image[(x + bitmapHeader.width * y) * 4] = (((color >> greenBitMaskOffset) & bitmapHeader.redBitMask) >> (32 - bitmapHeader.bitCount));
+						image[(x + bitmapHeader.width * y) * 4 + 1] = (((color >> blueBitMaskOffset) & bitmapHeader.greenBitMask) >> (32 - bitmapHeader.bitCount));
+						image[(x + bitmapHeader.width * y) * 4 + 2] = (((color >> 0) & bitmapHeader.blueBitMask) >> (32 - bitmapHeader.bitCount));
 						image[(x + bitmapHeader.width * y) * 4 + 3] = 0;
 					}
 					file.Seek(file.GetPosition() + rowPadding);
@@ -451,11 +451,6 @@ namespace Engine {
 					for (uint32_t x = 0; x < (uint32_t)abs(bitmapHeader.width); x++)
 					{
 						file.ReadBuffer(rawColorData.data(), 3);
-
-						image[(x + bitmapHeader.width * y) * 4] = rawColorData[2];
-						image[(x + bitmapHeader.width * y) * 4 + 1] = rawColorData[1];
-						image[(x + bitmapHeader.width * y) * 4 + 2] = rawColorData[0];
-						image[(x + bitmapHeader.width * y) * 4 + 3] = (uint8_t)0xFF;
 
 						if (useDefaultBitMask)
 						{

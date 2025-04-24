@@ -187,7 +187,7 @@ namespace Engine {
 	// This function is not tested, once a renderer has been built, test this function for its correctness.
 	Quaternion Quaternion::SquadSpline(const std::vector<Quaternion>& spline, float alpha)
 	{
-		int startIndex = (spline.size() - 1) * alpha;
+		int startIndex = static_cast<int>((spline.size() - 1) * alpha);
 		if (startIndex == spline.size()) startIndex--;
 		int endIndex = startIndex + 1;
 

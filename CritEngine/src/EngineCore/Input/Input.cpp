@@ -55,8 +55,8 @@ namespace Engine {
     {
         if (CurPos.x != xpos || CurPos.y != ypos) {
             PrevCurPos = CurPos;
-            CurPos.x = xpos;
-            CurPos.y = ypos;
+            CurPos.x = static_cast<float>(xpos);
+            CurPos.y = static_cast<float>(ypos);
             CurPosChanged = true;
         }
         else {

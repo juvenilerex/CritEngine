@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Logging/Logger.h"
-#include "Event.h";
+#include "Event.h"
 
 namespace Engine {
 
@@ -53,7 +53,7 @@ namespace Engine {
 
 	class MouseMovedEvent : public MouseEvent {
 	public:
-		MouseMovedEvent(const double xpos, const double ypos) { SetCurPos(Vector2(xpos, ypos)); }
+		MouseMovedEvent(const float xpos, const float ypos) { SetCurPos(Vector2(xpos, ypos)); }
 
 		void Print() const override {
 			Debug::Log("MouseMovedEvent:", this->position);

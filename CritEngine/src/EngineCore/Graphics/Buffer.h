@@ -35,9 +35,9 @@ namespace Engine {
 	struct BufferElement
 	{
 		std::string name;
-		ShaderDataType type;
+		uintptr_t offset;
 		uint32_t size;
-		uint32_t offset;
+		ShaderDataType type;
 		bool normalized;
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)

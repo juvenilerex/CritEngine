@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Logging/Logger.h"
-#include "Event.h";
+#include "Event.h"
 
 namespace Engine {
 
