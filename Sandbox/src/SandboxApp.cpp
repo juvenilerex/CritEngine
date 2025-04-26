@@ -18,7 +18,7 @@
 #include <EngineCore/Graphics/Renderer.h>
 #include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
-#include <EngineCore/Graphics/Texture.h>
+#include <EngineCore/Graphics/PIL/Texture.h>
 #include <EngineCore/Resource/Resource.h>
 #include <EngineCore/ECS/ECSManager.h>
 #include <EngineCore/ECS/Components/Spatial.h>
@@ -150,7 +150,7 @@ public:
 
 		this->camera.reset(new Engine::PerspectiveCamera(30, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
-		this->shader.reset(new Engine::Shader(vertexShaderSource, fragmentShaderSource));
+		this->shader = Engine::Shader::Create(vertexShaderSource, fragmentShaderSource);
 
 		this->squareVA = Engine::VertexArray::Create();
 

@@ -1,9 +1,10 @@
 #pragma once
 
 #include "../RenderContext.h"
-#include "../../Window/Window.h"
+#include "../../../Window/Window.h"
 
-struct GLFWwindow;
+#include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_glfw.h>
 
 namespace Engine {
 
@@ -19,8 +20,5 @@ namespace Engine {
 		virtual void InitImGui() override;
 		virtual void ImGuiStartFrame() override;
 		virtual void ImGuiRender() override;
-
-	private:
-		GLFWwindow* windowHandle;
 	};
 }

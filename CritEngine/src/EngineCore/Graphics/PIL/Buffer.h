@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "../Logging/Logger.h"
+#include "../../Core/Base.h"
+#include "../../Logging/Logger.h"
 
 namespace Engine {
 

@@ -1,11 +1,8 @@
 #pragma once
 
 #include "../Event/Event.h"
-#include "../Graphics/RenderContext.h"
 #include "../Graphics/Renderer.h"
-#ifdef CE_RENDERER_OPENGL4
-	#include "../Graphics/OpenGL/OpenGLContext.h"
-#endif
+#include "../Graphics/PIL/RenderContext.h"
 #include "../Input/Input.h"
 #include "../Event/WindowEvent.h"
 
@@ -45,7 +42,7 @@ namespace Engine {
 
 		GLFWwindow* windowHandle = nullptr;
 		std::unique_ptr<InputListener> input = nullptr;
-		std::unique_ptr<RenderContext> renderContext = nullptr;
+		std::shared_ptr<RenderContext> renderContext = nullptr;
 		int width, height;
 		
 	};

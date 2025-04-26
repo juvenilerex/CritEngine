@@ -2,6 +2,8 @@
 #include "Logging/Logger.h"
 #include "Core/GlobalEngine.h"
 
+#include <backends/imgui_impl_glfw.h>
+
 namespace Engine {
 
 	Application::Application()

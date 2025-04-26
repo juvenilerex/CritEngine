@@ -2,7 +2,7 @@
 
 #include "../ResourceLoader.h"
 #include "../FileAccessor.h"
-#include "../../Graphics/Texture.h"
+#include "../../Graphics/PIL/Texture.h"
 
 namespace Engine {
 
@@ -16,7 +16,6 @@ namespace Engine {
 		virtual std::string GetResourceType() override;
 		virtual std::shared_ptr<void> Load(std::filesystem::path filepath) override;		
 		
-
 	};
 
 }

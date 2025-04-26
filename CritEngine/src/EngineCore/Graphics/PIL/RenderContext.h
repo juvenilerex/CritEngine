@@ -1,19 +1,22 @@
 #pragma once
 
-#ifdef CE_RENDERER_OPENGL4
-#include "backends/imgui_impl_opengl3.h"
-#include "backends/imgui_impl_glfw.h"
-#endif
+#include "../../Core/Base.h"
+
+struct GLFWwindow;
 
 namespace Engine {
 
 	class RenderContext
 	{
 	public:
+		ENGINE_API static std::shared_ptr<RenderContext> Create(GLFWwindow* windowHandle);
+
 		virtual void Init() = 0;
 		virtual void SwapBuffers() = 0;
 		virtual void InitImGui() = 0;
 		virtual void ImGuiStartFrame() = 0;
 		virtual void ImGuiRender() = 0;
+	protected:
+		GLFWwindow* windowHandle;
 	};
 }

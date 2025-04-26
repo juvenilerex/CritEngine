@@ -7,9 +7,8 @@
 namespace Engine {
 
 	OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
-		: windowHandle(windowHandle)
 	{
-
+		this->windowHandle = windowHandle;
 	}
 
 	OpenGLContext::~OpenGLContext()

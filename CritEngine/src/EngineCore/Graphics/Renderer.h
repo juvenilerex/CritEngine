@@ -2,10 +2,11 @@
 
 #include "Scene.h"
 #include "Camera.h"
-#include "Shader.h"
-#include "Buffer.h"
-#include "VertexArray.h"
 #include "RenderCommand.h"
+
+#include "PIL/Shader.h"
+#include "PIL/Buffer.h"
+#include "PIL/VertexArray.h"
 
 namespace Engine {
 

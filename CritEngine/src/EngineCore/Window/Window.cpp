@@ -23,7 +23,7 @@ namespace Engine {
 		glfwSetWindowUserPointer(this->windowHandle, this);
 
 		this->input = std::make_unique<InputListener>(this->GetHandle());
-		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
+		this->renderContext = RenderContext::Create(this->GetHandle());
 		this->renderContext->Init();
 		this->renderContext->InitImGui();
 
