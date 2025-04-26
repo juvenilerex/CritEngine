@@ -45,8 +45,7 @@ project "CritEngine"
 		defines 
 		{
 			"ENGINE_BUILD_DLL",
-			"CE_PLATFORM_WINDOWS",
-			"CE_RENDERER_OPENGL4"
+			"CE_PLATFORM_WINDOWS"
 		}
 
 	filter "configurations:Debug"
