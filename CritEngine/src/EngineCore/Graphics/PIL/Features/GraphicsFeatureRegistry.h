@@ -8,8 +8,11 @@ namespace Engine {
 
 	enum GraphicsFeatureType : uint8_t
 	{
-		VertexBuffer,
-		IndexBuffer,
+		//Pipeline State
+		DynamicBlendState,
+		StaticBlendState,
+		DynamicPrimitiveModeState,
+		StaticPrimitiveModeState,
 		SIZE
 	};
 

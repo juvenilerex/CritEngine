@@ -237,11 +237,12 @@ public:
 
 		Engine::Renderer::BeginScene(this->camera);
 		
-		// TODO: Abstract this behind some generalized object class?
+		// TODO: Abstract this behind some type of material class?
 		this->shader->Bind();
 		this->shader->UploadUniformMat4("uModelProjection", transform->GetMatrix());
 
 		this->image->Bind(0);
+		//
 		Engine::Renderer::Submit(this->shader, this->squareVA);
 
 		Engine::Renderer::EndScene();

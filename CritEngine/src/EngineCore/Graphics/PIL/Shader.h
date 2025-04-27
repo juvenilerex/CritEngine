@@ -5,10 +5,23 @@
 
 
 namespace Engine {
+
+	enum ShaderType : uint8_t
+	{
+		Vertex,
+		Fragment,
+		Geometry,
+		Mesh,
+		Task,
+		TessellationControl,
+		TessellationEvaluation,
+		Compute
+	};
+
 	class Shader
 	{
 	public:
-		ENGINE_API static std::shared_ptr<Shader> Create(const std::string& vertexSource, const std::string& fragmentSource);
+		ENGINE_API static std::shared_ptr<Shader> Create(const std::string& glslSource, const ShaderType shaderType);
 
 		virtual ~Shader() {};
 

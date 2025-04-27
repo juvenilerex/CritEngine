@@ -6,7 +6,7 @@ namespace Engine {
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const std::string& vertexSource, const std::string& fragmentSource);
+		OpenGLShader(const std::string& glslSource, const ShaderType shaderType);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;

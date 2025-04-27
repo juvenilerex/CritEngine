@@ -7,55 +7,51 @@
 
 
 namespace Engine {
-	OpenGLShader::OpenGLShader(const std::string& vertexSource, const std::string& fragmentSource)
+
+	uint32_t EngineShaderTypeToOpenGLShaderType(ShaderType shaderType)
+	{
+		switch (shaderType)
+		{
+			case ShaderType::Vertex: return GL_VERTEX_SHADER;
+			case ShaderType::Fragment: return GL_FRAGMENT_SHADER;
+			case ShaderType::Geometry: return GL_GEOMETRY_SHADER;
+			case ShaderType::TessellationControl: return GL_TESS_CONTROL_SHADER;
+			case ShaderType::TessellationEvaluation: return GL_TESS_EVALUATION_SHADER;
+			case ShaderType::Compute: return GL_COMPUTE_SHADER;
+			default: return GL_NONE;
+		}
+	}
+
+	OpenGLShader::OpenGLShader(const std::string& glslSource, const ShaderType shaderType)
 		: shaderID(0)
 	{
-		uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		const char* source = vertexSource.c_str();
-		glShaderSource(vertexShader, 1, &source, 0);
-		glCompileShader(vertexShader);
+		ASSERT(shaderType != ShaderType::Task && shaderType != ShaderType::Mesh, "OpenGL doesn't support Task & Mesh Shaders!");
+
+		uint32_t shader = glCreateShader(EngineShaderTypeToOpenGLShaderType(shaderType));
+		const char* source = glslSource.c_str();
+		glShaderSource(shader, 1, &source, 0);
+		glCompileShader(shader);
 
 		int32_t isCompiled = 0;
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
 		if (isCompiled == false)
 		{
 			int32_t maxMessageLength = 0;
-			glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &maxMessageLength);
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxMessageLength);
 
 			std::vector<char> infoLog(maxMessageLength);
-			glGetShaderInfoLog(vertexShader, maxMessageLength, &maxMessageLength, &infoLog[0]);
+			glGetShaderInfoLog(shader, maxMessageLength, &maxMessageLength, &infoLog[0]);
 
-			glDeleteShader(vertexShader);
+			glDeleteShader(shader);
 
-			LogError("OpenGL", "Vertex Shader Compilation Failure!");
+			LogError("OpenGL", "Shader Compilation Failure!");
 			LogError("OpenGL", std::string(infoLog.begin(), infoLog.end()));
 
 			return;
 		}
 
-		uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		source = fragmentSource.c_str();
-		glShaderSource(fragmentShader, 1, &source, 0);
-		glCompileShader(fragmentShader);
-
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isCompiled);
-		if (isCompiled == false)
-		{
-			int32_t maxMessageLength = 0;
-			glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &maxMessageLength);
-
-			std::vector<char> infoLog(maxMessageLength);
-			glGetShaderInfoLog(fragmentShader, maxMessageLength, &maxMessageLength, &infoLog[0]);
-
-			glDeleteShader(fragmentShader);
-			glDeleteShader(vertexShader);
-
-			LogError("OpenGL", "Fragment Shader Compilation Failure!");
-			LogError("OpenGL", std::string(infoLog.begin(), infoLog.end()));
-
-			return;
-		}
-
+		// TODO: This functionality is best suited for an OpenGL pipeline object.
+		/*
 		uint32_t program = glCreateProgram();
 		this->shaderID = program;
 
@@ -86,7 +82,7 @@ namespace Engine {
 
 		glDetachShader(program, vertexShader);
 		glDetachShader(program, fragmentShader);
-
+		*/
 	}
 	OpenGLShader::~OpenGLShader()
 	{
