@@ -8,11 +8,24 @@ namespace Engine {
 
 	enum GraphicsFeatureType : uint8_t
 	{
-		//Pipeline State
-		DynamicBlendState,
-		StaticBlendState,
-		DynamicPrimitiveModeState,
-		StaticPrimitiveModeState,
+		PipelineDynamicStateViewport,
+		PipelineStaticStateViewport,
+		PipelineDynamicStateScissor,
+		PipelineStaticStateScissor,
+		PipelineDynamicStateLineWidth,
+		PipelineStaticStateLineWidth,
+		PipelineDynamicStateDepthBias,
+		PipelineStaticStateDepthBias,
+		PipelineDynamicStateBlendConstants,
+		PipelineStaticStateBlendConstants,
+		PipelineDynamicStateDepthBounds,
+		PipelineStaticStateDepthBounds,
+		PipelineDynamicStateStencilCompareMask,
+		PipelineStaticStateStencilCompareMask,
+		PipelineDynamicStateStencilWriteMask,
+		PipelineStaticStateStencilWriteMask,
+		PipelineDynamicStateStencilReference,
+		PipelineStaticStateStencilReference,
 		SIZE
 	};
 

@@ -173,7 +173,7 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\zenon.bmp");
+		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\Aegis_Jockey_.bmp");
 
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
