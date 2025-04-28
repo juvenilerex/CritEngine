@@ -19,6 +19,7 @@
 #include <EngineCore/Graphics/Scene.h>
 #include <EngineCore/Graphics/Camera.h>
 #include <EngineCore/Graphics/PIL/Texture.h>
+#include <EngineCore/Graphics/PIL/Pipeline.h>
 #include <EngineCore/Resource/Resource.h>
 #include <EngineCore/ECS/ECSManager.h>
 #include <EngineCore/ECS/Components/Spatial.h>
@@ -75,7 +76,7 @@ public:
 	}
 
 	void OnUpdate() override {
-//		LogInfo("ExampleLayer", "Update");
+		//LogInfo("ExampleLayer", "Update");
 	}
 	
 	void OnEvent(Engine::Event& event) override {
@@ -120,11 +121,10 @@ public:
   
 	void Sandbox::Initialize()
 	{
-		// I've linked Sandbox with ImGui and this function will ensure that we use the instance inside the application rather than a new one.
-		// Without linking we'd have to make a metric ton of wrapper functions, so for now, this is a quick solution.
-		ImGui::SetCurrentContext((ImGuiContext*)this->GetImGuiContext());
-  
 		CE_PROFILE_FUNC(SandboxInitialization);
+
+		this->window = Engine::GlobalEngine::Get().GetWindowManager().CreateWindow(800, 600, "Sandbox");
+		std::shared_ptr<Engine::Window> window = this->window.lock();
 
 		// Register any systems we may want to. All systems will update every frame with UpdateSystems()
 		// Return is optional
@@ -135,9 +135,9 @@ public:
 		player = manager.AddEntity();
 
 		// We simply add a component to an Entity. The component is automatically created and returned to us when this is called
-		auto primative = manager.AddComponent<SpatialComponent>(player);
+		auto primitive = manager.AddComponent<SpatialComponent>(player);
 
-		primative->velocity.x = .0025f;
+		primitive->velocity.x = .0025f;
 
 		//////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -148,9 +148,12 @@ public:
 
 		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
 
-		this->camera.reset(new Engine::PerspectiveCamera(30, this->GetWindow().GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
+		this->camera.reset(new Engine::PerspectiveCamera(30, window->GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
-		this->shader = Engine::Shader::Create(vertexShaderSource, fragmentShaderSource);
+		std::shared_ptr<Engine::Shader> fragmentShader = Engine::Shader::Create(fragmentShaderSource, Engine::ShaderType::Fragment);
+		std::shared_ptr<Engine::Shader> vertexShader = Engine::Shader::Create(vertexShaderSource, Engine::ShaderType::Vertex);
+
+		this->program = Engine::Pipeline::Create(vertexShader, fragmentShader);
 
 		this->squareVA = Engine::VertexArray::Create();
 
@@ -177,18 +180,8 @@ public:
 
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
-		this->shader->Bind();
-		this->shader->UploadUniformInt("texture1", 0);
-
-	}
-
-	void OnInputEvent(Engine::Event& event) override {
-
-		Engine::EventDispatcher dispatcher(event);
-
-		dispatcher.Dispatch<Engine::KeyPressedEvent>(BIND_EVENT_FUNC(this->TestKeys));
-		dispatcher.Dispatch<Engine::MousePressedEvent>(BIND_EVENT_FUNC(this->TestMouse));
-		dispatcher.Dispatch<Engine::MouseMovedEvent>(BIND_EVENT_FUNC(this->MoveCamera));
+		this->program->Bind();
+		this->program->UploadUniformInt("texture1", 0);
 
 	}
 
@@ -222,6 +215,7 @@ public:
 	{	
 		// Testing our ECS 
 		CE_PROFILE_FUNC(UpdateLoop);
+		std::shared_ptr<Engine::Window> window = this->window.lock();
 
 		manager.UpdateSystems();
 		auto transform = manager.GetComponent<SpatialComponent>(player);
@@ -229,21 +223,20 @@ public:
 		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
 		Engine::RenderCommand::Clear();
 
-		this->camera->SetAspectRatio(this->GetWindow().GetAspectRatio());
+		this->camera->SetAspectRatio(window->GetAspectRatio());
 
-		ImGui::Begin("Debug Window");
-		ImGui::Text("TransformComponent Position: %f, %f, %f", transform->position.x, transform->position.y, transform->position.z);
-		ImGui::End();
+		//ImGui::Begin("Debug Window");
+		//ImGui::Text("TransformComponent Position: %f, %f, %f", transform->position.x, transform->position.y, transform->position.z);
+		//ImGui::End();
 
 		Engine::Renderer::BeginScene(this->camera);
 		
-		// TODO: Abstract this behind some type of material class?
-		this->shader->Bind();
-		this->shader->UploadUniformMat4("uModelProjection", transform->GetMatrix());
+		this->program->Bind();
+		this->program->UploadUniformMat4("uModelProjection", transform->GetMatrix());
 
 		this->image->Bind(0);
 		//
-		Engine::Renderer::Submit(this->shader, this->squareVA);
+		Engine::Renderer::Submit(this->program, this->squareVA);
 
 		Engine::Renderer::EndScene();
 	}
@@ -255,9 +248,11 @@ public:
 
 private:
 
+	std::weak_ptr<Engine::Window> window;
+
 	std::shared_ptr<Engine::Texture> image;
 
-	std::shared_ptr<Engine::Shader> shader;
+	std::shared_ptr<Engine::Pipeline> program;
 	std::shared_ptr<Engine::VertexArray> squareVA;
 	std::shared_ptr<Engine::PerspectiveCamera> camera;
 	Engine::Vector2 prevCursorPos;

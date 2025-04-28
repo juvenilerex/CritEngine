@@ -18,9 +18,7 @@ namespace Engine {
 		ENGINE_API ~Window();
 
 		ENGINE_API GLFWwindow* GetHandle();
-
-		ENGINE_API void PollEvents();
-		ENGINE_API void SwapBuffers();
+		
 		ENGINE_API void ImGuiStartFrame();
 		ENGINE_API void ImGuiRender();
 
@@ -38,7 +36,17 @@ namespace Engine {
 		};
 		std::function<void(Event&)> eventCallback;
 
+		void Tick();
+
+		void OnWindowEvent(Event& event);
+		void OnInputEvent(Event& event);
+
+		bool OnWindowResize(WindowResizeEvent& event);
+		bool OnWindowClose(WindowCloseEvent& event);
+
 	private:
+		void PollEvents();
+		void SwapBuffers();
 
 		GLFWwindow* windowHandle = nullptr;
 		std::unique_ptr<InputListener> input = nullptr;

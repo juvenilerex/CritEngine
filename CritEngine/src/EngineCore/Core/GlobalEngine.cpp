@@ -14,6 +14,8 @@ namespace Engine {
 		engine->resourceManager = ResourceManager();
 		engine->resourceManager.RegisterLoader(std::make_unique<BitmapLoader>());
 
+		engine->windowManager = WindowManager();
+
 		GlobalEngine::globalInstance = std::move(engine);
 		GlobalEngine::globalInstance->application->Initialize();
 
@@ -35,14 +37,16 @@ namespace Engine {
 		return this->resourceManager;
 	}
 
+	WindowManager& GlobalEngine::GetWindowManager()
+	{
+		return this->windowManager;
+	}
+
 	void GlobalEngine::Tick()
 	{
+		this->windowManager.Tick();
 		this->application->TickInternal();
-		this->application->GetWindow().ImGuiStartFrame();
 		this->application->Tick();
-		this->application->GetWindow().ImGuiRender();
-		//this->application->OnGUIUpdate();
-		
 	}
 
 	GlobalEngine::GlobalEngine()

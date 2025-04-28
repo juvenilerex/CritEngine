@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "../Core/GlobalEngine.h"
 
 #include <GLFW/glfw3.h>
 
@@ -27,6 +28,9 @@ namespace Engine {
 		this->renderContext->Init();
 		this->renderContext->InitImGui();
 
+		this->SetEventCallback(BIND_EVENT_FUNC(this->OnWindowEvent));
+		this->GetInput().SetEventCallback(BIND_EVENT_FUNC(this->OnInputEvent));
+
 		glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* window)
 		{
 			Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
@@ -34,7 +38,6 @@ namespace Engine {
 			WindowCloseEvent _event;
 			win->eventCallback(_event);
 		});
-
 
 		glfwSetWindowSizeCallback(this->windowHandle, [](GLFWwindow* window, int width, int height) 
 		{
@@ -64,6 +67,14 @@ namespace Engine {
 		return this->windowHandle;
 	}
 
+	void Window::Tick()
+	{
+		//this->GetInput().PollKeyEvents();
+		//this->GetInput().PollMouseEvents();
+		this->PollEvents();
+		this->SwapBuffers();
+	}
+
 	void Window::SwapBuffers()
 	{
 		this->renderContext->SwapBuffers();
@@ -89,5 +100,36 @@ namespace Engine {
 		ASSERT(this->input);
 		return *this->input.get();
 	}
+
+	void Window::OnWindowEvent(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNC(this->OnWindowResize));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(this->OnWindowClose));
+	}
+
+	void Window::OnInputEvent(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNC(this->OnWindowResize));
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(this->OnWindowClose));
+	}
+
+	bool Window::OnWindowResize(WindowResizeEvent& event)
+	{
+		event.Print();
+		return false;
+	}
+
+	bool Window::OnWindowClose(WindowCloseEvent& event)
+	{
+		// Window closing logic here
+		GlobalEngine::Shutdown();
+		return true;
+	}
+
+	
 
 };
