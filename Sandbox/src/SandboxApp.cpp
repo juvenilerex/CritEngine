@@ -78,10 +78,6 @@ public:
 	void OnUpdate() override {
 		//LogInfo("ExampleLayer", "Update");
 	}
-	
-	void OnEvent(Engine::Event& event) override {
-
-	}
 
 };
 
@@ -126,6 +122,8 @@ public:
 		this->window = Engine::GlobalEngine::Get().GetWindowManager().CreateWindow(800, 600, "Sandbox");
 		std::shared_ptr<Engine::Window> window = this->window.lock();
 
+		window->GetInput()->OnMouseMove([this](Engine::Vector2(cursorPosition)) { this->MoveCamera(cursorPosition); });
+
 		// Register any systems we may want to. All systems will update every frame with UpdateSystems()
 		// Return is optional
 		manager.RegisterSystem<PhysicsSystem>(manager);
@@ -146,7 +144,7 @@ public:
 
 		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
 
-		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4, 0, 0));
+		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4f, 0.f, 0.f));
 
 		this->camera.reset(new Engine::PerspectiveCamera(30, window->GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
@@ -185,30 +183,20 @@ public:
 
 	}
 
-	bool TestKeys(Engine::KeyboardEvent& event) {
-		event.Print();
-		return true; 
-	}
-
-	bool TestMouse(Engine::MouseEvent& event) {
-		event.Print();
-		return true;
-	}
-
-	bool MoveCamera(Engine::MouseMovedEvent& event)
+	void MoveCamera(Engine::Vector2 cursorPosition)
 	{
 		if (this->prevCursorPos.x == 0 && this->prevCursorPos.y == 0)
 		{
-			this->prevCursorPos = event.GetCurPos();
+			this->prevCursorPos = cursorPosition;
 		}
-		Engine::Vector2 velocity = (this->prevCursorPos - event.GetCurPos()) / 1000.f;
+		Engine::Vector2 velocity = (this->prevCursorPos - cursorPosition) / 1000.f;
 		Debug::Log(velocity);
 
 		// Prevent roll by separating yaw and pitch rotations in the multiplication order.
 		this->camera->SetRotation(Engine::Quaternion::FromEulerAngles(Engine::Vector3(velocity.y, 0, 0)) * this->camera->GetRotation() * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, velocity.x, 0)));
 		
-		this->prevCursorPos = event.GetCurPos();
-		return true;
+		this->prevCursorPos = cursorPosition;
+		return;
 	}
 
 	void Tick() override

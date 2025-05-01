@@ -26,10 +26,10 @@ namespace Engine {
 		return std::weak_ptr<Window>(this->windows.back());
 	}
 
-	void WindowManager::DestroyWindow(std::weak_ptr<Window> window)
+	bool WindowManager::DestroyWindow(std::weak_ptr<Window> window)
 	{
 		std::shared_ptr<Window> reference_window = window.lock();
-		if (reference_window == nullptr) return;
+		if (reference_window == nullptr) return false;
 
 		auto result = std::find_if(
 			this->windows.begin(),
@@ -38,10 +38,30 @@ namespace Engine {
 			    return reference_window.get() == stored_window.get();
 		    }
 		);
-		if (result == this->windows.end()) return;
+		if (result == this->windows.end()) return false;
 
 		std::iter_swap(result, this->windows.end() - 1);
 		this->windows.pop_back();
+
+		return true;
+	}
+
+	ENGINE_API bool WindowManager::DestroyWindow(Window* window)
+	{
+		std::vector<std::shared_ptr<Window>>::iterator result = std::find_if(
+			this->windows.begin(),
+			this->windows.end(),
+			[&window](const std::shared_ptr<Window>& stored_window)
+		{
+			return stored_window.get() == window;
+		});
+
+		if (result == this->windows.end()) return false;
+
+		std::iter_swap(result, this->windows.end() - 1);
+		this->windows.pop_back();
+
+		return true;
 	}
 
 }
