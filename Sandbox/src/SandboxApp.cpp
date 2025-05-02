@@ -4,6 +4,8 @@
 #include <functional>
 #include <iostream>
 #include <chrono>
+#include <vector>
+#include <numeric>
 
 #include <EngineCore/Layer.h>
 #include <EngineCore/Application.h>
@@ -23,6 +25,9 @@
 #include <EngineCore/ECS/ECSManager.h>
 #include <EngineCore/ECS/Components/Spatial.h>
 #include <EngineCore/Profiler/Profiler.h>
+
+#include <EngineCore/Tasks/TaskScheduler.h>
+#include <EngineCore/Threading/ThreadingHelpers.h>
 
 
 #include <imgui.h>
@@ -113,6 +118,87 @@ public:
   
 	void Sandbox::Initialize()
 	{
+		// Example API use of the scheduler:
+		using Engine::TaskScheduler;
+		using Engine::Task;
+
+		TaskScheduler _scheduler;
+		_scheduler.Submit(Task([]() {
+			// Do stuff here
+			Debug::Log("Task ran");
+			}));
+
+		// Optionally wait. This blocks the calling thread until the internal task list is empty
+		_scheduler.Wait();
+
+		// end example use
+
+		// Batched submit example demonstrating basic fork and join parallelism 
+		const size_t numMultiplications = 100000;
+		const unsigned int numThreads = std::max(1u, GetThreadCountEstimate());
+
+		Debug::Log("Total multiplications: ", numMultiplications);
+		Debug::Log("Number of worker threads: ", numThreads);
+
+		std::vector<int> a(numMultiplications);
+		std::vector<int> b(numMultiplications);
+		std::vector<int64_t> results(numMultiplications);
+
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> distrib(1, 100);
+
+		Debug::Log("Generating input data...");
+		for (size_t i = 0; i < numMultiplications; ++i) {
+			a[i] = distrib(gen);
+			b[i] = distrib(gen);
+		}
+
+		Debug::Log("Creating Task Scheduler...");
+		TaskScheduler scheduler(numThreads);
+
+		Debug::Log("Submitting batched multiplication tasks using the helper...");
+		CE_PROFILE_MANUAL(multiThread_BatchedHelper); 
+
+		scheduler.SubmitBatched(numMultiplications, [&](size_t i) 
+			{
+				int64_t result = static_cast<int64_t>(a[i] * b[i]);
+				results[i] = result;
+			}
+			// Optionally provide desiredTasks hint. e.g: numThreads * 4
+			// Default behavior currently adds 4 tasks per every available worker thread
+		);
+
+		Debug::Log("All batched tasks submitted.");
+		Debug::Log("Waiting for tasks to complete...");
+
+		scheduler.Wait();
+
+		Debug::Log("Tasks completed.");
+
+		CE_PROFILE_MANUAL_STOP(multiThread_BatchedHelper);
+
+		Debug::Log("Summing results...");
+		int64_t finalSum = std::accumulate(results.begin(), results.end(), 0LL);
+		Debug::Log("Total calculated sum: ", finalSum);
+
+		Debug::Log("Performing sequential verification...");
+
+		CE_PROFILE_MANUAL(singleThread);
+
+		int64_t verificationSum = 0;
+		for (size_t i = 0; i < numMultiplications; ++i) {
+			verificationSum += static_cast<int64_t>(a[i]) * b[i];
+		}
+
+		CE_PROFILE_MANUAL_STOP(singleThread);
+
+		Debug::Log("Verification sum: ", verificationSum);
+		ASSERT(finalSum == verificationSum, "Parallel sum does not match sequential sum");
+		if (finalSum == verificationSum) {
+			Debug::Log("Verification Successful!");
+		}
+
 		// I've linked Sandbox with ImGui and this function will ensure that we use the instance inside the application rather than a new one.
 		// Without linking we'd have to make a metric ton of wrapper functions, so for now, this is a quick solution.
 		ImGui::SetCurrentContext((ImGuiContext*)this->GetImGuiContext());
@@ -166,7 +252,7 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\zenon.bmp");
+		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\steve\\Downloads\\bmptestsuite-0.9\\valid\\cyandumb-24bit.bmp");
 
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
@@ -212,8 +298,6 @@ public:
 
 	void Tick() override
 	{	
-		// Testing our ECS 
-		CE_PROFILE_FUNC(UpdateLoop);
 
 		manager.UpdateSystems();
 		auto transform = manager.GetComponent<SpatialComponent>(player);
