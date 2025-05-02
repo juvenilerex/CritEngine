@@ -122,7 +122,8 @@ public:
 		this->window = Engine::GlobalEngine::Get().GetWindowManager().CreateWindow(800, 600, "Sandbox");
 		std::shared_ptr<Engine::Window> window = this->window.lock();
 
-		window->GetInput()->OnMouseMove([this](Engine::Vector2(cursorPosition)) { this->MoveCamera(cursorPosition); });
+		window->GetInput()->OnMouseMove([this](Engine::Vector2(cursorPosition)) { this->MoveCameraLook(cursorPosition); });
+		window->GetInput()->OnKeyPressed([this](unsigned int key) { this->MoveCameraPosition(key); });
 
 		// Register any systems we may want to. All systems will update every frame with UpdateSystems()
 		// Return is optional
@@ -153,6 +154,8 @@ public:
 
 		this->program = Engine::Pipeline::Create(vertexShader, fragmentShader);
 
+		//Spinny
+
 		this->squareVA = Engine::VertexArray::Create();
 
 		float squareVertices[4 * 9] = {
@@ -174,6 +177,29 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
+		// FLOOR
+
+		this->floorVA = Engine::VertexArray::Create();
+
+		float floorVertices[4 * 9] = {
+			-50.0f, 0.0f,-50.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+			 50.0f, 0.0f,-50.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+			 50.0f, 0.0f, 50.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+			-50.0f, 0.0f, 50.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f
+		};
+
+		std::shared_ptr<Engine::VertexBuffer> floorVB = Engine::VertexBuffer::Create(floorVertices, sizeof(floorVertices));
+		floorVB->SetLayout({
+			{Engine::ShaderDataType::Float3, "aPos"},
+			{Engine::ShaderDataType::Float4, "aColor"},
+			{Engine::ShaderDataType::Float2, "aTexUV"},
+		});
+		floorVA->AddVertexBuffer(floorVB);
+
+		uint32_t floorIndices[6] = { 0, 1, 2, 2, 3, 0 };
+		std::shared_ptr<Engine::IndexBuffer> floorIB = Engine::IndexBuffer::Create(floorIndices, sizeof(floorIndices) / sizeof(uint32_t));
+		floorVA->SetIndexBuffer(floorIB);
+
 		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\Aegis_Jockey_.bmp");
 
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
@@ -183,14 +209,20 @@ public:
 
 	}
 
-	void MoveCamera(Engine::Vector2 cursorPosition)
+	void MoveCameraLook(Engine::Vector2 cursorPosition)
 	{
 		if (this->prevCursorPos.x == 0 && this->prevCursorPos.y == 0)
 		{
 			this->prevCursorPos = cursorPosition;
 		}
 		Engine::Vector2 velocity = (this->prevCursorPos - cursorPosition) / 1000.f;
-		Debug::Log(velocity);
+		
+		Engine::Vector3 cameraPosition = this->camera->GetPosition();
+		Engine::Quaternion cameraRotation = this->camera->GetRotation();
+		Engine::Vector3 forwardVector = cameraRotation.RotateVector(Engine::Vector3(0, 0, -1));
+
+		Debug::Log(forwardVector);
+		
 
 		// Prevent roll by separating yaw and pitch rotations in the multiplication order.
 		this->camera->SetRotation(Engine::Quaternion::FromEulerAngles(Engine::Vector3(velocity.y, 0, 0)) * this->camera->GetRotation() * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, velocity.x, 0)));
@@ -199,10 +231,47 @@ public:
 		return;
 	}
 
+	void MoveCameraPosition(unsigned int key)
+	{
+		Engine::Vector3 cameraPosition = this->camera->GetPosition();
+		Engine::Quaternion cameraRotation = this->camera->GetRotation();
+		
+		Engine::Vector3 forwardVector = cameraRotation.RotateVector(Engine::Vector3(0, 0, -1));
+		Engine::Vector3 upVector = cameraRotation.RotateVector(Engine::Vector3(0, 1, 0));
+		Engine::Vector3 rightVector = cameraRotation.RotateVector(Engine::Vector3(1, 0, 0));
+		if (key == Keys::KeyMap[Keys::W])
+		{
+			cameraPosition = cameraPosition + (forwardVector * -0.1);
+		}
+		if (key == Keys::KeyMap[Keys::A])
+		{
+			cameraPosition = cameraPosition + (rightVector * -0.1);
+		}
+		if (key == Keys::KeyMap[Keys::S])
+		{
+			cameraPosition = cameraPosition + (forwardVector * 0.1);
+		}
+		if (key == Keys::KeyMap[Keys::D])
+		{
+			cameraPosition = cameraPosition + (rightVector * 0.1);
+		}
+		if (key == Keys::KeyMap[Keys::SPACE])
+		{
+			cameraPosition = cameraPosition + (Engine::Vector3(0, 1, 0) * 0.1);
+		}
+		if (key == Keys::KeyMap[Keys::LEFT_SHIFT])
+		{
+			cameraPosition = cameraPosition + (Engine::Vector3(0, 1, 0) * -0.1);
+		}
+		
+		
+		this->camera->SetPosition(cameraPosition);
+	}
+
 	void Tick() override
 	{	
 		// Testing our ECS 
-		CE_PROFILE_FUNC(UpdateLoop);
+		//CE_PROFILE_FUNC(UpdateLoop);
 		std::shared_ptr<Engine::Window> window = this->window.lock();
 
 		manager.UpdateSystems();
@@ -219,12 +288,20 @@ public:
 
 		Engine::Renderer::BeginScene(this->camera);
 		
+		
+
+		
+		//
+		this->image->Bind(0);
 		this->program->Bind();
-		this->program->UploadUniformMat4("uModelProjection", transform->GetMatrix());
+		this->program->UploadUniformMat4("uModelProjection", Engine::Matrix4f::Identity());
+		Engine::Renderer::Submit(this->program, this->floorVA);
 
 		this->image->Bind(0);
-		//
+		this->program->Bind();
+		this->program->UploadUniformMat4("uModelProjection", transform->GetMatrix());
 		Engine::Renderer::Submit(this->program, this->squareVA);
+		
 
 		Engine::Renderer::EndScene();
 	}
@@ -242,6 +319,7 @@ private:
 
 	std::shared_ptr<Engine::Pipeline> program;
 	std::shared_ptr<Engine::VertexArray> squareVA;
+	std::shared_ptr<Engine::VertexArray> floorVA;
 	std::shared_ptr<Engine::PerspectiveCamera> camera;
 	Engine::Vector2 prevCursorPos;
 };
