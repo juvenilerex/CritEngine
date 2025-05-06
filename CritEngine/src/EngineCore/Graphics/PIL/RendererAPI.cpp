@@ -7,7 +7,7 @@ namespace Engine {
 
 	std::unique_ptr<RendererAPI> RendererAPI::Create()
 	{
-		switch (RendererAPI::api)
+		switch (RendererAPI::GetAPI())
 		{
 			case RendererAPI::API::None: ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL: return std::make_unique<OpenGLRendererAPI>();

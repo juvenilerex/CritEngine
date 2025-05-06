@@ -4,6 +4,10 @@
     #define CE_PROFILE_MANUAL(name) Engine::Profile _profile##name(#name);
 	#define CE_PROFILE_MANUAL_STOP(name) _profile##name.Stop();
     #define CE_PROFILE_FUNC(name) Engine::ScopedProfile _scopedprofile##name(#name);
+#else
+	#define CE_PROFILE_MANUAL(name)
+	#define CE_PROFILE_MANUAL_STOP(name)
+    #define CE_PROFILE_FUNC(name)
 #endif
 
 namespace Engine {

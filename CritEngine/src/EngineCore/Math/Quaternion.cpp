@@ -187,7 +187,7 @@ namespace Engine {
 	// This function is not tested, once a renderer has been built, test this function for its correctness.
 	Quaternion Quaternion::SquadSpline(const std::vector<Quaternion>& spline, float alpha)
 	{
-		int startIndex = (spline.size() - 1) * alpha;
+		int startIndex = static_cast<int>((spline.size() - 1) * alpha);
 		if (startIndex == spline.size()) startIndex--;
 		int endIndex = startIndex + 1;
 
@@ -230,13 +230,9 @@ namespace Engine {
 
 	Vector3 Quaternion::RotateVector(const Quaternion& base, const Vector3& vector)
 	{
-		Vector3 quatVector = Vector3(base.x, base.y, base.z);
-		float scalar = base.w;
-
-		return
-			2.0f * Vector3::Dot(quatVector, vector) * quatVector +
-			(scalar * scalar - Vector3::Dot(quatVector, quatVector)) * vector +
-			2.0f * scalar * Vector3::Cross(quatVector, vector);
+		const Vector3 quatVector(base.x, base.y, base.z);
+		const Vector3 intermediate = 2.f * vector.Cross(quatVector);
+		return vector + (base.w * intermediate) + intermediate.Cross(quatVector);
 	}
 
 	Vector3 Quaternion::ToEulerAngles(const Quaternion& base)

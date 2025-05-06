@@ -9,50 +9,12 @@
 
 struct GLFWwindow;
 
-namespace Engine {
-
-	class InputListener {
-
-	public:
-		ENGINE_API InputListener(GLFWwindow* windowHandle);
-
-        ENGINE_API void PollKeyEvents() const;
-        ENGINE_API void PollMouseEvents() const;
-
-		ENGINE_API static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        ENGINE_API static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-        ENGINE_API static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
-
-        ENGINE_API void SetEventCallback(const std::function<void(Event&)> callback) {
-            this->eventCallback = callback;
-        };
-        std::function<void(Event&)> eventCallback;
-
-	private:
-        unsigned int frameCount = 0;
-		GLFWwindow* windowHandle;
-
-        static std::unordered_map<int, bool> ButtonStates;
-        static std::unordered_map<int, bool> ButtonReleased;
-        static std::unordered_map<int, bool> ButtonJustPressed;
-        static std::unordered_map<int, bool> KeyStates;
-        static std::unordered_map<int, bool> KeyReleased;
-        static std::unordered_map<int, bool> KeyJustPressed;
-
-        static Vector2 CurPos;
-        static Vector2 PrevCurPos;
-
-        static bool CurPosChanged;
-
-        static double posX;
-        static double posY;
-	};
-}
 
 // GLFW keycode wrapper here so we can use it in the sandbox
 namespace Keys {
 
-    enum Key : int {
+    enum Key : int
+    {
         SPACE, APOSTROPHE, COMMA, MINUS, PERIOD, SLASH,
         DIGIT_0, DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4, DIGIT_5, DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9,
         SEMICOLON, EQUAL,
@@ -89,17 +51,10 @@ namespace Keys {
 
 }
 
-namespace Engine {
-
-    constexpr int KeyCode(Keys::Key key) {
-        return Keys::KeyMap[key];
-    }
-
-}
-
 namespace Mouse {
 
-    enum Button : unsigned int {
+    enum Button : unsigned int
+    {
         BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4, BUTTON_5, BUTTON_6, BUTTON_7, BUTTON_8
     };
 
@@ -111,8 +66,57 @@ namespace Mouse {
 
 namespace Engine {
 
-    constexpr unsigned int MouseButton(Mouse::Button button) {
+	class InputListener {
+
+	public:
+		ENGINE_API InputListener(GLFWwindow* windowHandle);
+
+        ENGINE_API void PollKeyEvents();
+        ENGINE_API void PollMouseEvents();
+
+        ENGINE_API void OnKeyPressed(KeyPressedEvent::FunctionType listener);
+        ENGINE_API void OnKeyJustPressed(KeyJustPressedEvent::FunctionType listener);
+        ENGINE_API void OnKeyReleased(KeyReleasedEvent::FunctionType listener);
+
+        ENGINE_API void OnMouseButtonPressed(MouseButtonPressedEvent::FunctionType listener);
+        ENGINE_API void OnMouseButtonJustPressed(MouseButtonJustPressedEvent::FunctionType listener);
+        ENGINE_API void OnMouseButtonReleased(MouseButtonReleasedEvent::FunctionType listener);
+        ENGINE_API void OnMouseMove(MouseMoveEvent::FunctionType listener);
+
+	private:
+        ENGINE_API static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        ENGINE_API static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+        ENGINE_API static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+
+        EventEmitter eventEmitter;
+
+        unsigned int frameCount = 0;
+		GLFWwindow* windowHandle;
+
+        static std::unordered_map<int, bool> ButtonStates;
+        static std::unordered_map<int, bool> ButtonReleased;
+        static std::unordered_map<int, bool> ButtonJustPressed;
+        static std::unordered_map<int, bool> KeyStates;
+        static std::unordered_map<int, bool> KeyReleased;
+        static std::unordered_map<int, bool> KeyJustPressed;
+
+        static Vector2 CurPos;
+        static Vector2 PrevCurPos;
+
+        static bool CurPosChanged;
+
+        static double posX;
+        static double posY;
+	};
+
+    constexpr unsigned int MouseButton(Mouse::Button button)
+    {
         return Mouse::ButtonMap[button];
+    }
+
+    constexpr int KeyCode(Keys::Key key)
+    {
+        return Keys::KeyMap[key];
     }
 
 }

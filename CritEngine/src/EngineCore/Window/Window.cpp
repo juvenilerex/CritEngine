@@ -1,12 +1,13 @@
 #pragma once
 #include "Window.h"
+#include "../Core/GlobalEngine.h"
 
 #include <GLFW/glfw3.h>
 
 namespace Engine {
 
 	Window::Window(const int width, const int height, const std::string& title)
-		: width(width), height(height)
+		: width(width), height(height), eventEmitter(EventEmitter())
 	{
 		bool success = glfwInit();
 		ASSERT(success, "Failed to initialize GLFW!");
@@ -23,34 +24,36 @@ namespace Engine {
 		glfwSetWindowUserPointer(this->windowHandle, this);
 
 		this->input = std::make_unique<InputListener>(this->GetHandle());
-		this->renderContext = std::make_unique<OpenGLContext>(this->GetHandle());
+		this->renderContext = RenderContext::Create(this->GetHandle());
 		this->renderContext->Init();
 		this->renderContext->InitImGui();
 
-		glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* window)
+		glfwSetWindowCloseCallback(this->windowHandle, [](GLFWwindow* glfwWindow)
 		{
-			Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-			
-			WindowCloseEvent _event;
-			win->eventCallback(_event);
+			Window* window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+			window->eventEmitter.Emit<WindowCloseEvent>(window);
 		});
 
-
-		glfwSetWindowSizeCallback(this->windowHandle, [](GLFWwindow* window, int width, int height) 
+		this->eventEmitter.AddListener<WindowCloseEvent>([](Window* window)
 		{
-            Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));		
+			GlobalEngine::Shutdown();
+		});
 
-			win->SetWidth(width);
-			win->SetHeight(height);
+		glfwSetWindowSizeCallback(this->windowHandle, [](GLFWwindow* glfwWindow, int width, int height) 
+		{
+            Window* window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));		
+			window->eventEmitter.Emit<WindowResizeEvent>(window, width, height);
+		});
+
+		this->eventEmitter.AddListener<WindowResizeEvent>([](Window* window, int width, int height)
+		{
+			window->SetWidth(width);
+			window->SetHeight(height);
 
 			RenderCommand::SetViewportSize(width, height);
 
-			
-
-			WindowResizeEvent _event(width, height);
-			win->eventCallback(_event);
 		});
-
+		
 	}
 
 	Window::~Window()
@@ -62,6 +65,14 @@ namespace Engine {
 	GLFWwindow* Window::GetHandle()
 	{
 		return this->windowHandle;
+	}
+
+	void Window::Tick()
+	{
+		this->GetInput()->PollKeyEvents();
+		this->GetInput()->PollMouseEvents();
+		this->PollEvents();
+		this->SwapBuffers();
 	}
 
 	void Window::SwapBuffers()
@@ -84,10 +95,9 @@ namespace Engine {
 		glfwPollEvents();
 	}
 
-	InputListener& Window::GetInput()
+	std::shared_ptr<InputListener> Window::GetInput()
 	{
 		ASSERT(this->input);
-		return *this->input.get();
+		return this->input;
 	}
-
 };

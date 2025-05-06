@@ -14,12 +14,12 @@ namespace Engine {
 
 	}
 
-	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray)
+	void Renderer::Submit(const std::shared_ptr<Pipeline>& program, const std::shared_ptr<VertexArray>& vertexArray)
 	{
-		shader->Bind();
-		shader->UploadUniformMat4("uViewProjection", Scene::GetActiveScene()->viewProjectionMatrix);
-		shader->UploadUniformMat4("uPerspectiveProjection", Scene::GetActiveScene()->perspectiveProjectionMatrix);
-		shader->UploadUniformMat4("uViewPerspectiveProjection", Scene::GetActiveScene()->viewPerspectiveProjectionMatrix);
+		program->Bind();
+		program->UploadUniformMat4("uViewProjection", Scene::GetActiveScene()->viewProjectionMatrix);
+		program->UploadUniformMat4("uPerspectiveProjection", Scene::GetActiveScene()->perspectiveProjectionMatrix);
+		program->UploadUniformMat4("uViewPerspectiveProjection", Scene::GetActiveScene()->viewPerspectiveProjectionMatrix);
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
 	}
