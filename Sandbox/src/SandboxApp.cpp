@@ -29,48 +29,10 @@
 
 #include <EngineCore/Tasks/TaskScheduler.h>
 #include <EngineCore/Threading/ThreadingHelpers.h>
+#include <EngineCore/Resource/Loaders/GLSLShaderLoader.h>
 
 
 #include <imgui.h>
-
-std::string vertexShaderSource = R"(
-	#version 460 core
-
-	uniform mat4 uViewProjection;
-	uniform mat4 uPerspectiveProjection;
-	uniform mat4 uModelProjection;
-	
-	layout (location = 0) in vec3 aPos;
-	layout (location = 1) in vec4 aColor;
-	layout (location = 2) in vec2 aTexUV;
-
-	out vec4 vColor;
-	out vec2 vTexUV;
-
-	void main()
-	{
-		
-		gl_Position = uPerspectiveProjection * uViewProjection * uModelProjection * vec4(aPos, 1.0);
-		vColor = aColor;
-		vTexUV = aTexUV;
-	}
-)";
-
-std::string fragmentShaderSource = R"(
-	#version 460 core
-
-	in vec4 vColor;
-	in vec2 vTexUV;
-
-	uniform sampler2D texture1;
-
-	layout(location = 0) out vec4 color;
-
-	void main()
-	{
-		color = texture(texture1, vTexUV);
-	}
-)";
 
 class LayerTest : public Engine::Layer {
 
@@ -235,8 +197,11 @@ public:
 
 		this->camera.reset(new Engine::PerspectiveCamera(30, window->GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
-		std::shared_ptr<Engine::Shader> fragmentShader = Engine::Shader::Create(fragmentShaderSource, Engine::ShaderType::Fragment);
-		std::shared_ptr<Engine::Shader> vertexShader = Engine::Shader::Create(vertexShaderSource, Engine::ShaderType::Vertex);
+		Engine::Resource vertexShaderSource = Engine::Resource("Shader", "C:\\Users\\steve\\Documents\\testshaders\\shader.vertshader");
+		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", "C:\\Users\\steve\\Documents\\testshaders\\shader.fragshader");
+
+		std::shared_ptr<Engine::Shader> vertexShader = std::static_pointer_cast<Engine::Shader>(vertexShaderSource.Get());
+		std::shared_ptr<Engine::Shader> fragmentShader = std::static_pointer_cast<Engine::Shader>(fragmentShaderSource.Get());
 
 		this->program = Engine::Pipeline::Create(vertexShader, fragmentShader);
 
@@ -288,9 +253,8 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> floorIB = Engine::IndexBuffer::Create(floorIndices, sizeof(floorIndices) / sizeof(uint32_t));
 		floorVA->SetIndexBuffer(floorIB);
 
-		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\Critical Floof\\Downloads\\bmptestsuite-0.9\\bmptestsuite-0.9\\valid\\Aegis_Jockey_.bmp");
-
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
+
 
 		this->program->Bind();
 		this->program->UploadUniformInt("texture1", 0);
