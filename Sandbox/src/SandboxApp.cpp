@@ -197,8 +197,8 @@ public:
 
 		this->camera.reset(new Engine::PerspectiveCamera(30, window->GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
-		Engine::Resource vertexShaderSource = Engine::Resource("Shader", "C:\\Users\\steve\\Documents\\testshaders\\shader.vertshader");
-		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", "C:\\Users\\steve\\Documents\\testshaders\\shader.fragshader");
+		Engine::Resource vertexShaderSource = Engine::Resource("Shader", "../../CritEngine/Sandbox/src/Shaders/shader.vertshader");
+		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", "../../CritEngine/Sandbox/src/Shaders/shader.fragshader");
 
 		std::shared_ptr<Engine::Shader> vertexShader = std::static_pointer_cast<Engine::Shader>(vertexShaderSource.Get());
 		std::shared_ptr<Engine::Shader> fragmentShader = std::static_pointer_cast<Engine::Shader>(fragmentShaderSource.Get());
