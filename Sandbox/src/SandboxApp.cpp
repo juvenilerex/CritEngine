@@ -33,7 +33,7 @@
 
 #include <imgui.h>
 
-const std::filesystem::path ROOT_ASSET_PATH = ((std::filesystem::path)(__FILE__)).parent_path() / "Assets"; // TODO: In the future the root asset path should be runtime flexible, a quick proof of concept should only require a file path macro.
+const std::filesystem::path ROOT_ASSET_PATH = ((std::filesystem::path)(__FILE__)).parent_path() / "Assets"; // TODO: This is temporary, the engine should provide easy to use "virtual" file system capabilities.
 
 class LayerTest : public Engine::Layer {
 
