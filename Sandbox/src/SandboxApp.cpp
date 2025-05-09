@@ -31,8 +31,9 @@
 #include <EngineCore/Threading/ThreadingHelpers.h>
 #include <EngineCore/Resource/Loaders/GLSLShaderLoader.h>
 
-
 #include <imgui.h>
+
+const std::filesystem::path ROOT_ASSET_PATH = ((std::filesystem::path)(__FILE__)).parent_path() / "Assets"; // TODO: In the future the root asset path should be runtime flexible, a quick proof of concept should only require a file path macro.
 
 class LayerTest : public Engine::Layer {
 
@@ -197,8 +198,8 @@ public:
 
 		this->camera.reset(new Engine::PerspectiveCamera(30, window->GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
 
-		Engine::Resource vertexShaderSource = Engine::Resource("Shader", "../../CritEngine/Sandbox/src/Shaders/shader.vertshader");
-		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", "../../CritEngine/Sandbox/src/Shaders/shader.fragshader");
+		Engine::Resource vertexShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.vertshader");
+		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.fragshader");
 
 		std::shared_ptr<Engine::Shader> vertexShader = std::static_pointer_cast<Engine::Shader>(vertexShaderSource.Get());
 		std::shared_ptr<Engine::Shader> fragmentShader = std::static_pointer_cast<Engine::Shader>(fragmentShaderSource.Get());
@@ -228,7 +229,7 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		squareVA->SetIndexBuffer(squareIB);
 
-		Engine::Resource textureHandle = Engine::Resource("Image", "C:\\Users\\steve\\Downloads\\bmptestsuite-0.9\\valid\\cyandumb-24bit.bmp");
+		Engine::Resource textureHandle = Engine::Resource("Image", ROOT_ASSET_PATH / "Textures/Aegis_Jockey.bmp");
 
 		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
