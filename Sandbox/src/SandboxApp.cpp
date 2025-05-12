@@ -263,6 +263,10 @@ public:
 
 		this->floorModel = std::make_shared<Engine::Model>(floorMesh);
 		
+		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
+		Engine::RenderCommand::EnableDepthTest(true);
+		Engine::RenderCommand::EnableDepthMask(true);
+		Engine::RenderCommand::SetDepthTestFunc(Engine::RendererAPI::DepthTestFunction::Less);
 	}
 
 	void MoveCameraLook(Engine::Vector2 cursorPosition)
@@ -333,15 +337,15 @@ public:
 		manager.UpdateSystems();
 		auto transform = manager.GetComponent<SpatialComponent>(player);
 
-		Engine::RenderCommand::SetClearColor({ 0.8, 0.2, 0.8, 1 });
-		Engine::RenderCommand::Clear();
-
 		this->camera->SetAspectRatio(window->GetAspectRatio());
 
 		//ImGui::Begin("Debug Window");
 		//ImGui::Text("TransformComponent Position: %f, %f, %f", transform->position.x, transform->position.y, transform->position.z);
 		//ImGui::End();
 		this->squareModel->SetProjection(transform->GetMatrix());
+
+		
+		Engine::RenderCommand::Clear();
 
 		Engine::Renderer::BeginScene(this->camera);
 

@@ -17,6 +17,21 @@ namespace Engine {
 			RenderCommand::rendererAPI->Clear();
 		}
 
+		ENGINE_API inline static void EnableDepthTest(const  bool newState)
+		{
+			RenderCommand::rendererAPI->EnableDepthTest(newState);
+		}
+
+		ENGINE_API inline static void EnableDepthMask(const bool newState)
+		{
+			RenderCommand::rendererAPI->EnableDepthMask(newState);
+		}
+
+		ENGINE_API inline static void SetDepthTestFunc(const RendererAPI::DepthTestFunction newFunction)
+		{
+			RenderCommand::rendererAPI->SetDepthTestFunc(newFunction);
+		}
+
 		ENGINE_API inline static void SetViewportSize(const int width, const int height)
 		{
 			RenderCommand::rendererAPI->SetViewportSize(width, height);
@@ -26,6 +41,8 @@ namespace Engine {
 		{
 			RenderCommand::rendererAPI->DrawIndexed(mesh);
 		}
+
+
 
 	private:
 		static std::unique_ptr<RendererAPI> rendererAPI;
