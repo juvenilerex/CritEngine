@@ -19,5 +19,5 @@ Engine::Matrix4f SpatialComponent::GetMatrix()
 		p.x, p.y, p.z, 1
 	});
 
-	return rotation * position;
+	return position * rotation;
 }
