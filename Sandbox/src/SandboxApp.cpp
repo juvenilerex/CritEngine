@@ -301,27 +301,27 @@ public:
 		Engine::Vector3 rightVector = cameraRotation.RotateVector(Engine::Vector3(1, 0, 0));
 		if (key == Keys::KeyMap[Keys::W])
 		{
-			cameraPosition = cameraPosition + (forwardVector * -0.1);
+			cameraPosition = cameraPosition + (forwardVector * -0.1f);
 		}
 		if (key == Keys::KeyMap[Keys::A])
 		{
-			cameraPosition = cameraPosition + (rightVector * -0.1);
+			cameraPosition = cameraPosition + (rightVector * -0.1f);
 		}
 		if (key == Keys::KeyMap[Keys::S])
 		{
-			cameraPosition = cameraPosition + (forwardVector * 0.1);
+			cameraPosition = cameraPosition + (forwardVector * 0.1f);
 		}
 		if (key == Keys::KeyMap[Keys::D])
 		{
-			cameraPosition = cameraPosition + (rightVector * 0.1);
+			cameraPosition = cameraPosition + (rightVector * 0.1f);
 		}
 		if (key == Keys::KeyMap[Keys::SPACE])
 		{
-			cameraPosition = cameraPosition + (Engine::Vector3(0, 1, 0) * 0.1);
+			cameraPosition = cameraPosition + (Engine::Vector3(0, 1, 0) * 0.1f);
 		}
 		if (key == Keys::KeyMap[Keys::LEFT_SHIFT])
 		{
-			cameraPosition = cameraPosition + (Engine::Vector3(0, 1, 0) * -0.1);
+			cameraPosition = cameraPosition + (Engine::Vector3(0, 1, 0) * -0.1f);
 		}
 		
 		
