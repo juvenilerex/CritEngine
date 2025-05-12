@@ -22,9 +22,9 @@ namespace Engine {
 			RenderCommand::rendererAPI->SetViewportSize(width, height);
 		}
 
-		ENGINE_API inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray)
+		ENGINE_API inline static void DrawIndexed(const std::shared_ptr<Mesh>& mesh)
 		{
-			RenderCommand::rendererAPI->DrawIndexed(vertexArray);
+			RenderCommand::rendererAPI->DrawIndexed(mesh);
 		}
 
 	private:

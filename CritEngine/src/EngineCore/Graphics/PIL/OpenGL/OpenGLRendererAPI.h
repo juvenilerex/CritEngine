@@ -11,7 +11,7 @@ namespace Engine {
 
 		virtual void SetViewportSize(const int width, const int height) override;
 
-		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) override;
+		virtual void DrawIndexed(const std::shared_ptr<Mesh>& mesh) override;
 	};
 
 }

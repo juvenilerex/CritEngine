@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "VertexArray.h"
+#include "Mesh.h"
 
 namespace Engine {
 
@@ -22,7 +22,7 @@ namespace Engine {
 
 		virtual void SetViewportSize(const int width, const int height) = 0;
 
-		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray ) = 0;
+		virtual void DrawIndexed(const std::shared_ptr<Mesh>& vertexArray ) = 0;
 
 	private:
 		static API api;

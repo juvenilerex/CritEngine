@@ -32,6 +32,8 @@
 #include <EngineCore/Resource/Loaders/GLSLShaderLoader.h>
 
 #include <imgui.h>
+#include <EngineCore/Graphics/Material.h>
+#include <EngineCore/Graphics/Model.h>
 
 const std::filesystem::path ROOT_ASSET_PATH = ((std::filesystem::path)(__FILE__)).parent_path() / "Assets"; // TODO: This is temporary, the engine should provide easy to use "virtual" file system capabilities.
 
@@ -201,14 +203,15 @@ public:
 		Engine::Resource vertexShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.vertshader");
 		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.fragshader");
 
+		Engine::Resource textureHandle = Engine::Resource("Image", ROOT_ASSET_PATH / "Textures/Aegis_Jockey.bmp");
+		std::shared_ptr<Engine::Texture> sampleTexture = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
+
 		std::shared_ptr<Engine::Shader> vertexShader = std::static_pointer_cast<Engine::Shader>(vertexShaderSource.Get());
 		std::shared_ptr<Engine::Shader> fragmentShader = std::static_pointer_cast<Engine::Shader>(fragmentShaderSource.Get());
 
-		this->program = Engine::Pipeline::Create(vertexShader, fragmentShader);
+		this->material = Engine::Material::Create(vertexShader, fragmentShader, {sampleTexture});
 
 		//Spinny
-
-		this->squareVA = Engine::VertexArray::Create();
 
 		float squareVertices[4 * 9] = {
 			-0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -223,17 +226,18 @@ public:
 			{Engine::ShaderDataType::Float4, "aColor"},
 			{Engine::ShaderDataType::Float2, "aTexUV"},
 		});
-		squareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
 		std::shared_ptr<Engine::IndexBuffer> squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
-		squareVA->SetIndexBuffer(squareIB);
 
-		Engine::Resource textureHandle = Engine::Resource("Image", ROOT_ASSET_PATH / "Textures/Aegis_Jockey.bmp");
+		std::shared_ptr<Engine::Mesh> squareMesh = Engine::Mesh::Create();
+		squareMesh->AddVertexBuffer(squareVB);
+		squareMesh->SetIndexBuffer(squareIB);
+		squareMesh->SetMaterial(this->material);
 
-		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
+		this->squareModel = std::make_shared<Engine::Model>(squareMesh);
 
-		this->floorVA = Engine::VertexArray::Create();
+		// Floor
 
 		float floorVertices[4 * 9] = {
 			-50.0f, 0.0f,-50.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -248,18 +252,17 @@ public:
 			{Engine::ShaderDataType::Float4, "aColor"},
 			{Engine::ShaderDataType::Float2, "aTexUV"},
 		});
-		floorVA->AddVertexBuffer(floorVB);
 
 		uint32_t floorIndices[6] = { 0, 1, 2, 2, 3, 0 };
 		std::shared_ptr<Engine::IndexBuffer> floorIB = Engine::IndexBuffer::Create(floorIndices, sizeof(floorIndices) / sizeof(uint32_t));
-		floorVA->SetIndexBuffer(floorIB);
 
-		this->image = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
+		std::shared_ptr<Engine::Mesh> floorMesh = Engine::Mesh::Create();
+		floorMesh->AddVertexBuffer(floorVB);
+		floorMesh->SetIndexBuffer(floorIB);
+		floorMesh->SetMaterial(this->material);
 
-
-		this->program->Bind();
-		this->program->UploadUniformInt("texture1", 0);
-
+		this->floorModel = std::make_shared<Engine::Model>(floorMesh);
+		
 	}
 
 	void MoveCameraLook(Engine::Vector2 cursorPosition)
@@ -338,24 +341,13 @@ public:
 		//ImGui::Begin("Debug Window");
 		//ImGui::Text("TransformComponent Position: %f, %f, %f", transform->position.x, transform->position.y, transform->position.z);
 		//ImGui::End();
+		this->squareModel->SetProjection(transform->GetMatrix());
 
 		Engine::Renderer::BeginScene(this->camera);
-		
-		
 
+		Engine::Renderer::Submit(this->floorModel);
+		Engine::Renderer::Submit(this->squareModel);
 		
-		//
-		this->image->Bind(0);
-		this->program->Bind();
-		this->program->UploadUniformMat4("uModelProjection", Engine::Matrix4f::Identity());
-		Engine::Renderer::Submit(this->program, this->floorVA);
-
-		this->image->Bind(0);
-		this->program->Bind();
-		this->program->UploadUniformMat4("uModelProjection", transform->GetMatrix());
-		Engine::Renderer::Submit(this->program, this->squareVA);
-		
-
 		Engine::Renderer::EndScene();
 	}
 
@@ -368,11 +360,9 @@ private:
 
 	std::weak_ptr<Engine::Window> window;
 
-	std::shared_ptr<Engine::Texture> image;
-
-	std::shared_ptr<Engine::Pipeline> program;
-	std::shared_ptr<Engine::VertexArray> squareVA;
-	std::shared_ptr<Engine::VertexArray> floorVA;
+	std::shared_ptr<Engine::Material> material;
+	std::shared_ptr<Engine::Model> squareModel;
+	std::shared_ptr<Engine::Model> floorModel;
 	std::shared_ptr<Engine::PerspectiveCamera> camera;
 	Engine::Vector2 prevCursorPos;
 };
