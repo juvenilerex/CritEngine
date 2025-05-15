@@ -6,14 +6,6 @@
 
 #include "../Logging/Logger.h"
 
-#define SET_EVENT_TYPE(type) static EventType GetStaticType() { return EventType::type; }\
-	virtual EventType GetEventType() const override { return GetStaticType(); }\
-	virtual std::string GetName() const override { return std::string(#type); }
-
-#define SET_EVENT_CATEGORY(cat) virtual int GetCategories() const override { return cat; }
-
-#define BIND_EVENT_FUNC(func) [this] (auto& event) -> decltype(auto) { return func(event); }
-
 namespace Engine {
 
 	// Some of these may or may not be used in the future
