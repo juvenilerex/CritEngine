@@ -1,5 +1,6 @@
 #pragma once
+#include <cstdint>
 
 namespace ECS {
-	using Entity = size_t;
+	using Entity = uint32_t;
 }

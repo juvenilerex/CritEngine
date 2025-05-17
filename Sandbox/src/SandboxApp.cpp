@@ -35,6 +35,8 @@
 #include <EngineCore/Graphics/Material.h>
 #include <EngineCore/Graphics/Model.h>
 
+#include <EngineCore/ECS/PagedVector.h>
+
 const std::filesystem::path ROOT_ASSET_PATH = ((std::filesystem::path)(__FILE__)).parent_path() / "Assets"; // TODO: This is temporary, the engine should provide easy to use "virtual" file system capabilities.
 
 class LayerTest : public Engine::Layer {
@@ -87,85 +89,17 @@ public:
   
 	void Sandbox::Initialize()
 	{
-		// Example API use of the scheduler:
-		using Engine::TaskScheduler;
-		using Engine::Task;
+		
+		Engine::PagedVector testVector = Engine::PagedVector<float, 16>();
+		testVector.Insert(1, 1.f);
+		testVector.Insert(2, 2.f);
+		testVector.Insert(3, 2.5f);
+		testVector.Insert(17, 3.f);
 
-		TaskScheduler _scheduler;
-		_scheduler.Submit(Task([]() {
-			// Do stuff here
-			Debug::Log("Task ran");
-			}));
-
-		// Optionally wait. This blocks the calling thread until the internal task list is empty
-		_scheduler.Wait();
-
-		// end example use
-
-		// Batched submit example demonstrating basic fork and join parallelism 
-		const size_t numMultiplications = 100000;
-		const unsigned int numThreads = std::max(1u, GetThreadCountEstimate());
-
-		Debug::Log("Total multiplications: ", numMultiplications);
-		Debug::Log("Number of worker threads: ", numThreads);
-
-		std::vector<int> a(numMultiplications);
-		std::vector<int> b(numMultiplications);
-		std::vector<int64_t> results(numMultiplications);
-
-		std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<> distrib(1, 100);
-
-		Debug::Log("Generating input data...");
-		for (size_t i = 0; i < numMultiplications; ++i) {
-			a[i] = distrib(gen);
-			b[i] = distrib(gen);
-		}
-
-		Debug::Log("Creating Task Scheduler...");
-		TaskScheduler scheduler(numThreads);
-
-		Debug::Log("Submitting batched multiplication tasks using the helper...");
-		CE_PROFILE_MANUAL(multiThread_BatchedHelper); 
-
-		scheduler.SubmitBatched(numMultiplications, [&](size_t i) 
-			{
-				int64_t result = static_cast<int64_t>(a[i] * b[i]);
-				results[i] = result;
-			}
-			// Optionally provide desiredTasks hint. e.g: numThreads * 4
-			// Default behavior currently adds 4 tasks per every available worker thread
-		);
-
-		Debug::Log("All batched tasks submitted.");
-		Debug::Log("Waiting for tasks to complete...");
-
-		scheduler.Wait();
-
-		Debug::Log("Tasks completed.");
-
-		CE_PROFILE_MANUAL_STOP(multiThread_BatchedHelper);
-
-		Debug::Log("Summing results...");
-		int64_t finalSum = std::accumulate(results.begin(), results.end(), 0LL);
-		Debug::Log("Total calculated sum: ", finalSum);
-
-		Debug::Log("Performing sequential verification...");
-
-		CE_PROFILE_MANUAL(singleThread);
-
-		int64_t verificationSum = 0;
-		for (size_t i = 0; i < numMultiplications; ++i) {
-			verificationSum += static_cast<int64_t>(a[i]) * b[i];
-		}
-
-		CE_PROFILE_MANUAL_STOP(singleThread);
-
-		Debug::Log("Verification sum: ", verificationSum);
-		ASSERT(finalSum == verificationSum, "Parallel sum does not match sequential sum");
-		if (finalSum == verificationSum) {
-			Debug::Log("Verification Successful!");
+		testVector.begin();
+		for (auto it = testVector.begin(); it != testVector.end(); it++)
+		{
+			Debug::Log("TestVector", *it);
 		}
   
 		CE_PROFILE_FUNC(SandboxInitialization);
@@ -203,7 +137,7 @@ public:
 		Engine::Resource vertexShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.vertshader");
 		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.fragshader");
 
-		Engine::Resource textureHandle = Engine::Resource("Image", ROOT_ASSET_PATH / "Textures/Aegis_Jockey.bmp");
+		Engine::Resource textureHandle = Engine::Resource("Image", "C:/Users/Critical Floof/Downloads/bmptestsuite-0.9/bmptestsuite-0.9/valid/crit.bmp");
 		std::shared_ptr<Engine::Texture> sampleTexture = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
 		std::shared_ptr<Engine::Shader> vertexShader = std::static_pointer_cast<Engine::Shader>(vertexShaderSource.Get());

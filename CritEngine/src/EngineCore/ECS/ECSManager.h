@@ -10,8 +10,9 @@ namespace Engine {
 	class ECSManager {
 	public:
 
+		//FIXME[LOW]: This will cause issues once ID's overflow, which normally may never happen but programs running for long enough will face this issue.
 		ECS::Entity AddEntity() {
-			static size_t ID = 0;
+			static uint32_t ID = 0;
 			this->entities.push_back(ID);
 			return ID++;
 		}
