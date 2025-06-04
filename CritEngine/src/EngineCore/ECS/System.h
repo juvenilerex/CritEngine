@@ -1,19 +1,21 @@
 #pragma once
 
-namespace Engine { class ECSManager; }
-
 namespace ECS {
+
+    class Scene;
 
     class System {
     public:
-        System(Engine::ECSManager& manager) : manager(manager) {}
+        System() {};
+        virtual ~System() {};
 
-        virtual ~System() = default;
+        void SetScene(Scene* scene)
+        {
+            this->scene = scene;
+        }
         virtual void Update() = 0;
 
-    protected:
-        // For now systems have direct access to the manager, which is a tad dangerous, but dead simple
-        Engine::ECSManager& manager;
+        Scene* scene = nullptr;
     };
 
 }

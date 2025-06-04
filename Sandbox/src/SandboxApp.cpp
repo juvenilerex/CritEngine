@@ -23,7 +23,7 @@
 #include <EngineCore/Graphics/PIL/Texture.h>
 #include <EngineCore/Graphics/PIL/Pipeline.h>
 #include <EngineCore/Resource/Resource.h>
-#include <EngineCore/ECS/ECSManager.h>
+#include <EngineCore/ECS/Scene.h>
 #include <EngineCore/ECS/Components/Spatial.h>
 #include <EngineCore/Profiler/Profiler.h>
 
@@ -34,8 +34,6 @@
 #include <imgui.h>
 #include <EngineCore/Graphics/Material.h>
 #include <EngineCore/Graphics/Model.h>
-
-#include <EngineCore/ECS/PagedVector.h>
 
 const std::filesystem::path ROOT_ASSET_PATH = ((std::filesystem::path)(__FILE__)).parent_path() / "Assets"; // TODO: This is temporary, the engine should provide easy to use "virtual" file system capabilities.
 
@@ -63,45 +61,34 @@ public:
 	// Systems essentially add underlying behavior to components
 	class PhysicsSystem : public ECS::System {
 	public:
-		// Start with a constructor and pass in a reference to an ECS manager for dependency injection
-		PhysicsSystem(Engine::ECSManager& manager) : System(manager) {}
 
 		void Update() override {
-			// Get all instances of certain components throughout the manager
-			const auto& primatives = manager.GetAllComponents<SpatialComponent>();
+			
 
 			// Perform logic, make modifications, etc..
 			const std::chrono::time_point<std::chrono::high_resolution_clock> curTime = std::chrono::high_resolution_clock::now();
 			const std::chrono::duration<float> deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - this->prevTime);
-			for (size_t i = 0; i < primatives.size(); i++) {
-				primatives[i]->rotation = primatives[i]->rotation * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, (deltaTime.count() * 10.f), 0));
+			for (ECS::EntityID entity : ECS::SceneView<SpatialComponent>(*scene))
+			{
+				SpatialComponent* primitive = this->scene->GetComponent<SpatialComponent>(entity);
 				
-				primatives[i]->position.y = sinf(std::chrono::duration_cast<std::chrono::milliseconds>(curTime - this->startTime).count() * 0.001f);
+				primitive->rotation = primitive->rotation * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, (deltaTime.count() * 10.f), 0));
+				primitive->position.y = sinf(std::chrono::duration_cast<std::chrono::milliseconds>(curTime - this->startTime).count() * 0.001f);
+
 			}
 			this->prevTime = curTime;
 		}
+
 		std::chrono::time_point<std::chrono::high_resolution_clock> prevTime = std::chrono::high_resolution_clock::now();
 		std::chrono::time_point<std::chrono::high_resolution_clock> startTime = std::chrono::high_resolution_clock::now();
 	};
 
-	Engine::ECSManager manager;
-	ECS::Entity player;
+	PhysicsSystem physicsSystem;
+	ECS::Scene componentScene;
+	ECS::EntityID player;
   
 	void Sandbox::Initialize()
 	{
-		
-		Engine::PagedVector testVector = Engine::PagedVector<float, 16>();
-		testVector.Insert(1, 1.f);
-		testVector.Insert(2, 2.f);
-		testVector.Insert(3, 2.5f);
-		testVector.Insert(17, 3.f);
-
-		testVector.begin();
-		for (auto it = testVector.begin(); it != testVector.end(); it++)
-		{
-			Debug::Log("TestVector", *it);
-		}
-  
 		CE_PROFILE_FUNC(SandboxInitialization);
 
 		this->window = Engine::GlobalEngine::Get().GetWindowManager().CreateWindow(800, 600, "Sandbox");
@@ -110,16 +97,12 @@ public:
 		window->GetInput()->OnMouseMove([this](Engine::Vector2(cursorPosition)) { this->MoveCameraLook(cursorPosition); });
 		window->GetInput()->OnKeyPressed([this](unsigned int key) { this->MoveCameraPosition(key); });
 
-		// Register any systems we may want to. All systems will update every frame with UpdateSystems()
-		// Return is optional
-		manager.RegisterSystem<PhysicsSystem>(manager);
+		this->physicsSystem = PhysicsSystem();
+		this->physicsSystem.SetScene(&this->componentScene);
 
-		// Add an Entity to the system. Entities are purely just an ID, and to keep track of them easily, AddEntity()
-		// returns the new ID number. Then we'll assign it to an Entity object
-		player = manager.AddEntity();
+		this->player = this->componentScene.CreateEntity();
 
-		// We simply add a component to an Entity. The component is automatically created and returned to us when this is called
-		auto primitive = manager.AddComponent<SpatialComponent>(player);
+		SpatialComponent* primitive = this->componentScene.Assign<SpatialComponent>(player);
 
 		primitive->velocity.x = .0025f;
 
@@ -137,7 +120,7 @@ public:
 		Engine::Resource vertexShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.vertshader");
 		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.fragshader");
 
-		Engine::Resource textureHandle = Engine::Resource("Image", "C:/Users/Critical Floof/Downloads/bmptestsuite-0.9/bmptestsuite-0.9/valid/crit.bmp");
+		Engine::Resource textureHandle = Engine::Resource("Image", ROOT_ASSET_PATH / "Textures/Aegis_Jockey.bmp");
 		std::shared_ptr<Engine::Texture> sampleTexture = std::static_pointer_cast<Engine::Texture>(textureHandle.Get());
 
 		std::shared_ptr<Engine::Shader> vertexShader = std::static_pointer_cast<Engine::Shader>(vertexShaderSource.Get());
@@ -214,8 +197,6 @@ public:
 		Engine::Vector3 cameraPosition = this->camera->GetPosition();
 		Engine::Quaternion cameraRotation = this->camera->GetRotation();
 		Engine::Vector3 forwardVector = cameraRotation.RotateVector(Engine::Vector3(0, 0, -1));
-
-		Debug::Log(forwardVector);
 		
 
 		// Prevent roll by separating yaw and pitch rotations in the multiplication order.
@@ -268,8 +249,8 @@ public:
 		//CE_PROFILE_FUNC(UpdateLoop);
 		std::shared_ptr<Engine::Window> window = this->window.lock();
 
-		manager.UpdateSystems();
-		auto transform = manager.GetComponent<SpatialComponent>(player);
+		this->physicsSystem.Update();
+		SpatialComponent* transform = this->componentScene.GetComponent<SpatialComponent>(player);
 
 		this->camera->SetAspectRatio(window->GetAspectRatio());
 
