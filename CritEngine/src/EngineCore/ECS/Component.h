@@ -3,9 +3,7 @@
 #include "../Core/Base.h"
 
 namespace ECS {
-    struct Component {
-        double hi;
-    };
+    struct Component {};
 
     static int componentIdCounter = 0;
     template <class T>
