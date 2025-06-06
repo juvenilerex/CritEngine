@@ -21,6 +21,14 @@ namespace Engine {
 	};
 	*/
 
+	static int eventIdCounter = 0;
+	template <class T>
+	int GetId()
+	{
+		static int eventId = eventIdCounter++;
+		return eventId;
+	};
+
 	template<typename Tuple>
 	struct tuple_to_function;
 
@@ -43,11 +51,6 @@ namespace Engine {
 		using Signature = tuple_cat_t<Sig, std::conditional_t<std::is_void_v<DerivedParent>, std::tuple<>, typename DerivedParent::Signature>>;
 		using FunctionType = typename tuple_to_function<Signature>::type;
 
-		inline static uintptr_t ID()
-		{
-			static int unique = 0;
-			return (uintptr_t)&unique;
-		}
 	};
 
 	template<typename Sig>
@@ -56,11 +59,6 @@ namespace Engine {
 		using Signature = Sig;
 		using FunctionType = typename tuple_to_function<Sig>::type;
 
-		inline static uintptr_t ID()
-		{
-			static int unique = 0;
-			return (uintptr_t)&unique;
-		}
 	};
 
 	struct AnyEvent : Event<std::tuple<>> {};
@@ -72,13 +70,13 @@ namespace Engine {
 		template<typename DerivedEvent>
 		void AddListener(typename DerivedEvent::FunctionType eventHandler)
 		{
-			const uintptr_t eventType = DerivedEvent::ID();
+			const uintptr_t eventId = GetId<DerivedEvent>();
 
 			std::function<void(std::vector<std::any>)> storedCallback = [this, eventHandler](const std::vector<std::any>& args)
 			{
 				this->unpack_and_call(eventHandler, args);
 			};
-			this->listeners[eventType].push_back(storedCallback);
+			this->listeners[eventId].push_back(storedCallback);
 		};
 
 		template<typename DerivedEvent, typename... Args>
@@ -87,12 +85,12 @@ namespace Engine {
 		>::type
 		Emit(Args&&... args)
 		{
-			const uintptr_t eventType = DerivedEvent::ID();
+			const uintptr_t eventId = GetId<DerivedEvent>();
 			const std::vector<std::any> packedArgs = this->to_any_vector(args...);
 
-			for (int i = 0; i < this->listeners[eventType].size(); i++)
+			for (int i = 0; i < this->listeners[eventId].size(); i++)
 			{
-				this->listeners[eventType][i](packedArgs);
+				this->listeners[eventId][i](packedArgs);
 			}
 		}
 
