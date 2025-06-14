@@ -128,20 +128,28 @@ public:
 
 		this->material = Engine::Material::Create(vertexShader, fragmentShader, {sampleTexture});
 
+		//Cube
+
+		Engine::Resource cubeSource = Engine::Resource("Mesh", ROOT_ASSET_PATH / "Meshes/AegisSphere.obj");
+		std::shared_ptr<Engine::Mesh> cubeMesh = std::static_pointer_cast<Engine::Mesh>(cubeSource.Get());
+		cubeMesh->SetMaterial(this->material);
+
+		this->cubeModel = std::make_shared<Engine::Model>(cubeMesh);
+
 		//Spinny
 
 		float squareVertices[4 * 9] = {
-			-0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-			 0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-			 0.8f,  0.8f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-			-0.8f,  0.8f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f
+			-0.8f, -0.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+			 0.8f, -0.8f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			 0.8f,  0.8f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+			-0.8f,  0.8f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> squareVB = Engine::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 		squareVB->SetLayout({
 			{Engine::ShaderDataType::Float3, "aPos"},
-			{Engine::ShaderDataType::Float4, "aColor"},
 			{Engine::ShaderDataType::Float2, "aTexUV"},
+			{Engine::ShaderDataType::Float4, "aColor"},
 		});
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
@@ -157,17 +165,17 @@ public:
 		// Floor
 
 		float floorVertices[4 * 9] = {
-			-50.0f, 0.0f,-50.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-			 50.0f, 0.0f,-50.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-			 50.0f, 0.0f, 50.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-			-50.0f, 0.0f, 50.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f
+			-50.0f, 0.0f,-50.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+			 50.0f, 0.0f,-50.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			 50.0f, 0.0f, 50.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+			-50.0f, 0.0f, 50.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> floorVB = Engine::VertexBuffer::Create(floorVertices, sizeof(floorVertices));
 		floorVB->SetLayout({
 			{Engine::ShaderDataType::Float3, "aPos"},
-			{Engine::ShaderDataType::Float4, "aColor"},
 			{Engine::ShaderDataType::Float2, "aTexUV"},
+			{Engine::ShaderDataType::Float4, "aColor"},
 		});
 
 		uint32_t floorIndices[6] = { 0, 1, 2, 2, 3, 0 };
@@ -257,7 +265,7 @@ public:
 		//ImGui::Begin("Debug Window");
 		//ImGui::Text("TransformComponent Position: %f, %f, %f", transform->position.x, transform->position.y, transform->position.z);
 		//ImGui::End();
-		this->squareModel->SetProjection(transform->GetMatrix());
+		this->cubeModel->SetProjection(transform->GetMatrix());
 
 		
 		Engine::RenderCommand::Clear();
@@ -265,7 +273,8 @@ public:
 		Engine::Renderer::BeginScene(this->camera);
 
 		Engine::Renderer::Submit(this->floorModel);
-		Engine::Renderer::Submit(this->squareModel);
+		//Engine::Renderer::Submit(this->squareModel);
+		Engine::Renderer::Submit(this->cubeModel);
 		
 		Engine::Renderer::EndScene();
 	}
@@ -282,6 +291,7 @@ private:
 	std::shared_ptr<Engine::Material> material;
 	std::shared_ptr<Engine::Model> squareModel;
 	std::shared_ptr<Engine::Model> floorModel;
+	std::shared_ptr<Engine::Model> cubeModel;
 	std::shared_ptr<Engine::PerspectiveCamera> camera;
 	Engine::Vector2 prevCursorPos;
 };

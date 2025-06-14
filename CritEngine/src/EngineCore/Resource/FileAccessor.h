@@ -44,6 +44,8 @@ namespace Engine {
         int32_t ReadINT32();
         int64_t ReadINT64();
 
+        std::string ReadLine(char delimiter = '\n');
+
         const uint64_t GetPosition();
         uint64_t GetSize();
         bool IsAtEof() const;

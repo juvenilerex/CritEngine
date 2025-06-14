@@ -157,6 +157,25 @@ namespace Engine {
         return value;
     }
 
+    std::string FileAccessor::ReadLine(char delimiter)
+    {
+        std::string output = "";
+
+        int iter = this->buffer.size() - this->position;
+        for (int i = 0; i < iter; i++)
+        {
+            char value = static_cast<char>(*(this->buffer.data() + this->position));
+            if (value == delimiter)
+            {
+                this->position += sizeof(char);
+                break;
+            }
+            output += value;
+            this->position += sizeof(char);
+        }
+        return output;
+    }
+
     bool FileAccessor::CheckReadBounds(uint64_t size) const {
         if (this->position < 0 || this->position + size > this->buffer.size())
         {

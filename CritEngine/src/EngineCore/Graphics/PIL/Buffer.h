@@ -80,6 +80,12 @@ namespace Engine {
 			CalculateOffsetsAndStride();
 		}
 
+		BufferLayout(const std::vector<BufferElement>& element)
+			: elements(element)
+		{
+			CalculateOffsetsAndStride();
+		}
+
 		inline std::vector<BufferElement> GetElements() const { return this->elements; }
 		inline uint32_t GetStride() const { return this->stride; }
 

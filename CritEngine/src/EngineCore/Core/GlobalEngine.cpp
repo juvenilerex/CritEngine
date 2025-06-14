@@ -2,6 +2,7 @@
 
 #include "../Resource/Loaders/BitmapLoader.h"
 #include "../Resource/Loaders/GLSLShaderLoader.h"
+#include "../Resource/Loaders/ObjLoader.h"
 
 namespace Engine {
 
@@ -15,6 +16,7 @@ namespace Engine {
 		engine->resourceManager = ResourceManager();
 		engine->resourceManager.RegisterLoader(std::make_unique<GLSLShaderLoader>());
 		engine->resourceManager.RegisterLoader(std::make_unique<BitmapLoader>());
+		engine->resourceManager.RegisterLoader(std::make_unique<ObjLoader>());
 
 		engine->windowManager = WindowManager();
 
