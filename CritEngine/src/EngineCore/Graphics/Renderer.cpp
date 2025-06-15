@@ -14,13 +14,23 @@ namespace Engine {
 
 	}
 
-	void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray)
+	void Renderer::Submit(const std::shared_ptr<Model>& model)
 	{
-		shader->Bind();
-		shader->UploadUniformMat4("uViewProjection", Scene::GetActiveScene()->viewProjectionMatrix);
-		shader->UploadUniformMat4("uPerspectiveProjection", Scene::GetActiveScene()->perspectiveProjectionMatrix);
-		shader->UploadUniformMat4("uViewPerspectiveProjection", Scene::GetActiveScene()->viewPerspectiveProjectionMatrix);
-		vertexArray->Bind();
-		RenderCommand::DrawIndexed(vertexArray);
+		std::shared_ptr<Mesh> mesh = model->GetMesh();
+		std::shared_ptr<Pipeline> program = InternalMaterialAccessor::GetPipeline(mesh->GetMaterial());
+		program->Bind();
+		program->UploadUniformMat4("uViewProjection", Scene::GetActiveScene()->viewProjectionMatrix);
+		program->UploadUniformMat4("uPerspectiveProjection", Scene::GetActiveScene()->perspectiveProjectionMatrix);
+		program->UploadUniformMat4("uViewPerspectiveProjection", Scene::GetActiveScene()->viewPerspectiveProjectionMatrix);
+		program->UploadUniformMat4("uModelProjection", model->GetModelProjection());
+
+		std::vector<std::shared_ptr<Texture>> textures = InternalMaterialAccessor::GetTextures(mesh->GetMaterial());
+		for (int i = 0; i < textures.size(); i++)
+		{
+			textures[i]->Bind(i);
+		}
+
+		InternalMeshAccessor::Bind(mesh);
+		RenderCommand::DrawIndexed(mesh);
 	}
 }

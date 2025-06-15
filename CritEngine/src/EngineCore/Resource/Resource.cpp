@@ -16,7 +16,7 @@ namespace Engine {
 
 	Resource::~Resource() {}
 
-	std::shared_ptr<void> Resource::Get()
+	std::shared_ptr<void> Resource::Get() const
 	{
 		return GlobalEngine::Get().GetResourceManager().GetResourceData(*this);
 	};

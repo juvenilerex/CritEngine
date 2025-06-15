@@ -1,3 +1,6 @@
+local DependencyFetcher = require "dependency_fetcher" 
+DependencyFetcher.Setup()  -- Check and fetch dependencies before anything else
+
 workspace "CritEngine"
 	architecture "x64"
 	startproject "Sandbox"
@@ -57,10 +60,10 @@ project "CritEngine"
 		defines "CE_RELEASE"
 		optimize "On"
 
-	include "CritEngine/thirdparty/libs/glfw.lua"
-	include "CritEngine/thirdparty/libs/glad.lua"
-	include "CritEngine/thirdparty/libs/glm.lua"
-	include "CritEngine/thirdparty/libs/imgui.lua"
+	include "CritEngine/thirdparty/glfw.lua"
+	include "CritEngine/thirdparty/glad.lua"
+	include "CritEngine/thirdparty/glm.lua"
+	include "CritEngine/thirdparty/imgui.lua"
 
 project "Sandbox"
 	location "Sandbox"
@@ -78,17 +81,16 @@ project "Sandbox"
 		"%{prj.name}/src/**.cpp"
 	}
 
-
-
 	includedirs 
 	{
 		"%{wks.location}/CritEngine/src",
-		"CritEngine/thirdparty/libs/glm/"
+		"CritEngine/thirdparty/libs/glm/",
+		"CritEngine/thirdparty/libs/imgui/"
 	}
 	
 	links 
 	{
-		"CritEngine", "GLM"
+		"CritEngine", "GLM", "ImGui"
 	}
 
 	filter "system:windows"
