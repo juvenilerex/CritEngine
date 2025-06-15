@@ -5,7 +5,7 @@
 
 #include "../Core/Base.h"
 
-const ENGINE_API unsigned int GetThreadCountEstimate();
+ENGINE_API unsigned int GetThreadCountEstimate();
 
 namespace Engine {
 

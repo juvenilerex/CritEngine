@@ -7,6 +7,7 @@
 #include <chrono>
 #include <sstream>
 #include <utility>
+#include <time.h>
 
 #include "../Core/Base.h"
 

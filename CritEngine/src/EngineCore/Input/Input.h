@@ -90,8 +90,8 @@ namespace Engine {
 
         EventEmitter eventEmitter;
 
-        unsigned int frameCount = 0;
-		GLFWwindow* windowHandle;
+        //unsigned int frameCount = 0;
+		//GLFWwindow* windowHandle;
 
         static std::unordered_map<int, bool> ButtonStates;
         static std::unordered_map<int, bool> ButtonReleased;

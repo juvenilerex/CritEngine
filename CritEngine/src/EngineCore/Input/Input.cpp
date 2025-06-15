@@ -1,4 +1,3 @@
-#pragma once
 #include "Input.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -16,7 +15,7 @@ namespace Engine {
     Vector2 InputListener::PrevCurPos;
     bool InputListener::CurPosChanged = false;
 
-    InputListener::InputListener(GLFWwindow* windowHandle) : windowHandle(windowHandle), eventEmitter(EventEmitter()) {
+    InputListener::InputListener(GLFWwindow* windowHandle) : eventEmitter(EventEmitter()) {
         glfwSetKeyCallback(windowHandle, this->KeyCallback);
         glfwSetMouseButtonCallback(windowHandle, this->MouseButtonCallback);
         glfwSetCursorPosCallback(windowHandle, this->CursorPosCallback);

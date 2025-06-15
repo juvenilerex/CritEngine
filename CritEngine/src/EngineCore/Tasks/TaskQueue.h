@@ -15,10 +15,10 @@ namespace Engine
         ENGINE_API ~TaskQueue() = default;
 
         // Explicitly delete copy and move operations
-        ENGINE_API TaskQueue(const TaskQueue&) = delete;
-        ENGINE_API TaskQueue& operator=(const TaskQueue&) = delete;
-        ENGINE_API TaskQueue(TaskQueue&&) = delete;
-        ENGINE_API TaskQueue& operator=(TaskQueue&&) = delete;
+        TaskQueue(const TaskQueue&) = delete;
+        TaskQueue& operator=(const TaskQueue&) = delete;
+        TaskQueue(TaskQueue&&) = delete;
+        TaskQueue& operator=(TaskQueue&&) = delete;
 
         ENGINE_API void PushBack(const Task& task);
         ENGINE_API void PushFront(const Task& task);

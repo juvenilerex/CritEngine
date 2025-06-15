@@ -31,19 +31,20 @@ namespace Engine
         ENGINE_API long long GetSchedulerIdleThreadSleepTime();
 
     private:
-        // Default is 2ms, which feels like a good sweetspot for now
-        const long long WORKER_LOOP_WAIT_NANOSECONDS_DEFAULT = 2000000LL;
-        // If desiredTasks is zero in SubmitBatched(), this is the default multiplier for the number of tasks per..
-        // worker thread. This allows for better load balancing and more work-stealing. 
-        const unsigned int BATCH_SUBMIT_HUERISTIC_MULTIPLIER = 4;
-
-        long long idleSleepTime;
 
         void WorkerLoop(size_t threadIndex);
         bool TryStealTask(size_t thiefIndex, Task& outTask);
 
         size_t RandomIndex() const;
 
+        // Default is 2ms, which feels like a good sweetspot for now
+        const long long WORKER_LOOP_WAIT_NANOSECONDS_DEFAULT = 2000000LL;
+
+        // If desiredTasks is zero in SubmitBatched(), this is the default multiplier for the number of tasks per..
+        // worker thread. This allows for better load balancing and more work-stealing. 
+        const unsigned int BATCH_SUBMIT_HUERISTIC_MULTIPLIER = 4;
+
+        long long idleSleepTime;
         std::vector<std::unique_ptr<TaskQueue>> queues;
         std::vector<std::thread> threads;
         std::atomic<bool> stopFlag;

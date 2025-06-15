@@ -9,6 +9,8 @@ namespace Engine {
 	class RenderContext
 	{
 	public:
+		ENGINE_API virtual ~RenderContext() = default;
+
 		ENGINE_API static std::shared_ptr<RenderContext> Create(GLFWwindow* windowHandle);
 
 		virtual void Init() = 0;

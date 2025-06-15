@@ -63,7 +63,7 @@ namespace ECS {
 		template<typename T>
 		T* Assign(EntityID id)
 		{
-			int componentId = GetId<T>();
+			size_t componentId = GetId<T>();
 
 			if (this->componentPools.size() <= componentId)
 			{
@@ -120,7 +120,7 @@ namespace ECS {
 			{
 				// Unpack the template parameters into an initializer list
 				int componentIds[] = { 0, GetId<ComponentTypes>() ... };
-				for (int i = 1; i < (sizeof...(ComponentTypes) + 1); i++)
+				for (size_t i = 1; i < (sizeof...(ComponentTypes) + 1); i++)
 				{
 					this->componentMask.set(componentIds[i], true);
 				}
@@ -130,7 +130,7 @@ namespace ECS {
 		struct Iterator
 		{
 			Iterator(Scene* scene, EntityIndex index, ComponentMask mask, bool all)
-				: scene(scene), index(index), mask(mask), all(all)
+				: index(index), scene(scene), mask(mask), all(all)
 			{
 			}
 
@@ -175,7 +175,7 @@ namespace ECS {
 
 		const Iterator begin() const
 		{
-			int firstIndex = 0;
+			size_t firstIndex = 0;
 			while (firstIndex < this->scene->Size() &&
 				   (this->componentMask != (this->componentMask & this->scene->GetEntity(firstIndex).mask)
 				   || !EntityUtils::IsEntityValid(this->scene->GetEntity(firstIndex).id)))

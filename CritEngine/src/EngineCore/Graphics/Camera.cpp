@@ -14,7 +14,7 @@ namespace Engine {
 		Vector3 position,
 		Quaternion rotation
 	)
-		: verticalFOV(verticalFOV), aspectRatio(aspectRatio), nearPlane(nearPlane), farPlane(farPlane), position(position), rotation(rotation)
+		: rotation(rotation), position(position), verticalFOV(verticalFOV), aspectRatio(aspectRatio), nearPlane(nearPlane), farPlane(farPlane)
 	{
 		this->CalculatePerspectiveMatrix();
 		this->CalculateViewMatrix();
@@ -119,7 +119,7 @@ namespace Engine {
 		Vector3 position,
 		Quaternion rotation
 	)
-		: height(height), aspectRatio(aspectRatio), nearPlane(nearPlane), farPlane(farPlane), position(position), rotation(rotation)
+		: rotation(rotation), position(position), height(height), aspectRatio(aspectRatio), nearPlane(nearPlane), farPlane(farPlane)
 	{
 		this->CalculatePerspectiveMatrix();
 		this->CalculateViewMatrix();

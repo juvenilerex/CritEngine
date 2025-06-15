@@ -14,7 +14,8 @@ const std::string Debug::GetCurrentTimestamp()
 
 	// This is considered deprecated because it's not thread-safe, but the alternatives are not cross-platform and
 	// I don't think we need multithreading for this, so we can ignore the warning
-	std::tm local_time = *std::localtime(&time_now);
+	std::tm local_time;
+	localtime_s(&local_time, &time_now);
 
 	/* Regardless, this is how it would be done safely in Windows:
 	std::tm local_time;

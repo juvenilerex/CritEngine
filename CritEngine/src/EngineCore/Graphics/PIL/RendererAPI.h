@@ -26,6 +26,8 @@ namespace Engine {
 			GreaterOrEqual
 		};
 
+		ENGINE_API virtual ~RendererAPI() = default;
+
 		ENGINE_API static std::unique_ptr<RendererAPI> Create();
 
 		inline static API GetAPI() { return RendererAPI::api; }

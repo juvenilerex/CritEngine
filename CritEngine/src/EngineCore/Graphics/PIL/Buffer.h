@@ -14,6 +14,7 @@ namespace Engine {
 	{
 		switch (type)
 		{
+			case ShaderDataType::None:   ASSERT(false, "'None' is an Invalid ShaderDataType."); return 0;
 			case ShaderDataType::Float:  return 4;
 			case ShaderDataType::Float2: return 4 * 2;
 			case ShaderDataType::Float3: return 4 * 3;
@@ -42,7 +43,7 @@ namespace Engine {
 		bool normalized;
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-			: type(type), name(name), size(ShaderDataTypeSize(type)), offset(0), normalized(normalized)
+			: name(name), offset(0), size(ShaderDataTypeSize(type)), type(type), normalized(normalized)
 		{
 
 		};
@@ -51,6 +52,7 @@ namespace Engine {
 		{
 			switch (this->type)
 			{
+				case ShaderDataType::None: ASSERT(false, "'None' is an Invalid ShaderDataType."); return 0;
 				case ShaderDataType::Float:  return 1;
 				case ShaderDataType::Float2: return 2;
 				case ShaderDataType::Float3: return 3;

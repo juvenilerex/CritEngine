@@ -3,7 +3,7 @@
 namespace Engine {
 
     TaskScheduler::TaskScheduler(size_t threadCount)
-        : stopFlag(false), idleSleepTime(WORKER_LOOP_WAIT_NANOSECONDS_DEFAULT)
+        : idleSleepTime(WORKER_LOOP_WAIT_NANOSECONDS_DEFAULT), stopFlag(false)
     {
         ASSERT(threadCount > 0, "Thread count must be greater than zero");
 
