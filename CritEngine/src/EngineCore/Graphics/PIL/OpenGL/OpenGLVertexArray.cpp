@@ -7,6 +7,7 @@ namespace Engine {
 	{
 		switch (type)
 		{
+			case ShaderDataType::None: ASSERT(false, "'None' is an Invalid ShaderDataType."); return 0;
 			case ShaderDataType::Float:  return GL_FLOAT;
 			case ShaderDataType::Float2: return GL_FLOAT;
 			case ShaderDataType::Float3: return GL_FLOAT;
@@ -20,8 +21,8 @@ namespace Engine {
 			case ShaderDataType::Bool:   return GL_BOOL;
 		}
 
-		ASSERT(false, "Unknown ShaderDataType.")
-			return 0;
+		ASSERT(false, "Unknown ShaderDataType.");
+		return 0;
 	}
 
 	OpenGLVertexArray::OpenGLVertexArray()

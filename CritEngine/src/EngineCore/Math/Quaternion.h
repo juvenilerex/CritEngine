@@ -31,7 +31,7 @@ namespace Engine {
 		Quaternion Exp() const { return Quaternion::Exp(*this); }
 		Quaternion Conjugate() const { return Quaternion::Conjugate(*this); }
 		Quaternion Normalize() const { return Quaternion::Normalize(*this); }
-		Vector3 RotateVector(Vector3& vector) const { return Quaternion::RotateVector(*this, vector); }
+		Vector3 RotateVector(const Vector3& vector) const { return Quaternion::RotateVector(*this, vector); }
 		Vector3 ToEulerAngles() const { return Quaternion::ToEulerAngles(*this); }
 
 		// Operators

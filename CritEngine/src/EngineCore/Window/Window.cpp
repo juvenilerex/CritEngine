@@ -1,4 +1,3 @@
-#pragma once
 #include "Window.h"
 #include "../Core/GlobalEngine.h"
 
@@ -7,7 +6,7 @@
 namespace Engine {
 
 	Window::Window(const int width, const int height, const std::string& title)
-		: width(width), height(height), eventEmitter(EventEmitter())
+		: eventEmitter(EventEmitter()), width(width), height(height)
 	{
 		bool success = glfwInit();
 		ASSERT(success, "Failed to initialize GLFW!");

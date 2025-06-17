@@ -6,6 +6,9 @@ namespace Engine {
 
 	class OpenGLRendererAPI : public RendererAPI
 	{
+	public:
+		virtual ~OpenGLRendererAPI() override {};
+
 		virtual void SetClearColor(const glm::vec4& color) override;
 		virtual void Clear() override;
 

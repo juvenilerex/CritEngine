@@ -1,5 +1,3 @@
-#pragma once
-
 #include <cstdio>
 #include <functional>
 #include <iostream>
@@ -87,7 +85,7 @@ public:
 	ECS::Scene componentScene;
 	ECS::EntityID player;
   
-	void Sandbox::Initialize()
+	void Initialize()
 	{
 		CE_PROFILE_FUNC(SandboxInitialization);
 
@@ -202,11 +200,6 @@ public:
 		}
 		Engine::Vector2 velocity = (this->prevCursorPos - cursorPosition) / 1000.f;
 		
-		Engine::Vector3 cameraPosition = this->camera->GetPosition();
-		Engine::Quaternion cameraRotation = this->camera->GetRotation();
-		Engine::Vector3 forwardVector = cameraRotation.RotateVector(Engine::Vector3(0, 0, -1));
-		
-
 		// Prevent roll by separating yaw and pitch rotations in the multiplication order.
 		this->camera->SetRotation(Engine::Quaternion::FromEulerAngles(Engine::Vector3(velocity.y, 0, 0)) * this->camera->GetRotation() * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, velocity.x, 0)));
 		
@@ -220,7 +213,6 @@ public:
 		Engine::Quaternion cameraRotation = this->camera->GetRotation();
 		
 		Engine::Vector3 forwardVector = cameraRotation.RotateVector(Engine::Vector3(0, 0, -1));
-		Engine::Vector3 upVector = cameraRotation.RotateVector(Engine::Vector3(0, 1, 0));
 		Engine::Vector3 rightVector = cameraRotation.RotateVector(Engine::Vector3(1, 0, 0));
 		if (key == Keys::KeyMap[Keys::W])
 		{

@@ -8,6 +8,9 @@ namespace Engine {
 	class Pipeline
 	{
 	public:
+
+		ENGINE_API virtual ~Pipeline() = default;
+
 		ENGINE_API static std::shared_ptr<Pipeline> Create(std::shared_ptr<Engine::Shader> vertexShader, std::shared_ptr<Engine::Shader> fragmentShader);
 
 		virtual void Bind() const = 0;

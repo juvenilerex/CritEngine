@@ -14,7 +14,7 @@ namespace Engine {
 	public:
 
 		ENGINE_API Application();
-		ENGINE_API ~Application();
+		ENGINE_API virtual ~Application();
 
 		ENGINE_API void virtual Initialize();
 

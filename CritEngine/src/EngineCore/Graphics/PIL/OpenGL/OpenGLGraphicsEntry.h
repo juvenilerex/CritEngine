@@ -8,7 +8,7 @@ namespace Engine {
 	{
 
 		OpenGLGraphicsEntry();
-		~OpenGLGraphicsEntry();
+		virtual ~OpenGLGraphicsEntry() override {};
 
 		virtual void Init() override;
 

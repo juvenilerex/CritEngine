@@ -1,9 +1,24 @@
 local DependencyFetcher = require "dependency_fetcher" 
 DependencyFetcher.Setup()  -- Check and fetch dependencies before anything else
 
+newoption {
+   trigger = "toolchain",
+   value = "Toolchain",
+   description = "Choose which compiler toolchain to use.",
+   allowed = {
+      { "clang", "Clang" },
+      { "msc", "Microsoft Compiler (Windows only)" }
+   },
+   default = "msc"
+}
+
+outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+
 workspace "CritEngine"
 	architecture "x64"
 	startproject "Sandbox"
+	toolset (_OPTIONS["toolchain"])
+	
 
 	configurations
 	{
@@ -11,8 +26,6 @@ workspace "CritEngine"
 		"ReleaseDev",
 		"Release"
 	}
-
-outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 project "CritEngine"
 	location "CritEngine"

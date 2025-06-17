@@ -1,4 +1,3 @@
-#pragma once
 #include "OpenGLBuffer.h"
 
 #include <glad/glad.h>

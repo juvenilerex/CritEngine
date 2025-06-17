@@ -32,7 +32,7 @@ namespace Engine {
     // If the value of the first byte is 1, we are in little endian since the least significant byte is stored first
     bool FileAccessor::IsSystemBigEndian() const {
         int val = 1;
-        return (!*(char*)&val == 1);
+        return (!(*(char*)&val == 1));
     }
 
     void FileAccessor::Seek(const uint64_t offset) {
@@ -46,7 +46,7 @@ namespace Engine {
         this->position = this->buffer.size();
     }
 
-    const uint64_t FileAccessor::GetPosition()
+    uint64_t FileAccessor::GetPosition()
     {
         return this->position;
     }

@@ -1,4 +1,3 @@
-#pragma once
 #include "OpenGLContext.h"
 
 #include <glad/glad.h>

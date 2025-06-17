@@ -7,7 +7,7 @@ namespace Engine {
 	{
 	public:
 		OpenGLPipeline(std::shared_ptr<Engine::Shader> vertexShader, std::shared_ptr<Engine::Shader> fragmentShader);
-		~OpenGLPipeline();
+		ENGINE_API virtual ~OpenGLPipeline() override;
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;

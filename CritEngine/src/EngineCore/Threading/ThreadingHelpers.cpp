@@ -1,6 +1,6 @@
 #include "ThreadingHelpers.h"
 
-const unsigned int GetThreadCountEstimate()
+unsigned int GetThreadCountEstimate()
 {
     return std::thread::hardware_concurrency();
 }

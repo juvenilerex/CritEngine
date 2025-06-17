@@ -39,7 +39,8 @@ namespace Engine {
 		GLFWwindow* windowHandle = nullptr;
 		std::shared_ptr<InputListener> input = nullptr;
 		std::shared_ptr<RenderContext> renderContext = nullptr;
-		int width, height;
+		int width;
+		int height;
 		
 	};
 
