@@ -60,8 +60,8 @@ namespace Engine {
 		this->perspectiveMatrix = Matrix4f({
 			1 / (this->aspectRatio * tanFovY), 0, 0, 0,
 			0, 1 / tanFovY, 0, 0,
-			0, 0, (far + near) / (near + far), 1,
-			0, 0, (2 * far * near) / (near - far), 0
+			0, 0, -(far + near) / (far + near), -1,
+			0, 0, -(2 * far * near) / (far - near), 0
 		});
 
 		this->viewPerspectiveMatrix = this->perspectiveMatrix * this->viewMatrix;
