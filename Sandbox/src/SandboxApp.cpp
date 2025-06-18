@@ -163,10 +163,10 @@ public:
 		// Floor
 
 		float floorVertices[4 * 9] = {
-			-50.0f, 0.0f,-50.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-			 50.0f, 0.0f,-50.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			 50.0f, 0.0f, 50.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-			-50.0f, 0.0f, 50.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			-50.0f, 0.0f,-50.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+			 50.0f, 0.0f,-50.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			 50.0f, 0.0f, 50.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+			-50.0f, 0.0f, 50.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> floorVB = Engine::VertexBuffer::Create(floorVertices, sizeof(floorVertices));
@@ -198,7 +198,7 @@ public:
 		{
 			this->prevCursorPos = cursorPosition;
 		}
-		Engine::Vector2 velocity = (this->prevCursorPos - cursorPosition) / 1000.f;
+		Engine::Vector2 velocity = (cursorPosition - this->prevCursorPos) / 1000.f;
 		
 		// Prevent roll by separating yaw and pitch rotations in the multiplication order.
 		this->camera->SetRotation(Engine::Quaternion::FromEulerAngles(Engine::Vector3(velocity.y, 0, 0)) * this->camera->GetRotation() * Engine::Quaternion::FromEulerAngles(Engine::Vector3(0, velocity.x, 0)));
@@ -216,7 +216,7 @@ public:
 		Engine::Vector3 rightVector = cameraRotation.RotateVector(Engine::Vector3(1, 0, 0));
 		if (key == Keys::KeyMap[Keys::W])
 		{
-			cameraPosition = cameraPosition + (forwardVector * -0.1f);
+			cameraPosition = cameraPosition + (forwardVector * 0.1f);
 		}
 		if (key == Keys::KeyMap[Keys::A])
 		{
@@ -224,7 +224,7 @@ public:
 		}
 		if (key == Keys::KeyMap[Keys::S])
 		{
-			cameraPosition = cameraPosition + (forwardVector * 0.1f);
+			cameraPosition = cameraPosition + (forwardVector * -0.1f);
 		}
 		if (key == Keys::KeyMap[Keys::D])
 		{
