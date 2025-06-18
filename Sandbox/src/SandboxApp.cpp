@@ -85,7 +85,7 @@ public:
 	ECS::Scene componentScene;
 	ECS::EntityID player;
   
-	void Initialize()
+	void Initialize() override
 	{
 		CE_PROFILE_FUNC(SandboxInitialization);
 
@@ -111,9 +111,9 @@ public:
 
 		Engine::Scene::SetActiveScene(std::make_shared<Engine::Scene>());
 
-		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(-0.4f, 0.f, 0.f));
+		Engine::Quaternion camera_rot = Engine::Quaternion::FromEulerAngles(Engine::Vector3(0.4f, 0.f, 0.f));
 
-		this->camera.reset(new Engine::PerspectiveCamera(30, window->GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, -10), camera_rot));
+		this->camera.reset(new Engine::PerspectiveCamera(30, window->GetAspectRatio(), 0.01f, 100, Engine::Vector3(0, 1.25, 10), camera_rot));
 
 		Engine::Resource vertexShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.vertshader");
 		Engine::Resource fragmentShaderSource = Engine::Resource("Shader", ROOT_ASSET_PATH / "Shaders/shader.fragshader");
@@ -163,10 +163,10 @@ public:
 		// Floor
 
 		float floorVertices[4 * 9] = {
-			-50.0f, 0.0f,-50.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-			 50.0f, 0.0f,-50.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			 50.0f, 0.0f, 50.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-			-50.0f, 0.0f, 50.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			-50.0f, 0.0f,-50.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+			 50.0f, 0.0f,-50.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			 50.0f, 0.0f, 50.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+			-50.0f, 0.0f, 50.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> floorVB = Engine::VertexBuffer::Create(floorVertices, sizeof(floorVertices));
