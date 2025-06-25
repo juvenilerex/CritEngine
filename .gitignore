@@ -1,13 +1,77 @@
-bin
-bin-intermediate
-obj
-.vs
-*.vcxproj*
-*.sln
-*.vcxproj
-*.vcxproj.filters
-*.vcxproj.user
-/CritEngine/thirdparty/*
-!CritEngine/thirdparty/*.lua
-/CritEngine/thirdparty/*/
-Sandbox/imgui.ini
+# Ignore all files by default, but scan all directories
+*
+!*/
+
+# C/C++ source files
+!*.c
+!*.cc
+!*.cpp
+!*.cpp.template
+!*.h
+!*.h.template
+!*.hpp
+!*.inl
+!*.inc
+!*.m
+!*.mm
+!*.rc
+!*.rc2
+!*.def
+!*.manifest
+
+# C# source files
+!*.cs
+!*.cs.template
+!*.aspx
+!*.resx
+
+# Shader formats
+!*.usf
+!*.ush
+!*.hlsl
+!*.glsl
+!*.fragshader
+!*.vertshader
+
+# Text files
+!*.txt
+!*.md
+
+# Script files
+!*.bat
+!*.sh
+!*.pl
+!*.py
+!*.ps1
+!*.js
+!*.ts
+!*.tsx
+!*.command
+
+# Projects and premake
+!*.csproj
+!*.lua
+
+# Specific names
+!README
+!AUTHORS
+!LICENSE
+!FAQ
+!VERSION
+!ChangeLog
+!.gitignore
+
+# ThirdParty Executables
+!**/thirdparty/**/*.exe
+
+# Autogen Directories
+Intermediate/
+libs/
+obj/
+.vs/
+
+
+# Media Files
+!*.bmp
+!*.mtl
+!*.obj

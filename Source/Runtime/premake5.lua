@@ -1,24 +1,12 @@
 local DependencyFetcher = require "dependency_fetcher" 
 DependencyFetcher.Setup()  -- Check and fetch dependencies before anything else
 
-newoption {
-   trigger = "toolchain",
-   value = "Toolchain",
-   description = "Choose which compiler toolchain to use.",
-   allowed = {
-      { "clang", "Clang" },
-      { "msc", "Microsoft Compiler (Windows only)" }
-   },
-   default = "msc"
-}
-
-outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+outputDirectory = "../../Binaries/%{cfg.system}-%{cfg.architecture}/"
+intermediateDirectory = "../../Intermediate/%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
 workspace "CritEngine"
 	architecture "x64"
 	startproject "Sandbox"
-	toolset (_OPTIONS["toolchain"])
-	
 
 	configurations
 	{
@@ -32,8 +20,8 @@ project "CritEngine"
 	kind "SharedLib"
 	language "C++"
 	
-	targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
-	objdir ("bin-intermediate/" .. outputDirectory .. "/%{prj.name}")
+	targetdir (outputDirectory)
+	objdir (intermediateDirectory .. "%{prj.name}")
 	includedirs { "CritEngine/thirdparty/libs/glfw/include/", "CritEngine/thirdparty/libs/glad/include/", "CritEngine/thirdparty/libs/glm/", "CritEngine/thirdparty/libs/imgui/", "CritEngine/thirdparty/libs/imgui/examples"}
 
 	files
@@ -43,12 +31,6 @@ project "CritEngine"
 	}
 
 	links { "GLFW", "GLM", "GLAD", "ImGui" }
-
-	postbuildcommands 
-	{ 
-		"{MKDIR} ../bin/" .. outputDirectory .. "/Sandbox", -- Prevents the next command causing the dll being copied as a file named "Sandbox" in the parent directory.
-		"{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputDirectory .. "/Sandbox" 
-	}
 
 	filter "system:windows"
 		cppdialect "C++17"
@@ -84,8 +66,8 @@ project "Sandbox"
 	language "C++"
 	
 
-	targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
-	objdir ("bin-intermediate/" .. outputDirectory .. "/%{prj.name}")
+	targetdir (outputDirectory)
+	objdir (intermediateDirectory .. "%{prj.name}")
 	
 
 	files
